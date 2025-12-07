@@ -13,8 +13,9 @@ require_relative "jekyll-highlight-cards/expression_evaluator"
 require_relative "jekyll-highlight-cards/archive_helper"
 require_relative "jekyll-highlight-cards/template_renderer"
 
-# TODO: Require tags and hooks as they are implemented
-# require_relative "jekyll-highlight-cards/linkcard_tag"
+# Require tags and hooks
+require_relative "jekyll-highlight-cards/linkcard_tag"
+# TODO: Require remaining tags and hooks as they are implemented
 # require_relative "jekyll-highlight-cards/polaroid_tag"
 # require_relative "jekyll-highlight-cards/image_sizing_hooks"
 

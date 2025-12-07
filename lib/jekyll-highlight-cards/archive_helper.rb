@@ -10,12 +10,12 @@ module JekyllHighlightCards
     # Get archive URL for a given URL, with caching and optional submission
     #
     # @param url [String] the original URL to archive
-    # @return [String] the archive URL, or empty string if not found
+    # @return [String, nil] the archive URL, or nil if not found
     def archive_url_for(url)
       @@archive_cache[url] ||= begin
         log_info("Looking up archive for #{url}")
-        archive_url = lookup_archive(url) || ""
-        log_info("Archive URL: #{archive_url}")
+        archive_url = lookup_archive(url)
+        log_info("Archive URL: #{archive_url || ""}")
 
         if archive_save_enabled?
           log_info("Submitting to SavePageNow: #{url}")
@@ -23,11 +23,11 @@ module JekyllHighlightCards
           log_info("SavePageNow archived #{url} -> #{archive_url}")
         end
 
-        archive_url
+        archive_url.to_s.empty? ? nil : archive_url
       end
     rescue StandardError => e
       log_debug("Archive lookup failed for #{url}: #{e.message}")
-      ""
+      nil
     end
 
     # Check if archiving is enabled via environment variables

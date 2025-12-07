@@ -113,9 +113,9 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
           .to_return(status: 200, body: cdx_response_body, headers: { "Content-Type" => "application/json" })
       end
 
-      it "returns empty string" do
+      it "returns nil" do
         result = helper.archive_url_for(test_url)
-        expect(result).to eq("")
+        expect(result).to be_nil
       end
     end
 
@@ -157,9 +157,9 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
           .to_return(status: 500, body: "Internal Server Error")
       end
 
-      it "returns empty string" do
+      it "returns nil" do
         result = helper.archive_url_for(test_url)
-        expect(result).to eq("")
+        expect(result).to be_nil
       end
 
       it "does not raise an exception" do
@@ -195,9 +195,9 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
           .to_raise(SocketError.new("Failed to open TCP connection"))
       end
 
-      it "returns empty string" do
+      it "returns nil" do
         result = helper.archive_url_for(test_url)
-        expect(result).to eq("")
+        expect(result).to be_nil
       end
 
       it "does not raise an exception" do
