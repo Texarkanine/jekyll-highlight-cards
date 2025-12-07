@@ -1,0 +1,13 @@
+<blockquote class="link-card{% if archive_url %} link-card-with-archive{% endif %}">
+  {% if title %}
+  <h1>{{ escaped_title }}</h1>
+  {% endif %}
+  <a href="{{ escaped_url }}" target="_blank" rel="noopener">{{ escaped_display_url }}</a>
+  {% if archive_url %}
+  <small class="link-card-archive">
+    (<a href="{{ escaped_archive_url }}" target="_blank" rel="noopener">archive</a>)
+  </small>
+  {% endif %}
+</blockquote>
+
+
