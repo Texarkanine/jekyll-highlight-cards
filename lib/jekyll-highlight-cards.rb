@@ -15,8 +15,8 @@ require_relative "jekyll-highlight-cards/template_renderer"
 
 # Require tags and hooks
 require_relative "jekyll-highlight-cards/linkcard_tag"
-# TODO: Require remaining tags and hooks as they are implemented
-# require_relative "jekyll-highlight-cards/polaroid_tag"
+require_relative "jekyll-highlight-cards/polaroid_tag"
+# TODO: Require remaining hooks as they are implemented
 # require_relative "jekyll-highlight-cards/image_sizing_hooks"
 
 module JekyllHighlightCards
