@@ -4,13 +4,13 @@
 
 ### Prerequisites
 
-- Ruby 2.7 or higher
+- Ruby 3.1 or higher
 - Bundler
 
 ### Clone and Setup
 
 ```bash
-git clone https://github.com/yourusername/jekyll-highlight-cards.git
+git clone https://github.com/texarkanine/jekyll-highlight-cards.git
 cd jekyll-highlight-cards
 bundle install
 ```
@@ -60,7 +60,7 @@ This creates `jekyll-highlight-cards-VERSION.gem`.
 ### Installing Locally
 
 ```bash
-gem install ./jekyll-highlight-cards-0.1.0.gem
+gem install ./jekyll-highlight-cards-*.gem
 ```
 
 Or in a test Jekyll site's Gemfile:

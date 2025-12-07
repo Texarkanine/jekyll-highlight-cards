@@ -85,6 +85,55 @@ RSpec.describe JekyllHighlightCards::TemplateRenderer do
         expect(result).to eq(gem_template_path)
       end
     end
+
+    context "with invalid template names (path traversal protection)" do
+      let(:mock_site) { double("Jekyll::Site", source: "/test/site") }
+
+      it "rejects template names with path separators" do
+        expect {
+          renderer.find_template_path(mock_site, "../../../etc/passwd")
+        }.to raise_error(ArgumentError, /Invalid template name/)
+      end
+
+      it "rejects template names with dots" do
+        expect {
+          renderer.find_template_path(mock_site, "..password")
+        }.to raise_error(ArgumentError, /Invalid template name/)
+      end
+
+      it "rejects template names with slashes" do
+        expect {
+          renderer.find_template_path(mock_site, "subdir/template")
+        }.to raise_error(ArgumentError, /Invalid template name/)
+      end
+
+      it "rejects template names with special characters" do
+        expect {
+          renderer.find_template_path(mock_site, "temp@late")
+        }.to raise_error(ArgumentError, /Invalid template name/)
+      end
+
+      it "accepts valid template names with hyphens" do
+        allow(File).to receive(:exist?).and_return(false)
+        expect {
+          renderer.find_template_path(mock_site, "link-card")
+        }.not_to raise_error
+      end
+
+      it "accepts valid template names with underscores" do
+        allow(File).to receive(:exist?).and_return(false)
+        expect {
+          renderer.find_template_path(mock_site, "link_card")
+        }.not_to raise_error
+      end
+
+      it "accepts valid template names with numbers" do
+        allow(File).to receive(:exist?).and_return(false)
+        expect {
+          renderer.find_template_path(mock_site, "template123")
+        }.not_to raise_error
+      end
+    end
   end
 
   describe "#render_template" do
@@ -139,10 +188,10 @@ RSpec.describe JekyllHighlightCards::TemplateRenderer do
           .and_return(nil)
       end
 
-      it "raises an error" do
+      it "raises TemplateNotFoundError" do
         expect {
           renderer.render_template(mock_site, "nonexistent", {})
-        }.to raise_error("Template not found: nonexistent")
+        }.to raise_error(JekyllHighlightCards::TemplateNotFoundError, /Template not found: nonexistent/)
       end
     end
 
@@ -165,10 +214,10 @@ RSpec.describe JekyllHighlightCards::TemplateRenderer do
         FileUtils.rm_rf(temp_dir)
       end
 
-      it "raises Liquid::SyntaxError" do
+      it "raises TemplateRenderError with context" do
         expect {
           renderer.render_template(mock_site, "invalid", {})
-        }.to raise_error(Liquid::SyntaxError)
+        }.to raise_error(JekyllHighlightCards::TemplateRenderError, /Liquid error in template 'invalid'/)
       end
     end
 

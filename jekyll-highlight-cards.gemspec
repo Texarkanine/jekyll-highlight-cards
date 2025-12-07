@@ -5,16 +5,16 @@ require_relative "lib/jekyll-highlight-cards/version"
 Gem::Specification.new do |spec|
   spec.name          = "jekyll-highlight-cards"
   spec.version       = JekyllHighlightCards::VERSION
-  spec.authors       = ["Your Name"]
-  spec.email         = ["your.email@example.com"]
+  spec.authors       = ["Texarkanine"]
+  spec.email         = ["texarkanine@protonmail.com"]
 
   spec.summary       = "Jekyll plugin providing linkcard and polaroid Liquid tags with archive integration"
   spec.description   = "A Jekyll gem that provides two Liquid tags (linkcard and polaroid) for creating " \
                        "styled card components with integrated Internet Archive functionality and image sizing. " \
                        "Also includes Markdown image sizing hooks."
-  spec.homepage      = "https://github.com/yourusername/jekyll-highlight-cards"
-  spec.license       = "MIT"
-  spec.required_ruby_version = ">= 2.7.0"
+  spec.homepage      = "https://github.com/texarkanine/jekyll-highlight-cards"
+  spec.license       = "AGPL-3.0-or-later"
+  spec.required_ruby_version = ">= 3.1.0"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = spec.homepage
