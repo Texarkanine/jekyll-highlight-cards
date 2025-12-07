@@ -1,7 +1,16 @@
 # frozen_string_literal: true
 
 module JekyllHighlightCards
-  # Module for evaluating Liquid expressions and handling string values
+  # Evaluate Liquid expressions and handle string values
+  #
+  # Provides utilities for evaluating Liquid variables (e.g., `{{ page.title }}`)
+  # and processing string values with quote stripping and fallback behavior.
+  #
+  # @example Evaluate a Liquid variable
+  #   result = evaluate_expression("{{ page.title }}", context)
+  #
+  # @example Evaluate a quoted string
+  #   result = evaluate_expression('"My Title"', context)  #=> "My Title"
   module ExpressionEvaluator
     # Evaluate a token as a Liquid expression or literal string
     #

@@ -1,13 +1,25 @@
 # frozen_string_literal: true
 
 module JekyllHighlightCards
-  # Jekyll hooks for processing Markdown image sizing syntax
+  # Jekyll hooks for Markdown image sizing syntax
   #
-  # Processes Markdown images with dimension specifiers:
-  #   ![alt](image.jpg =300x200)
+  # Extends standard Markdown image syntax with dimension specifiers:
+  # `![alt](image.jpg =300x200)`
   #
-  # Pre-render: Converts syntax to HTML comment markers
-  # Post-render: Applies width/height attributes and auto-links sized images
+  # Automatically wraps sized images in links to themselves and applies
+  # width/height attributes. Skips images in code blocks.
+  #
+  # @example Basic sizing
+  #   ![Photo](image.jpg =300x200)
+  #
+  # @example Width only
+  #   ![Photo](image.jpg =400x)
+  #
+  # @example Height only
+  #   ![Photo](image.jpg =x300)
+  #
+  # @note Images inside code fences and inline code are not processed
+  # @note Sized images are automatically wrapped in <a> tags (if not already)
   module ImageSizingHooks
     extend DimensionParser
 

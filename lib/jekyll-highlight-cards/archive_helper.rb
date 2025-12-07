@@ -1,8 +1,17 @@
 # frozen_string_literal: true
 
 module JekyllHighlightCards
-  # Module for Internet Archive integration functionality
-  # Provides archive URL lookup, submission, and caching
+  # Internet Archive integration for automatic URL archival
+  #
+  # Provides methods for looking up existing archives and submitting
+  # URLs to the Internet Archive's Wayback Machine. Results are cached
+  # per-site-build to avoid redundant API calls.
+  #
+  # @example Enable archiving
+  #   export JEKYLL_HIGHLIGHT_CARDS_ARCHIVE=1
+  #
+  # @example Enable auto-submission
+  #   export JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE=1
   module ArchiveHelper
     # Shared cache for archive URLs across all tag instances
     @@archive_cache = {}

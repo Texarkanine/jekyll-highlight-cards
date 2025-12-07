@@ -1,8 +1,18 @@
 # frozen_string_literal: true
 
 module JekyllHighlightCards
-  # Module for parsing dimension specifications in "WxH" format
-  # Supports formats: WIDTHxHEIGHT, WIDTHx, xHEIGHT, WIDTH
+  # Parse dimension specifications in "WxH" format
+  #
+  # Supports multiple formats for specifying image dimensions:
+  # - `WIDTHxHEIGHT`: Both dimensions (e.g., "300x200")
+  # - `WIDTHx`: Width only (e.g., "300x")
+  # - `xHEIGHT`: Height only (e.g., "x200")
+  # - `WIDTH`: Width only shorthand (e.g., "300")
+  # - Units: Supports px, em, %, etc. (e.g., "400pxx300px")
+  #
+  # @example
+  #   include DimensionParser
+  #   width, height = parse_dimensions("300x200")  #=> ["300", "200"]
   module DimensionParser
     # Parse dimension string into width and height components
     #
