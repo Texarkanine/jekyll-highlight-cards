@@ -28,7 +28,7 @@ module JekyllHighlightCards
         idx = dim_str.index("xx")
         # Split at the second 'x' (include first 'x' in width, skip both 'x's for height)
         width = dim_str[0..idx].empty? ? nil : dim_str[0..idx]
-        height = dim_str[(idx + 2)..]
+        height = dim_str[idx+2..-1]
         height = nil if height.nil? || height.empty?
         [width, height]
       elsif dim_str =~ /x\d/ || dim_str =~ /(?<![a-z])x$/i || dim_str.start_with?("x")
@@ -50,3 +50,5 @@ module JekyllHighlightCards
     module_function :parse_dimensions
   end
 end
+
+

@@ -105,7 +105,7 @@ RSpec.describe JekyllHighlightCards::TemplateRenderer do
       before do
         FileUtils.mkdir_p(template_dir)
         File.write(template_path, test_template_content)
-
+        
         allow(renderer).to receive(:find_template_path)
           .with(mock_site, "test")
           .and_return(template_path)
@@ -117,7 +117,7 @@ RSpec.describe JekyllHighlightCards::TemplateRenderer do
 
       it "renders the template with variables" do
         result = renderer.render_template(mock_site, "test", variables)
-
+        
         expect(result).to include("Test Title")
         expect(result).to include("https://example.com")
         expect(result).to include("example.com")
@@ -126,7 +126,7 @@ RSpec.describe JekyllHighlightCards::TemplateRenderer do
 
       it "handles empty variables" do
         result = renderer.render_template(mock_site, "test", {})
-
+        
         expect(result).to include('<div class="test">')
         expect(result).not_to include("Test Title")
       end
@@ -140,9 +140,9 @@ RSpec.describe JekyllHighlightCards::TemplateRenderer do
       end
 
       it "raises an error" do
-        expect do
+        expect {
           renderer.render_template(mock_site, "nonexistent", {})
-        end.to raise_error("Template not found: nonexistent")
+        }.to raise_error("Template not found: nonexistent")
       end
     end
 
@@ -155,7 +155,7 @@ RSpec.describe JekyllHighlightCards::TemplateRenderer do
       before do
         FileUtils.mkdir_p(template_dir)
         File.write(template_path, invalid_template_content)
-
+        
         allow(renderer).to receive(:find_template_path)
           .with(mock_site, "invalid")
           .and_return(template_path)
@@ -166,9 +166,9 @@ RSpec.describe JekyllHighlightCards::TemplateRenderer do
       end
 
       it "raises Liquid::SyntaxError" do
-        expect do
+        expect {
           renderer.render_template(mock_site, "invalid", {})
-        end.to raise_error(Liquid::SyntaxError)
+        }.to raise_error(Liquid::SyntaxError)
       end
     end
 
@@ -194,7 +194,7 @@ RSpec.describe JekyllHighlightCards::TemplateRenderer do
       before do
         FileUtils.mkdir_p(template_dir)
         File.write(template_path, complex_template_content)
-
+        
         allow(renderer).to receive(:find_template_path)
           .with(mock_site, "complex")
           .and_return(template_path)
@@ -207,17 +207,19 @@ RSpec.describe JekyllHighlightCards::TemplateRenderer do
       it "handles conditionals with all variables present" do
         vars = variables.merge("archive_url" => "https://archive.org/test")
         result = renderer.render_template(mock_site, "complex", vars)
-
+        
         expect(result).to include("<h1>Test Title</h1>")
         expect(result).to include("https://archive.org/test")
       end
 
       it "handles conditionals with missing variables" do
         result = renderer.render_template(mock_site, "complex", variables)
-
+        
         expect(result).to include("<h1>Test Title</h1>")
         expect(result).not_to include("archive")
       end
     end
   end
 end
+
+
