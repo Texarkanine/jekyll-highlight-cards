@@ -1,5 +1,3 @@
----
----
 /*
  * jekyll-highlight-cards Default Styles
  *
@@ -10,7 +8,7 @@
  * 3. Using higher specificity selectors
  *
  * To use these styles, add to your site's _config.yml or main SCSS:
- *   @import "highlight-cards";
+ *   @use "highlight-cards";
  *
  * All styles use low specificity for easy customization.
  */
