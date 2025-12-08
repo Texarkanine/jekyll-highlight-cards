@@ -14,14 +14,18 @@ module JekyllHighlightCards
   #   export JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE=1
   module ArchiveHelper
     # Shared cache for archive URLs across all tag instances
-    @@archive_cache = {}
+    @archive_cache = {}
+
+    class << self
+      attr_accessor :archive_cache
+    end
 
     # Get archive URL for a given URL, with caching and optional submission
     #
     # @param url [String] the original URL to archive
     # @return [String, nil] the archive URL, or nil if not found
     def archive_url_for(url)
-      @@archive_cache[url] ||= begin
+      ArchiveHelper.archive_cache[url] ||= begin
         log_info("Looking up archive for #{url}")
         archive_url = lookup_archive(url)
         log_info("Archive URL: #{archive_url || ""}")

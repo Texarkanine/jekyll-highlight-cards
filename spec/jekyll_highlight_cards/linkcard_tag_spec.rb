@@ -3,14 +3,14 @@
 require "spec_helper"
 
 RSpec.describe JekyllHighlightCards::LinkcardTag do
-  let(:site) { instance_double("Jekyll::Site", source: "/test/site") }
+  let(:site) { instance_double(Jekyll::Site, source: "/test/site") }
   let(:registers) { { site: site } }
   let(:context) { Liquid::Context.new({}, {}, registers) }
   let(:template_path) { File.expand_path("../../_includes/highlight-cards/linkcard.html", __dir__) }
 
   # Clear archive cache and ENV before each test to ensure isolation
   before do
-    JekyllHighlightCards::ArchiveHelper.class_variable_set(:@@archive_cache, {})
+    JekyllHighlightCards::ArchiveHelper.instance_variable_set(:@archive_cache, {})
     allow(ENV).to receive(:[]).and_call_original
     # Stub any potential archive lookups with empty response (archiving disabled by default)
     stub_request(:get, %r{web\.archive\.org/cdx/search/cdx}).to_return(status: 404)
@@ -68,7 +68,11 @@ RSpec.describe JekyllHighlightCards::LinkcardTag do
         allow(ENV).to receive(:[]).and_call_original
         allow(ENV).to receive(:[]).with("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE").and_return("1")
         stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
-          .to_return(status: 200, body: [%w[timestamp original], ["20231201120000", "https://example.com"]].to_json, headers: { "Content-Type" => "application/json" })
+          .to_return(
+            status: 200,
+            body: [%w[timestamp original], ["20231201120000", "https://example.com"]].to_json,
+            headers: { "Content-Type" => "application/json" }
+          )
       end
 
       it "includes archive link when found" do
@@ -120,7 +124,7 @@ RSpec.describe JekyllHighlightCards::LinkcardTag do
 
     context "with variable for title" do
       it "evaluates the title variable" do
-        result = render_tag('https://example.com {{ page.title }}')
+        result = render_tag("https://example.com {{ page.title }}")
         expect(result).to include("My Page Title")
       end
     end
@@ -143,7 +147,7 @@ RSpec.describe JekyllHighlightCards::LinkcardTag do
 
   describe "HTML escaping" do
     it "escapes HTML in URL" do
-      result = render_tag('https://example.com?a=<script>alert(1)</script>')
+      result = render_tag("https://example.com?a=<script>alert(1)</script>")
       expect(result).to include("&lt;script&gt;")
       expect(result).not_to include("<script>alert(1)</script>")
     end
@@ -155,7 +159,7 @@ RSpec.describe JekyllHighlightCards::LinkcardTag do
     end
 
     it "escapes HTML in archive URL" do
-      result = render_tag('https://example.com archive:https://archive.org/<script>')
+      result = render_tag("https://example.com archive:https://archive.org/<script>")
       expect(result).to include("&lt;script&gt;")
     end
 
@@ -206,4 +210,3 @@ RSpec.describe JekyllHighlightCards::LinkcardTag do
     end
   end
 end
-
