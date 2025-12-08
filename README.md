@@ -35,7 +35,9 @@ bundle install
 
 ### Linkcard Tag
 
-Create styled link cards:
+Highlight links:
+
+![Linkcard visual example](doc/linkcard-example.jpg)
 
 ```liquid
 {% linkcard https://example.com %}
@@ -45,16 +47,12 @@ Create styled link cards:
 ```
 
 **Parameters:**
-- URL (required, first parameter)
-- Title (optional, everything after URL until `archive:`)
-- `archive:URL` - Explicit archive URL
-- `archive:none` - Disable archive lookup
-
-**With Liquid variables:**
-
-```liquid
-{% linkcard {{ page.url }} {{ page.title }} %}
-```
+| Parameter        | Description                                                      |
+|------------------|------------------------------------------------------------------|
+| URL              | (required, first parameter)                                      |
+| Title            | (optional, everything after URL until `archive:`)                |
+| `archive:URL`    | Explicit archive URL                                             |
+| `archive:none`   | Disable archive lookup                                           |
 
 ### Polaroid Tag
 
@@ -71,12 +69,14 @@ Create polaroid-style image cards:
 ```
 
 **Parameters:**
-- Image URL (required, first parameter)
-- `size=WxH` - Image dimensions (formats: `300x200`, `300x`, `x200`, `300`, `400pxx300px`)
-- `alt="..."` - Alt text for image (for accessibility)
-- `title="..."` - Title text displayed below image (also used as alt fallback)
-- `link="..."` - Explicit URL to link to
-- `archive="..."` - Archive URL or `none` to disable
+| Parameter          | Description                                                                                              |
+|--------------------|----------------------------------------------------------------------------------------------------------|
+| Image URL          | (required, first parameter)                                                                              |
+| `size=WxH`         | Image dimensions. Formats: `300x200`, `300x`, `x200`, `300`, `400pxx300px`                               |
+| `alt="..."`        | Alt text for image (for accessibility)                                                                   |
+| `title="..."`      | Title text displayed below image (also used as alt fallback)                                             |
+| `link="..."`       | Explicit URL to link to                                                                                  |
+| `archive="..."`    | Archive URL or `none` to disable                                                                         |
 
 **Image Alt Text:**
 The `alt` attribute priority: explicit `alt` parameter → `title` parameter → empty string.
@@ -89,8 +89,6 @@ This allows you to:
 **Link Display:**
 - **No `link` parameter:** Image links to itself, no visible link text shown
 - **With `link` parameter:** Image and visible link text both point to the specified URL
-
-This keeps the display clean when showcasing images without external references.
 
 ### Markdown Image Sizing
 
@@ -124,25 +122,6 @@ export JEKYLL_HIGHLIGHT_CARDS_ARCHIVE=1
 
 ### CSS Styles
 
-**Option 1: Use default styles**
-
-Add to your main SCSS file:
-
-```scss
-@import "highlight-cards";
-```
-
-**Option 2: Custom styles only**
-
-Don't import the default styles. Define your own:
-
-```scss
-.link-card { /* your styles */ }
-.polaroid { /* your styles */ }
-```
-
-**Option 3: Override defaults**
-
 Import defaults and override specific properties:
 
 ```scss
@@ -153,9 +132,12 @@ Import defaults and override specific properties:
 }
 ```
 
+The default style are structural only - they create the shapes but don't set colors, fonts, etc.
+The recommended approach is to use the default styles and then add aesthetics to the provided classes.
+
 ### Template Customization
 
-Override templates by creating files in your Jekyll site:
+If the provided HTML structure doesn't work for you, you can override templates by creating files in your Jekyll site:
 
 **Linkcard template:**
 - Create `_includes/highlight-cards/linkcard.html`
