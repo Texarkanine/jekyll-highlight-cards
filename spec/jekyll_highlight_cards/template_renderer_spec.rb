@@ -22,7 +22,7 @@ RSpec.describe JekyllHighlightCards::TemplateRenderer do
   end
 
   describe "#find_template_path" do
-    let(:mock_site) { double("Jekyll::Site", source: "/test/site") }
+    let(:mock_site) { instance_double(Jekyll::Site, source: "/test/site") }
 
     context "when user override exists" do
       before do
@@ -39,7 +39,7 @@ RSpec.describe JekyllHighlightCards::TemplateRenderer do
     end
 
     context "when only gem default exists" do
-      let(:gem_root) { File.expand_path("..", __dir__) }
+      let(:gem_root) { File.expand_path("../..", __dir__) }
       let(:gem_template_path) { File.join(gem_root, "_includes/highlight-cards/test.html") }
 
       before do
@@ -70,7 +70,7 @@ RSpec.describe JekyllHighlightCards::TemplateRenderer do
     end
 
     context "when site is nil" do
-      let(:gem_root) { File.expand_path("..", __dir__) }
+      let(:gem_root) { File.expand_path("../..", __dir__) }
       let(:gem_template_path) { File.join(gem_root, "_includes/highlight-cards/test.html") }
 
       before do
@@ -87,7 +87,7 @@ RSpec.describe JekyllHighlightCards::TemplateRenderer do
     end
 
     context "with invalid template names (path traversal protection)" do
-      let(:mock_site) { double("Jekyll::Site", source: "/test/site") }
+      let(:mock_site) { instance_double(Jekyll::Site, source: "/test/site") }
 
       it "rejects template names with path separators" do
         expect {
@@ -137,7 +137,7 @@ RSpec.describe JekyllHighlightCards::TemplateRenderer do
   end
 
   describe "#render_template" do
-    let(:mock_site) { double("Jekyll::Site", source: nil) }
+    let(:mock_site) { instance_double(Jekyll::Site, source: nil) }
     let(:variables) do
       {
         "title" => "Test Title",

@@ -5,7 +5,7 @@ require "spec_helper"
 RSpec.describe JekyllHighlightCards::ImageSizingHooks do
   # Create mock Jekyll document
   let(:mock_document) do
-    double("Jekyll::Document").tap do |doc|
+    instance_double(Jekyll::Document).tap do |doc|
       allow(doc).to receive(:content) { defined?(content) ? content : @content }
       allow(doc).to receive(:content=) { |new_content| @content = new_content }
       allow(doc).to receive(:output) { defined?(output) ? output : @output }

@@ -16,7 +16,7 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
 
   before do
     # Clear the cache before each test
-    described_class.class_variable_set(:@@archive_cache, {})
+    described_class.archive_cache = {}
 
     # Reset environment variables
     ENV.delete("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE")
