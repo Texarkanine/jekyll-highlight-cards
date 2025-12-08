@@ -43,12 +43,12 @@ module JekyllHighlightCards
 
         # Process the line to convert sized images
         processed_line = line.dup
-        
+
         # Match ![alt](src =dimensions) pattern
         # Use gsub with block to check each match
         processed_line.gsub!(/!\[([^\]]*)\]\(([^)]+)\s+=([^)]+)\)/) do |match|
           match_start = Regexp.last_match.begin(0)
-          
+
           # Skip if inside inline code
           if in_inline_code?(line, match_start)
             match
@@ -56,10 +56,10 @@ module JekyllHighlightCards
             alt = Regexp.last_match(1)
             src = Regexp.last_match(2).strip
             size = Regexp.last_match(3).strip
-            
+
             # Parse dimensions using DimensionParser
             width, height = parse_dimensions(size)
-            
+
             # Build marker comment
             "![#{alt}](#{src})<!-- IMG_SIZE:#{width}:#{height} -->"
           end
@@ -83,7 +83,7 @@ module JekyllHighlightCards
       output = output.dup
 
       # Match <img><!-- IMG_SIZE:W:H --> patterns
-      output.gsub!(%r{(<img\s+[^>]*>)\s*<!--\s*IMG_SIZE:([^:]*):([^:]*)\s*-->}) do
+      output.gsub!(/(<img\s+[^>]*>)\s*<!--\s*IMG_SIZE:([^:]*):([^:]*)\s*-->/) do
         img_tag = Regexp.last_match(1)
         width = Regexp.last_match(2).to_s.strip
         height = Regexp.last_match(3).to_s.strip
@@ -95,7 +95,7 @@ module JekyllHighlightCards
 
         # Add attributes to img tag
         modified_img = if attrs.any?
-                         img_tag.sub(/<img/, "<img #{attrs.join(' ')}")
+                         img_tag.sub("<img", "<img #{attrs.join(" ")}")
                        else
                          img_tag
                        end
@@ -105,10 +105,9 @@ module JekyllHighlightCards
 
         # Check if image is already in a link (look back in output)
         # Simple heuristic: check if there's an <a> tag before this image without a closing </a>
-        already_linked = false
         img_position = Regexp.last_match.begin(0)
         prefix = output[0...img_position]
-        
+
         # Count <a> and </a> tags before this image
         open_count = prefix.scan(/<a\s+/).length
         close_count = prefix.scan(%r{</a>}).length
@@ -147,7 +146,7 @@ module JekyllHighlightCards
 
       # Check if current line and previous lines are indented
       idx = line_idx
-      while idx > 0
+      while idx.positive?
         line = lines[idx]
         # If line starts with 4+ spaces or tab, it's indented code
         break unless line =~ /^(    |\t)/
@@ -184,4 +183,3 @@ end
 Jekyll::Hooks.register :documents, :post_render do |document|
   JekyllHighlightCards::ImageSizingHooks.process_post_render(document)
 end
-

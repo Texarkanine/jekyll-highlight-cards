@@ -101,11 +101,11 @@ module JekyllHighlightCards
         if char == "{" && !in_quotes
           in_liquid += 1
           current += char
-        elsif char == "}" && !in_quotes && in_liquid > 0
+        elsif char == "}" && !in_quotes && in_liquid.positive?
           in_liquid -= 1
           current += char
         # Track quote boundaries
-        elsif ['"', "'"].include?(char) && !in_quotes && in_liquid == 0
+        elsif ['"', "'"].include?(char) && !in_quotes && in_liquid.zero?
           in_quotes = true
           quote_char = char
           current += char
@@ -114,7 +114,7 @@ module JekyllHighlightCards
           current += char
           quote_char = nil
         # Split on whitespace only if not in quotes or Liquid expression
-        elsif char.match?(/\s/) && !in_quotes && in_liquid == 0
+        elsif char.match?(/\s/) && !in_quotes && in_liquid.zero?
           tokens << current unless current.empty?
           current = ""
         else
@@ -130,13 +130,13 @@ module JekyllHighlightCards
       # Parse remaining tokens as key=value pairs
       result = { image_url: image_url }
       tokens.each do |token|
-        if token =~ /^(\w+)=(.+)$/
-          key = Regexp.last_match(1).to_sym
-          value_token = Regexp.last_match(2)
+        next unless token =~ /^(\w+)=(.+)$/
 
-          # Evaluate value as Liquid expression
-          result[key] = evaluate_expression(value_token, context, allow_nil: true)
-        end
+        key = Regexp.last_match(1).to_sym
+        value_token = Regexp.last_match(2)
+
+        # Evaluate value as Liquid expression
+        result[key] = evaluate_expression(value_token, context, allow_nil: true)
       end
 
       result
@@ -206,4 +206,3 @@ end
 
 # Register the tag with Liquid
 Liquid::Template.register_tag("polaroid", JekyllHighlightCards::PolaroidTag)
-
