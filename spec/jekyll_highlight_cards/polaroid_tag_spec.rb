@@ -37,14 +37,14 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
       it "does not display image path as link text" do
         result = render_tag("/assets/photo.jpg")
         # Should not show the image filename as visible link text
-        expect(result).not_to match(/>\/assets\/photo\.jpg</i)
-        expect(result).not_to match(/>assets\/photo\.jpg</i)
+        expect(result).not_to match(%r{>/assets/photo\.jpg<}i)
+        expect(result).not_to match(%r{>assets/photo\.jpg<}i)
       end
     end
 
     context "with image and size" do
       it "applies width and height" do
-        result = render_tag('/assets/photo.jpg size=300x200')
+        result = render_tag("/assets/photo.jpg size=300x200")
         expect(result).to include('width="300"')
         expect(result).to include('height="200"')
       end
@@ -86,7 +86,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
   describe "size parameter" do
     context "with WIDTHxHEIGHT format" do
       it "applies both dimensions" do
-        result = render_tag('/photo.jpg size=300x200')
+        result = render_tag("/photo.jpg size=300x200")
         expect(result).to include('width="300"')
         expect(result).to include('height="200"')
       end
@@ -94,37 +94,37 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
 
     context "with WIDTHx format" do
       it "applies width only" do
-        result = render_tag('/photo.jpg size=300x')
+        result = render_tag("/photo.jpg size=300x")
         expect(result).to include('width="300"')
-        expect(result).not_to include('height=')
+        expect(result).not_to include("height=")
       end
     end
 
     context "with xHEIGHT format" do
       it "applies height only" do
-        result = render_tag('/photo.jpg size=x200')
-        expect(result).not_to include('width=')
+        result = render_tag("/photo.jpg size=x200")
+        expect(result).not_to include("width=")
         expect(result).to include('height="200"')
       end
     end
 
     context "with WIDTH format" do
       it "applies width only" do
-        result = render_tag('/photo.jpg size=400')
+        result = render_tag("/photo.jpg size=400")
         expect(result).to include('width="400"')
-        expect(result).not_to include('height=')
+        expect(result).not_to include("height=")
       end
     end
 
     context "with units" do
       it "handles px units with xx separator" do
-        result = render_tag('/photo.jpg size=400pxx300px')
+        result = render_tag("/photo.jpg size=400pxx300px")
         expect(result).to include('width="400px"')
         expect(result).to include('height="300px"')
       end
 
       it "handles percentage values" do
-        result = render_tag('/photo.jpg size=50%')
+        result = render_tag("/photo.jpg size=50%")
         expect(result).to include('width="50%"')
       end
     end
@@ -151,7 +151,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
       end
 
       it "has empty alt when neither alt nor title provided" do
-        result = render_tag('/photo.jpg')
+        result = render_tag("/photo.jpg")
         expect(result).to include('alt=""')
       end
     end
@@ -160,7 +160,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
       it "escapes HTML in alt attribute" do
         result = render_tag('/photo.jpg alt="Text with <script>alert(\'xss\')</script>"')
         expect(result).to include('alt="Text with &lt;script&gt;')
-        expect(result).not_to include('<script>')
+        expect(result).not_to include("<script>")
       end
     end
   end
@@ -185,7 +185,9 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
       before do
         allow(ENV).to receive(:[]).with("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE").and_return("1")
         stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
-          .to_return(status: 200, body: [%w[timestamp original], ["20231201120000", "https://example.com"]].to_json, headers: { "Content-Type" => "application/json" })
+          .to_return(status: 200, body: [%w[timestamp original],
+                                         ["20231201120000",
+                                          "https://example.com"]].to_json, headers: { "Content-Type" => "application/json" })
       end
 
       it "archives the link URL not the image URL" do
@@ -214,14 +216,14 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
 
     context "with variable for title" do
       it "evaluates the variable" do
-        result = render_tag('/photo.jpg title={{ page.title }}')
+        result = render_tag("/photo.jpg title={{ page.title }}")
         expect(result).to include("My Photo")
       end
     end
 
     context "with multiple variables" do
       it "evaluates all variables" do
-        result = render_tag('{{ page.image }} title={{ page.title }} link={{ page.link }}')
+        result = render_tag("{{ page.image }} title={{ page.title }} link={{ page.link }}")
         expect(result).to include("/assets/photo.jpg")
         expect(result).to include("My Photo")
         expect(result).to include("example.com")
@@ -231,7 +233,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
 
   describe "HTML escaping" do
     it "escapes HTML in image URL" do
-      result = render_tag('/photo.jpg?param=<script>')
+      result = render_tag("/photo.jpg?param=<script>")
       expect(result).to include("&lt;script&gt;")
       expect(result).not_to include("<script>")
     end
@@ -280,7 +282,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
     end
 
     it "does not show link display when no explicit link provided" do
-      result = render_tag('/photo.jpg')
+      result = render_tag("/photo.jpg")
       # Link section should show &nbsp; not the image path
       expect(result).to include('<div class="polaroid-link">')
       expect(result).to match(/polaroid-link[^>]*>\s*&nbsp;/i)
@@ -318,4 +320,3 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
     end
   end
 end
-
