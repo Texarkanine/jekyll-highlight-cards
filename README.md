@@ -74,11 +74,23 @@ Create polaroid-style image cards:
 - Image URL (required, first parameter)
 - `size=WxH` - Image dimensions (formats: `300x200`, `300x`, `x200`, `300`, `400pxx300px`)
 - `alt="..."` - Alt text for image (for accessibility)
-- `title="..."` - Title text (also used as alt fallback if alt not provided)
-- `link="..."` - Link URL (image links to this, displayed below title)
+- `title="..."` - Title text displayed below image (also used as alt fallback)
+- `link="..."` - Explicit URL to link to
 - `archive="..."` - Archive URL or `none` to disable
 
-**Alt text priority:** The `alt` attribute uses this priority: explicit `alt` parameter → `title` parameter → empty string. This allows you to set accessible alt text without displaying a visible title.
+**Image Alt Text:**
+The `alt` attribute priority: explicit `alt` parameter → `title` parameter → empty string.
+
+This allows you to:
+- Set accessible alt text without displaying a visible title
+- Use title as both visual label and screen reader description
+- Separate concerns: detailed alt for accessibility, brief title for display
+
+**Link Display:**
+- **No `link` parameter:** Image links to itself, no visible link text shown
+- **With `link` parameter:** Image and visible link text both point to the specified URL
+
+This keeps the display clean when showcasing images without external references.
 
 ### Markdown Image Sizing
 
