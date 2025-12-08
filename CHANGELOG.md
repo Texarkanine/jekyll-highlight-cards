@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v0.2.1...v0.2.2) (2025-12-08)
+
+
+### Bug Fixes
+
+* **ci:** something up w/ trusted publishing, make deployment env explicit...? ([f391a7e](https://github.com/Texarkanine/jekyll-highlight-cards/commit/f391a7e341730f80b7bbf1db21212c1c9511c4a6))
+
 ## [0.2.1](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v0.2.0...v0.2.1) (2025-12-08)
 
 
