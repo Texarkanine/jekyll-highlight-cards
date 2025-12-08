@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v0.2.3...v0.3.0) (2025-12-08)
+
+
+### Features
+
+* **polaroid:** Wrap Polaroids in a container to allow block or inline-block display ([#7](https://github.com/Texarkanine/jekyll-highlight-cards/issues/7)) ([9904795](https://github.com/Texarkanine/jekyll-highlight-cards/commit/990479582798b0741472e8555da09221c6cdd2e9))
+
 ## [0.2.3](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v0.2.2...v0.2.3) (2025-12-08)
 
 
