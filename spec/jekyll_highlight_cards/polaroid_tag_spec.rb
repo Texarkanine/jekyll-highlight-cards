@@ -3,13 +3,13 @@
 require "spec_helper"
 
 RSpec.describe JekyllHighlightCards::PolaroidTag do
-  let(:site) { instance_double("Jekyll::Site", source: "/test/site") }
+  let(:site) { instance_double(Jekyll::Site, source: "/test/site") }
   let(:registers) { { site: site } }
   let(:context) { Liquid::Context.new({}, {}, registers) }
 
   # Clear archive cache before each test to ensure isolation
   before do
-    JekyllHighlightCards::ArchiveHelper.class_variable_set(:@@archive_cache, {})
+    JekyllHighlightCards::ArchiveHelper.archive_cache = {}
     allow(ENV).to receive(:[]).and_call_original
     # Stub archive lookups by default (archiving disabled)
     stub_request(:get, %r{web\.archive\.org/cdx/search/cdx}).to_return(status: 404)
