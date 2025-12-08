@@ -34,9 +34,6 @@ jobs:
         id: release
         with:
           token: ${{ steps.generate-token.outputs.token }}
-          release-type: ruby
-          package-name: ${{ env.GEM_NAME }}
-          version-file: lib/${{ env.GEM_NAME }}/version.rb
 
       # Publish to rubygems if a release was created
       - uses: actions/checkout@v6
