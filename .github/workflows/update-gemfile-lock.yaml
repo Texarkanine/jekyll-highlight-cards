@@ -42,7 +42,7 @@ jobs:
           max_attempts: 3
           retry_wait_seconds: 5
           command: |
-            git config user.name "texarkanine-s-little-helper"
+            git config user.name "texarkanine-s-little-helper[bot]"
             git config user.email "texarkanine-s-little-helper[bot]@users.noreply.github.com"
             if ! git diff --quiet Gemfile.lock; then
               git pull --rebase origin ${{ github.head_ref }}
