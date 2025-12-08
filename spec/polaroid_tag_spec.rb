@@ -289,7 +289,8 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
     it "shows link display only when explicit link provided" do
       result = render_tag('/photo.jpg link="https://example.com"')
       expect(result).to include("example.com")
-      expect(result).not_to include("photo.jpg")
+      # Image path should only be in src attribute, not as visible link text
+      expect(result).not_to match(/polaroid-link[^>]*>[^<]*photo\.jpg/i)
     end
 
     it "handles multiline markup" do

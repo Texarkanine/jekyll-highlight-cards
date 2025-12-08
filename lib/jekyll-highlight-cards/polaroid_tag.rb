@@ -55,6 +55,8 @@ module JekyllHighlightCards
       width, height = parse_dimensions(params[:size]) if params[:size]
 
       # Determine link URL (defaults to image URL)
+      # Track if link was explicitly provided
+      explicit_link = !params[:link].nil? && !params[:link].empty?
       link_url = params[:link] || params[:image_url]
 
       # Resolve archive URL (archives the link URL, not the image)
@@ -68,6 +70,7 @@ module JekyllHighlightCards
         params[:title],
         params[:alt],
         link_url,
+        explicit_link,
         archive_url
       )
 
@@ -166,10 +169,12 @@ module JekyllHighlightCards
     # @param title [String, nil] the title text
     # @param alt [String, nil] the alt text for the image
     # @param link_url [String] the link URL
+    # @param explicit_link [Boolean] whether link was explicitly provided
     # @param archive_url [String, nil] the archive URL
     # @return [Hash] template variables with raw and escaped versions
-    def build_template_variables(image_url, width, height, title, alt, link_url, archive_url)
-      link_display = link_url ? strip_protocol(link_url) : nil
+    def build_template_variables(image_url, width, height, title, alt, link_url, explicit_link, archive_url)
+      # Only set link_display if link was explicitly provided (not defaulted to image)
+      link_display = explicit_link && link_url ? strip_protocol(link_url) : nil
 
       {
         "image_url" => image_url,
