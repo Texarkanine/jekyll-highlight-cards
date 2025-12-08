@@ -5,6 +5,7 @@
     "include-component-in-tag": false,
     "packages": {
         ".": {
+            "version-file": "lib/jekyll-highlight-cards/version.rb",
             "pull-request-header": ":service_dog: I have created a release \\*bark\\* \\*woof\\*"
         }
     }
