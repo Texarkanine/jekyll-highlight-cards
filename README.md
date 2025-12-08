@@ -37,7 +37,7 @@ bundle install
 
 Highlight links:
 
-![Linkcard visual example](doc/linkcard-example.jpg)
+![Linkcard visual example](docs/linkcard-example.jpg)
 
 ```liquid
 {% linkcard https://example.com %}
@@ -57,6 +57,8 @@ Highlight links:
 ### Polaroid Tag
 
 Create polaroid-style image cards:
+
+![Polaroid visual example](docs/polaroid-example.jpg)
 
 ```liquid
 {% polaroid /assets/image.jpg %}
@@ -89,6 +91,19 @@ This allows you to:
 **Link Display:**
 - **No `link` parameter:** Image links to itself, no visible link text shown
 - **With `link` parameter:** Image and visible link text both point to the specified URL
+
+**Stacking:**
+
+By default, the Polaroids are displayed centered in their available space. Two Polaroids in a row will be [stacked vertically](docs/polaroid-stacked-example.jpg).
+
+If you want Polaroids to fill the available width [side-by-side](docs/polaroid-sidebyside-example.jpg), add the following to your `main.scss` file:
+
+```css
+.polaroid-container {
+  display: inline-block;
+  width: auto;
+}
+```
 
 ### Markdown Image Sizing
 
