@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v0.2.0...v0.2.1) (2025-12-08)
+
+
+### Bug Fixes
+
+* **ci:** tests run w/ rspec directly, not rake ([e14f8ed](https://github.com/Texarkanine/jekyll-highlight-cards/commit/e14f8edb4e41e165c516970eddbfa6adba3d5832))
+
 ## [0.2.0](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v0.1.0...v0.2.0) (2025-12-08)
 
 
