@@ -90,13 +90,28 @@ module JekyllHighlightCards
     # @return [Hash] parsed parameters
     def parse_markup(markup, context)
       # Split by whitespace, keeping quoted strings and Liquid expressions together
+      # Handles escaped quotes (\") and backslashes (\\) within quoted strings
       tokens = []
       current = ""
       in_quotes = false
       quote_char = nil
       in_liquid = 0
+      escaped = false
 
       markup.each_char do |char|
+        # Handle escape sequences when in quotes
+        if escaped
+          current += char # Add the escaped character directly
+          escaped = false
+          next
+        end
+
+        # Check for escape character when in quotes
+        if char == "\\" && in_quotes
+          escaped = true
+          next # Don't add backslash to output, it's just the escape marker
+        end
+
         # Track Liquid expression boundaries
         if char == "{" && !in_quotes
           in_liquid += 1

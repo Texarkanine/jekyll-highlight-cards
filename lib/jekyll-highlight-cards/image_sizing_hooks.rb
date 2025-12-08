@@ -103,9 +103,13 @@ module JekyllHighlightCards
         # Extract src for auto-linking
         src = img_tag[/src=["']([^"']+)["']/, 1]
 
+        # Skip auto-linking if src is missing or malformed
+        if src.nil? || src.empty?
+          next modified_img
+        end
+
         # Check if image is already in a link (look back in output)
         # Simple heuristic: check if there's an <a> tag before this image without a closing </a>
-        already_linked = false
         img_position = Regexp.last_match.begin(0)
         prefix = output[0...img_position]
         
