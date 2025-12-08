@@ -202,4 +202,3 @@ RSpec.describe JekyllHighlightCards::ImageSizingHooks do
     end
   end
 end
-

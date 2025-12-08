@@ -123,6 +123,41 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
     end
   end
 
+  describe "alt attribute" do
+    context "with alt parameter provided" do
+      it "uses alt text for img alt attribute" do
+        result = render_tag('/photo.jpg alt="Description for screen readers"')
+        expect(result).to include('alt="Description for screen readers"')
+      end
+
+      it "uses alt even when title is also provided" do
+        result = render_tag('/photo.jpg alt="Alt text" title="Title text"')
+        expect(result).to include('alt="Alt text"')
+        expect(result).not_to include('alt="Title text"')
+      end
+    end
+
+    context "without alt parameter" do
+      it "uses title as alt fallback" do
+        result = render_tag('/photo.jpg title="My Photo"')
+        expect(result).to include('alt="My Photo"')
+      end
+
+      it "has empty alt when neither alt nor title provided" do
+        result = render_tag('/photo.jpg')
+        expect(result).to include('alt=""')
+      end
+    end
+
+    context "with HTML in alt text" do
+      it "escapes HTML in alt attribute" do
+        result = render_tag('/photo.jpg alt="Text with <script>alert(\'xss\')</script>"')
+        expect(result).to include('alt="Text with &lt;script&gt;')
+        expect(result).not_to include('<script>')
+      end
+    end
+  end
+
   describe "archive functionality" do
     context "with archive opt-out" do
       it "does not include archive link" do

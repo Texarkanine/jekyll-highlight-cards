@@ -4,18 +4,24 @@ module JekyllHighlightCards
   # Liquid tag for creating styled polaroid photo components
   #
   # Syntax:
-  #   {% polaroid IMAGE_URL [size=WxH] [title="..."] [link="..."] [archive="..."] %}
+  #   {% polaroid IMAGE_URL [size=WxH] [alt="..."] [title="..."] [link="..."] [archive="..."] %}
   #
   # Parameters:
   #   - IMAGE_URL (required): Path or URL to the image (can be Liquid expression)
   #   - size=WxH (optional): Image dimensions (e.g., size=300x200, size=400x, size=x300)
-  #   - title="..." (optional): Title text to display (can be Liquid expression)
+  #   - alt="..." (optional): Alt text for the image (can be Liquid expression)
+  #   - title="..." (optional): Title text to display (can be Liquid expression, also used as alt fallback)
   #   - link="..." (optional): URL to link to (can be Liquid expression)
   #   - archive="..." (optional): Archive URL or "none" to opt out
+  #
+  # Note: Alt text priority: alt parameter > title parameter > empty string
+  #       This allows setting alt text without a visible title for accessibility
   #
   # Examples:
   #   {% polaroid /assets/img/photo.jpg %}
   #   {% polaroid /img/photo.jpg size=300x200 title="My Photo" %}
+  #   {% polaroid /img/photo.jpg alt="Screen reader description" %}
+  #   {% polaroid /img/photo.jpg alt="Detailed alt" title="Short Title" %}
   #   {% polaroid {{ page.image }} size=x400 title={{ page.title }} %}
   #   {% polaroid /img.jpg link="https://example.com" archive="none" %}
   class PolaroidTag < Liquid::Tag
@@ -60,6 +66,7 @@ module JekyllHighlightCards
         width,
         height,
         params[:title],
+        params[:alt],
         link_url,
         archive_url
       )
@@ -157,16 +164,18 @@ module JekyllHighlightCards
     # @param width [String, nil] the image width
     # @param height [String, nil] the image height
     # @param title [String, nil] the title text
+    # @param alt [String, nil] the alt text for the image
     # @param link_url [String] the link URL
     # @param archive_url [String, nil] the archive URL
     # @return [Hash] template variables with raw and escaped versions
-    def build_template_variables(image_url, width, height, title, link_url, archive_url)
+    def build_template_variables(image_url, width, height, title, alt, link_url, archive_url)
       link_display = link_url ? strip_protocol(link_url) : nil
 
       {
         "image_url" => image_url,
         "link_url" => link_url,
         "title" => title,
+        "alt" => alt,
         "link_display" => link_display,
         "archive_url" => archive_url,
         "width" => width,
@@ -174,6 +183,7 @@ module JekyllHighlightCards
         "escaped_image_url" => CGI.escapeHTML(image_url),
         "escaped_link_url" => link_url ? CGI.escapeHTML(link_url) : nil,
         "escaped_title" => title && !title.empty? ? CGI.escapeHTML(title) : "&nbsp;",
+        "escaped_alt" => alt && !alt.empty? ? CGI.escapeHTML(alt) : "",
         "escaped_link_display" => link_display && !link_display.empty? ? CGI.escapeHTML(link_display) : "&nbsp;",
         "escaped_archive_url" => archive_url ? CGI.escapeHTML(archive_url) : nil
       }

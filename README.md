@@ -64,6 +64,8 @@ Create polaroid-style image cards:
 {% polaroid /assets/image.jpg %}
 {% polaroid /assets/image.jpg size=300x200 %}
 {% polaroid /assets/image.jpg size=400x title="My Photo" %}
+{% polaroid /assets/image.jpg alt="Screen reader description" %}
+{% polaroid /assets/image.jpg alt="Alt text" title="Visible Title" %}
 {% polaroid /assets/image.jpg title="Photo" link="https://example.com" %}
 {% polaroid {{ page.image }} size=x400 title={{ page.title }} %}
 ```
@@ -71,9 +73,12 @@ Create polaroid-style image cards:
 **Parameters:**
 - Image URL (required, first parameter)
 - `size=WxH` - Image dimensions (formats: `300x200`, `300x`, `x200`, `300`, `400pxx300px`)
-- `title="..."` - Title text
+- `alt="..."` - Alt text for image (for accessibility)
+- `title="..."` - Title text (also used as alt fallback if alt not provided)
 - `link="..."` - Link URL (image links to this, displayed below title)
 - `archive="..."` - Archive URL or `none` to disable
+
+**Alt text priority:** The `alt` attribute uses this priority: explicit `alt` parameter → `title` parameter → empty string. This allows you to set accessible alt text without displaying a visible title.
 
 ### Markdown Image Sizing
 

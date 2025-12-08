@@ -24,9 +24,4 @@ RSpec.configure do |config|
 
   # Mock external HTTP requests by default
   WebMock.disable_net_connect!(allow_localhost: true)
-
-  # Reset configuration before each test
-  config.before do
-    # Clear any cached data between tests
-  end
 end
