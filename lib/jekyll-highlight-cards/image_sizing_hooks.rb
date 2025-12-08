@@ -131,12 +131,32 @@ module JekyllHighlightCards
     # @param line_idx [Integer] the current line index
     # @return [Boolean] true if inside code fence
     def self.in_code_fence?(lines, line_idx)
+      # Check for fenced code blocks (backticks or tildes)
       fence_count = 0
       (0...line_idx).each do |i|
-        fence_count += 1 if lines[i] =~ /^```/
+        # Match both backtick and tilde fences
+        fence_count += 1 if lines[i] =~ /^(`{3,}|~{3,})/
       end
       # Odd count means we're inside a fence
-      fence_count.odd?
+      return true if fence_count.odd?
+
+      # Check for indented code blocks
+      # A line is in an indented code block if there's a contiguous run
+      # of indented lines (4+ spaces or tab) leading up to it
+      return false if line_idx.zero?
+
+      # Check if current line and previous lines are indented
+      idx = line_idx
+      while idx > 0
+        line = lines[idx]
+        # If line starts with 4+ spaces or tab, it's indented code
+        break unless line =~ /^(    |\t)/
+
+        idx -= 1
+      end
+
+      # If we found a contiguous run of indented lines reaching current line
+      idx < line_idx
     end
 
     # Check if text position is inside inline code
