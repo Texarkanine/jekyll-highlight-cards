@@ -83,9 +83,9 @@ RSpec.describe JekyllHighlightCards::LinkcardTag do
 
       it "caches the archive URL" do
         render_tag("https://example.com")
-        # Second call should use cache, not make another HTTP request
-        expect(WebMock).to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx}).once
         render_tag("https://example.com")
+        # Second call should have used cache, only one HTTP request made total
+        expect(WebMock).to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx}).once
       end
     end
 
