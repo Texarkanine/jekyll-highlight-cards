@@ -33,6 +33,13 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
         result = render_tag("/assets/photo.jpg")
         expect(result).to include('href="/assets/photo.jpg"')
       end
+
+      it "does not display image path as link text" do
+        result = render_tag("/assets/photo.jpg")
+        # Should not show the image filename as visible link text
+        expect(result).not_to match(/>\/assets\/photo\.jpg</i)
+        expect(result).not_to match(/>assets\/photo\.jpg</i)
+      end
     end
 
     context "with image and size" do
@@ -270,6 +277,19 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
       result = render_tag('/photo.jpg link=""')
       expect(result).to include("/photo.jpg")
       # Should render without errors
+    end
+
+    it "does not show link display when no explicit link provided" do
+      result = render_tag('/photo.jpg')
+      # Link section should show &nbsp; not the image path
+      expect(result).to include('<div class="polaroid-link">')
+      expect(result).to match(/polaroid-link[^>]*>\s*&nbsp;/i)
+    end
+
+    it "shows link display only when explicit link provided" do
+      result = render_tag('/photo.jpg link="https://example.com"')
+      expect(result).to include("example.com")
+      expect(result).not_to include("photo.jpg")
     end
 
     it "handles multiline markup" do
