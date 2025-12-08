@@ -21,7 +21,9 @@ env:
 jobs:
   release-please:
     runs-on: ubuntu-latest
-    environment: rubygems
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      version: ${{ steps.release.outputs.version }}
     steps:
       - name: Generate GitHub App Token
         id: generate-token
@@ -35,36 +37,34 @@ jobs:
         with:
           token: ${{ steps.generate-token.outputs.token }}
 
-      # Publish to rubygems if a release was created
+  publish-gem:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    runs-on: ubuntu-latest
+    environment: rubygems
+    steps:
       - uses: actions/checkout@v6
-        if: ${{ steps.release.outputs.release_created }}
 
       - name: Set up Ruby
-        if: ${{ steps.release.outputs.release_created }}
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
           bundler-cache: true
 
       - name: Run tests with coverage
-        if: ${{ steps.release.outputs.release_created }}
         run: bundle exec rake test
 
       - name: Upload coverage to Codecov
-        if: ${{ steps.release.outputs.release_created }}
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
 
       - name: Build gem
-        if: ${{ steps.release.outputs.release_created }}
         run: gem build ${{ env.GEM_NAME }}.gemspec
 
       - name: Configure RubyGems credentials
-        if: ${{ steps.release.outputs.release_created }}
         uses: rubygems/configure-rubygems-credentials@v1.0.0
 
       - name: Publish to RubyGems
-        if: ${{ steps.release.outputs.release_created }}
-        run: gem push ${{ env.GEM_NAME }}-${{ steps.release.outputs.version }}.gem
+        run: gem push ${{ env.GEM_NAME }}-${{ needs.release-please.outputs.version }}.gem
