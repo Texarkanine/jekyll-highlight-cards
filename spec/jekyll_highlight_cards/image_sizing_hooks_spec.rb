@@ -230,6 +230,31 @@ RSpec.describe JekyllHighlightCards::ImageSizingHooks do
         expect(@output).to include('height="200"')
       end
     end
+
+    context "with malformed img tag (missing src)" do
+      let(:output) { '<img alt="Alt"><!-- IMG_SIZE:300:200 -->' }
+
+      it "does not crash and applies dimensions" do
+        expect { described_class.process_post_render(mock_document) }.not_to raise_error
+        expect(@output).to include('width="300"')
+        expect(@output).to include('height="200"')
+      end
+
+      it "does not attempt to auto-link" do
+        described_class.process_post_render(mock_document)
+        # Should not wrap in <a> tag when src is missing
+        expect(@output).not_to include('<a href=')
+      end
+    end
+
+    context "with img tag with malformed src attribute" do
+      let(:output) { '<img src=><!-- IMG_SIZE:300:200 -->' }
+
+      it "does not crash" do
+        expect { described_class.process_post_render(mock_document) }.not_to raise_error
+        expect(@output).to include('width="300"')
+      end
+    end
   end
 
   describe "integration" do

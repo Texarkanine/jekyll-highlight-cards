@@ -299,6 +299,23 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
       expect(result).to include("Test")
       expect(result).to include('width="300"')
     end
+
+    it "handles escaped quotes in title" do
+      result = render_tag('/photo.jpg title="Photo with \\" quote"')
+      # Quote should be HTML-escaped in output
+      expect(result).to include("Photo with &quot; quote")
+    end
+
+    it "handles escaped backslash in title" do
+      result = render_tag('/photo.jpg title="Photo with \\\\ backslash"')
+      expect(result).to include("Photo with \\ backslash")
+    end
+
+    it "handles complex escapes in title" do
+      result = render_tag('/photo.jpg title="Complex: \\" and \\\\"')
+      # Quote HTML-escaped, backslash literal
+      expect(result).to include("Complex: &quot; and \\")
+    end
   end
 end
 
