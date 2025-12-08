@@ -37,23 +37,21 @@ require_relative "jekyll-highlight-cards/image_sizing_hooks"
 #
 # @see README.md Full usage documentation
 module JekyllHighlightCards
-  # Main gem module - provides Liquid tags and hooks for Jekyll
 
+  # 1. Define the path to SCSS files relative to this Ruby file
+  SASS_PATH = File.join(File.dirname(__FILE__), "../_sass")
+
+  # 2. Register a hook to run after Jekyll initializes
   Jekyll::Hooks.register :site, :after_init do |site|
-    plugin_sass_path = File.expand_path("../assets/stylesheets", __FILE__)
+    
+    # Ensure the 'sass' and 'load_paths' config keys exist
+    site.config["sass"] ||= {}
+    site.config["sass"]["load_paths"] ||= []
 
-    # 2. Access the current sass_dir configuration
-    current_sass_dirs = site.config["sass_dir"]
-
-    # 3. Append our scss path
-    if current_sass_dirs.is_a?(Array)
-      current_sass_dirs << plugin_sass_path
-    elsif current_sass_dirs.is_a?(String)
-      site.config["sass_dir"] = [current_sass_dirs, plugin_sass_path]
-    else
-      # If sass_dir wasn't set at all, initialize it with our path
-      site.config["sass_dir"] = [plugin_sass_path]
-    end
+    # 3. Append your plugin's path to the load_paths array
+    # We check first to avoid adding it multiple times (e.g. in watch mode)
+    unless site.config["sass"]["load_paths"].include?(SASS_PATH)
+      site.config["sass"]["load_paths"] << SASS_PATH
+    end      
   end
-
 end

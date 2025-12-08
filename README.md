@@ -31,6 +31,12 @@ Run:
 bundle install
 ```
 
+Add to your `main.scss` file:
+
+```scss
+@import "highlight-cards";
+```
+
 ## Usage
 
 ### Linkcard Tag
