@@ -23,9 +23,9 @@ module JekyllHighlightCards
       raise TemplateNotFoundError, "Template not found: #{template_name}" if template_path.nil?
 
       begin
-      template_content = File.read(template_path)
-      template = Liquid::Template.parse(template_content)
-      template.render(variables)
+        template_content = File.read(template_path)
+        template = Liquid::Template.parse(template_content)
+        template.render(variables)
       rescue Errno::ENOENT, Errno::EACCES => e
         raise TemplateRenderError, "Failed to read template '#{template_name}' at #{template_path}: #{e.message}"
       rescue Encoding::InvalidByteSequenceError => e

@@ -27,7 +27,9 @@ module JekyllHighlightCards
 
       # If the original token was quoted, treat as literal string
       if stripped != token
-        return allow_nil ? stripped : (stripped.empty? ? nil : stripped)
+        return stripped if allow_nil
+
+        return stripped.empty? ? nil : stripped
       end
 
       # Try to evaluate as Liquid expression
@@ -36,16 +38,22 @@ module JekyllHighlightCards
           # Parse and evaluate the Liquid expression
           template = Liquid::Template.parse(token)
           result = template.render(context)
-          return allow_nil ? result : (result.to_s.empty? ? nil : result)
+          return result if allow_nil
+
+          return result.to_s.empty? ? nil : result
         rescue Liquid::SyntaxError, StandardError => e
           log_debug("Failed to evaluate '#{token}' as Liquid expression: #{e.message}")
           # Fall back to literal string
-          return allow_nil ? token : (token.empty? ? nil : token)
+          return token if allow_nil
+
+          return token.empty? ? nil : token
         end
       end
 
       # Return as literal string
-      allow_nil ? token : (token.empty? ? nil : token)
+      return token if allow_nil
+
+      token.empty? ? nil : token
     end
 
     # Check if an expression looks like a Liquid variable lookup
@@ -66,9 +74,9 @@ module JekyllHighlightCards
       return value if value.nil? || value.empty?
 
       # Check for matching outer quotes
-      if (value.start_with?('"') && value.end_with?('"')) ||
-         (value.start_with?("'") && value.end_with?("'"))
-        return value[1..-2] if value.length > 1
+      if ((value.start_with?('"') && value.end_with?('"')) ||
+         (value.start_with?("'") && value.end_with?("'"))) && (value.length > 1)
+        return value[1..-2]
       end
 
       value
