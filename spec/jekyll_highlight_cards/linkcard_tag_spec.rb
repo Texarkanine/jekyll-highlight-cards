@@ -200,6 +200,21 @@ RSpec.describe JekyllHighlightCards::LinkcardTag do
       expect(result).to include("This is a long title")
     end
 
+    it "handles escaped quotes in title" do
+      result = render_tag('https://example.com "Title with \\" quote"')
+      expect(result).to include('Title with " quote')
+    end
+
+    it "handles escaped backslash in title" do
+      result = render_tag('https://example.com "Title with \\\\ backslash"')
+      expect(result).to include("Title with \\ backslash")
+    end
+
+    it "handles complex escapes in title" do
+      result = render_tag('https://example.com "Complex: \\" and \\\\"')
+      expect(result).to include('Complex: " and \\')
+    end
+
     it "handles archive parameter in any position" do
       result1 = render_tag('https://example.com "Title" archive:https://archive.org/123')
       result2 = render_tag('https://example.com archive:https://archive.org/123 "Title"')
