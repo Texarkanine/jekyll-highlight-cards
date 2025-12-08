@@ -33,6 +33,13 @@
    Polaroid Styles
    ========================================================================= */
 
+
+.polaroid-container {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
 .polaroid {
   display: inline-block;
   position: relative;
@@ -48,7 +55,6 @@
   .polaroid-image {
     display: block;
     max-width: 100%;
-    height: auto;
     border: 1px solid #333;
     margin: 0 auto;
   }
