@@ -1,4 +1,4 @@
-name: Update Gemfile.lock on Release PR
+name: "Release PR"
 
 on:
   pull_request:
@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   update-gemfile-lock:
+    name: "Update Gemfile.lock"
     # Only run on Release Please PRs
     if: startsWith(github.head_ref, 'release-please--')
     runs-on: ubuntu-latest
