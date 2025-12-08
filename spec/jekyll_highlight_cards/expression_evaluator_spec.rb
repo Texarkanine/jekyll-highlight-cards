@@ -14,7 +14,7 @@ RSpec.describe JekyllHighlightCards::ExpressionEvaluator do
     Liquid::Context.new(
       { "page" => { "title" => "Test Title", "url" => "https://example.com" } },
       {},
-      { registers: { site: double("Site") } }
+      { registers: { site: instance_double(Jekyll::Site) } }
     )
   end
 
