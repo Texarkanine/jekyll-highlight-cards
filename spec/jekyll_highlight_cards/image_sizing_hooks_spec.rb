@@ -170,7 +170,7 @@ RSpec.describe JekyllHighlightCards::ImageSizingHooks do
       it "auto-links the image" do
         described_class.process_post_render(mock_document)
         expect(@output).to include('<a href="image.jpg">')
-        expect(@output).to include("</a>")
+        expect(@output).to include('</a>')
       end
 
       it "removes the marker comment" do
@@ -185,7 +185,7 @@ RSpec.describe JekyllHighlightCards::ImageSizingHooks do
       it "applies width attribute only" do
         described_class.process_post_render(mock_document)
         expect(@output).to include('width="300"')
-        expect(@output).not_to include("height=")
+        expect(@output).not_to include('height=')
       end
     end
 
@@ -195,7 +195,7 @@ RSpec.describe JekyllHighlightCards::ImageSizingHooks do
       it "applies height attribute only" do
         described_class.process_post_render(mock_document)
         expect(@output).to include('height="200"')
-        expect(@output).not_to include("width=")
+        expect(@output).not_to include('width=')
       end
     end
 
@@ -205,7 +205,7 @@ RSpec.describe JekyllHighlightCards::ImageSizingHooks do
       it "does not auto-link images already in anchors" do
         described_class.process_post_render(mock_document)
         # Should have only one <a> tag
-        expect(@output.scan("<a ").length).to eq(1)
+        expect(@output.scan(/<a /).length).to eq(1)
         expect(@output).to include('<a href="/page">')
       end
 
@@ -219,7 +219,7 @@ RSpec.describe JekyllHighlightCards::ImageSizingHooks do
     context "with multiple sized images" do
       let(:output) do
         '<img src="img1.jpg"><!-- IMG_SIZE:100:100 -->' \
-          '<img src="img2.jpg"><!-- IMG_SIZE:200:200 -->'
+        '<img src="img2.jpg"><!-- IMG_SIZE:200:200 -->'
       end
 
       it "processes all images" do
@@ -243,12 +243,12 @@ RSpec.describe JekyllHighlightCards::ImageSizingHooks do
       it "does not attempt to auto-link" do
         described_class.process_post_render(mock_document)
         # Should not wrap in <a> tag when src is missing
-        expect(@output).not_to include("<a href=")
+        expect(@output).not_to include('<a href=')
       end
     end
 
     context "with img tag with malformed src attribute" do
-      let(:output) { "<img src=><!-- IMG_SIZE:300:200 -->" }
+      let(:output) { '<img src=><!-- IMG_SIZE:300:200 -->' }
 
       it "does not crash" do
         expect { described_class.process_post_render(mock_document) }.not_to raise_error
@@ -266,7 +266,7 @@ RSpec.describe JekyllHighlightCards::ImageSizingHooks do
         # Pre-render: markdown → marker
         described_class.process_pre_render(mock_document)
         expect(@content).to include("<!-- IMG_SIZE:300:200 -->")
-
+        
         # Post-render: marker → final HTML
         described_class.process_post_render(mock_document)
         expect(@output).to include('width="300"')

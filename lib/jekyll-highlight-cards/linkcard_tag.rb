@@ -72,13 +72,13 @@ module JekyllHighlightCards
       current = ""
       in_quotes = false
       quote_char = nil
-      in_liquid = 0 # Track nested Liquid expressions
-      escaped = false # Track if next character is escaped
+      in_liquid = 0  # Track nested Liquid expressions
+      escaped = false  # Track if next character is escaped
 
       markup.each_char do |char|
         # Handle escape sequences when in quotes
         if escaped
-          current += char # Add the escaped character directly
+          current += char  # Add the escaped character directly
           escaped = false
           next
         end
@@ -86,7 +86,7 @@ module JekyllHighlightCards
         # Check for escape character when in quotes
         if char == "\\" && in_quotes
           escaped = true
-          next # Don't add backslash to output, it's just the escape marker
+          next  # Don't add backslash to output, it's just the escape marker
         end
 
         # Track Liquid expression boundaries
@@ -165,13 +165,19 @@ module JekyllHighlightCards
     # @return [String, nil] resolved archive URL
     def resolve_archive(source, context, url)
       # Check for explicit opt-out
-      return nil if source && source.downcase == "none"
+      if source && source.downcase == "none"
+        return nil
+      end
 
       # Check for explicit archive URL
-      return evaluate_expression(source, context, allow_nil: true) if source && !source.empty?
+      if source && !source.empty?
+        return evaluate_expression(source, context, allow_nil: true)
+      end
 
       # Auto-lookup if enabled
-      return archive_url_for(url) if archive_enabled?
+      if archive_enabled?
+        return archive_url_for(url)
+      end
 
       nil
     end
@@ -209,3 +215,4 @@ end
 
 # Register the tag with Liquid
 Liquid::Template.register_tag("linkcard", JekyllHighlightCards::LinkcardTag)
+

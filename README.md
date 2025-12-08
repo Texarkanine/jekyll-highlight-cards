@@ -37,7 +37,7 @@ bundle install
 
 Highlight links:
 
-![Linkcard visual example](docs/linkcard-example.jpg)
+![Linkcard visual example](doc/linkcard-example.jpg)
 
 ```liquid
 {% linkcard https://example.com %}
