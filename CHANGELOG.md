@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v0.3.0...v0.3.1) (2025-12-08)
+
+
+### Bug Fixes
+
+* CSS was not automatically loaded when plugin was added to a site ([#9](https://github.com/Texarkanine/jekyll-highlight-cards/issues/9)) ([2183771](https://github.com/Texarkanine/jekyll-highlight-cards/commit/21837712ea9d47d61495c082dfc6a1d99c7dcac2))
+
 ## [0.3.0](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v0.2.3...v0.3.0) (2025-12-08)
 
 
