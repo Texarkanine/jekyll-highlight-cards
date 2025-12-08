@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.2.3](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v0.2.2...v0.2.3) (2025-12-08)
+
+
+### Bug Fixes
+
+* **ci:** bot name ([f440e8e](https://github.com/Texarkanine/jekyll-highlight-cards/commit/f440e8e50f514e7905185849c12dd8dba0f579e4))
+* **ci:** Bump Gemfile.lock in release-please PRs ([daa500f](https://github.com/Texarkanine/jekyll-highlight-cards/commit/daa500f0464504349c0e7daffc76a2d6ac8c3451))
+* **ci:** Decorate commits properly when updating Gemfile.lock ([a2d17c4](https://github.com/Texarkanine/jekyll-highlight-cards/commit/a2d17c49e4857b548f2fea050581d671757e0afb))
+* **ci:** Need to point rp at version-file ([17ad648](https://github.com/Texarkanine/jekyll-highlight-cards/commit/17ad648778f73ef27c0c0c122259276aed978197))
+* **deps:** re-lock Gemfile? ([8988d60](https://github.com/Texarkanine/jekyll-highlight-cards/commit/8988d609a050d8b4f46007f7407df5c9c3be2b57))
+
 ## [0.2.2](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v0.2.1...v0.2.2) (2025-12-08)
 
 
