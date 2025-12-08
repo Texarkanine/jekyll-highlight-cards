@@ -71,9 +71,59 @@ RSpec.describe JekyllHighlightCards::ImageSizingHooks do
         MARKDOWN
       end
 
-      it "skips images in code fences" do
+      it "skips images in backtick code fences" do
         described_class.process_pre_render(mock_document)
         # Should not convert the fenced image
+        expect(@content).to include("![Alt](image.jpg =300x200)")
+        # Should convert the real image
+        expect(@content).to include("<!-- IMG_SIZE:400:300 -->")
+      end
+    end
+
+    context "with tilde code fences" do
+      let(:content) do
+        <<~MARKDOWN
+          Some text
+          ~~~
+          ![Alt](image.jpg =300x200)
+          ~~~
+          ![Real](other.jpg =400x300)
+        MARKDOWN
+      end
+
+      it "skips images in tilde code fences" do
+        described_class.process_pre_render(mock_document)
+        # Should not convert the fenced image
+        expect(@content).to include("![Alt](image.jpg =300x200)")
+        # Should convert the real image
+        expect(@content).to include("<!-- IMG_SIZE:400:300 -->")
+      end
+    end
+
+    context "with indented code blocks (spaces)" do
+      let(:content) do
+        <<~MARKDOWN
+          Some text
+              ![Alt](image.jpg =300x200)
+          ![Real](other.jpg =400x300)
+        MARKDOWN
+      end
+
+      it "skips images in indented code blocks" do
+        described_class.process_pre_render(mock_document)
+        # Should not convert the indented image
+        expect(@content).to include("![Alt](image.jpg =300x200)")
+        # Should convert the real image
+        expect(@content).to include("<!-- IMG_SIZE:400:300 -->")
+      end
+    end
+
+    context "with indented code blocks (tab)" do
+      let(:content) { "Some text\n\t![Alt](image.jpg =300x200)\n![Real](other.jpg =400x300)" }
+
+      it "skips images in tab-indented code blocks" do
+        described_class.process_pre_render(mock_document)
+        # Should not convert the tab-indented image
         expect(@content).to include("![Alt](image.jpg =300x200)")
         # Should convert the real image
         expect(@content).to include("<!-- IMG_SIZE:400:300 -->")
