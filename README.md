@@ -73,6 +73,7 @@ Create polaroid-style image cards:
 {% polaroid /assets/image.jpg alt="Screen reader description" %}
 {% polaroid /assets/image.jpg alt="Alt text" title="Visible Title" %}
 {% polaroid /assets/image.jpg title="Photo" link="https://example.com" %}
+{% polaroid /assets/image.jpg link="https://example.com" image_link="https://other.com" %}
 {% polaroid {{ page.image }} size=x400 title={{ page.title }} %}
 ```
 
@@ -83,7 +84,8 @@ Create polaroid-style image cards:
 | `size=WxH`         | Image dimensions. Formats: `300x200`, `300x`, `x200`, `300`, `400pxx300px`                               |
 | `alt="..."`        | Alt text for image (for accessibility)                                                                   |
 | `title="..."`      | Title text displayed below image (also used as alt fallback)                                             |
-| `link="..."`       | Explicit URL to link to                                                                                  |
+| `link="..."`       | Explicit URL to link to (shows as visible link text)                                                     |
+| `image_link="..."` | Override where the image links to (independent of visible link text)                                     |
 | `archive="..."`    | Archive URL or `none` to disable                                                                         |
 
 **Image Alt Text:**
@@ -94,9 +96,11 @@ This allows you to:
 - Use title as both visual label and screen reader description
 - Separate concerns: detailed alt for accessibility, brief title for display
 
-**Link Display:**
+**Link Behavior:**
 - **No `link` parameter:** Image links to itself, no visible link text shown
 - **With `link` parameter:** Image and visible link text both point to the specified URL
+- **With `image_link` parameter:** Image links to `image_link` URL, overriding default behavior
+- **With both `link` and `image_link`:** Image links to `image_link`, but visible text displays `link`
 
 **Stacking:**
 
@@ -173,7 +177,7 @@ Templates receive these variables:
 - `escaped_url`, `escaped_display_url`, `escaped_title`, `escaped_archive_url`
 
 **Polaroid variables:**
-- `image_url`, `link_url`, `title`, `link_display`, `archive_url`, `width`, `height`
+- `image_url`, `link_url`, `image_link_url`, `title`, `link_display`, `archive_url`, `width`, `height`, `alt`
 - `escaped_*` versions of all text fields
 
 See default templates in gem's `_includes/` directory for examples.
