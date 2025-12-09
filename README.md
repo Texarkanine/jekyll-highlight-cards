@@ -1,5 +1,8 @@
 # jekyll-highlight-cards
 
+[![Gem Version](https://badge.fury.io/rb/jekyll-highlight-cards.svg)](https://rubygems.org/gems/jekyll-highlight-cards)
+[![code coverage](https://codecov.io/gh/Texarkanine/jekyll-highlight-cards/graph/badge.svg)](https://codecov.io/gh/Texarkanine/jekyll-highlight-cards)
+
 A Jekyll plugin providing styled card components for links and images with Internet Archive integration.
 
 ## Features
