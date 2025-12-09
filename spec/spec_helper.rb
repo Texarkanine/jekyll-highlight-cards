@@ -1,7 +1,14 @@
 # frozen_string_literal: true
 
 require "simplecov"
+require "simplecov-cobertura"
+
+# Configure coverage formatter for CI environments (Codecov)
 SimpleCov.start do
+  if ENV["CI"]
+    formatter SimpleCov::Formatter::CoberturaFormatter
+  end
+  
   add_filter "/spec/"
   add_filter "/vendor/"
 end
