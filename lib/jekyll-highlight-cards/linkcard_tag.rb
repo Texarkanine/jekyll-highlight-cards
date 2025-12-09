@@ -184,6 +184,7 @@ module JekyllHighlightCards
     # @return [Hash] template variables with raw and escaped versions
     def build_template_variables(url, title, archive_url)
       display_url = strip_protocol(url)
+      display_url = display_url.sub(%r{/$}, "")
 
       {
         "url" => url,
