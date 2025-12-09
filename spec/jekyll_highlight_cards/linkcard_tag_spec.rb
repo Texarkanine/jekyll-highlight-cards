@@ -141,7 +141,13 @@ RSpec.describe JekyllHighlightCards::LinkcardTag do
   describe "URL display" do
     it "strips protocol from display" do
       result = render_tag("https://example.com/path")
-      expect(result).to include("example.com/path")
+      expect(result).to include("example.com/path</a>")
+    end
+
+    it "strips trailing slash from display" do
+      result = render_tag("https://example.com/path/")
+      expect(result).to include("example.com/path</a>")
+      expect(result).not_to include("/path/</a>")
     end
   end
 

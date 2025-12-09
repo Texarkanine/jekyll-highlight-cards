@@ -4,7 +4,7 @@ module JekyllHighlightCards
   # Liquid tag for creating styled polaroid photo components
   #
   # Syntax:
-  #   {% polaroid IMAGE_URL [size=WxH] [alt="..."] [title="..."] [link="..."] [archive="..."] %}
+  #   {% polaroid IMAGE_URL [size=WxH] [alt="..."] [title="..."] [link="..."] [image_link="..."] [archive="..."] %}
   #
   # Parameters:
   #   - IMAGE_URL (required): Path or URL to the image (can be Liquid expression)
@@ -12,10 +12,16 @@ module JekyllHighlightCards
   #   - alt="..." (optional): Alt text for the image (can be Liquid expression)
   #   - title="..." (optional): Title text to display (can be Liquid expression, also used as alt fallback)
   #   - link="..." (optional): URL to link to (can be Liquid expression)
+  #   - image_link="..." (optional): URL for the image to link to, overrides default behavior (can be Liquid expression)
   #   - archive="..." (optional): Archive URL or "none" to opt out
   #
   # Note: Alt text priority: alt parameter > title parameter > empty string
   #       This allows setting alt text without a visible title for accessibility
+  #
+  # Note: Image link behavior:
+  #       - No link or image_link: image links to itself
+  #       - link only: image links to link URL
+  #       - image_link: image links to image_link URL (overrides default)
   #
   # Examples:
   #   {% polaroid /assets/img/photo.jpg %}
@@ -24,6 +30,7 @@ module JekyllHighlightCards
   #   {% polaroid /img/photo.jpg alt="Detailed alt" title="Short Title" %}
   #   {% polaroid {{ page.image }} size=x400 title={{ page.title }} %}
   #   {% polaroid /img.jpg link="https://example.com" archive="none" %}
+  #   {% polaroid /img.jpg link="https://example.com" image_link="https://other.com" %}
   class PolaroidTag < Liquid::Tag
     include ArchiveHelper
     include DimensionParser
@@ -59,6 +66,14 @@ module JekyllHighlightCards
       explicit_link = !params[:link].nil? && !params[:link].empty?
       link_url = params[:link] || params[:image_url]
 
+      # Determine image link URL (can be overridden by image_link parameter)
+      # If image_link is provided, use it; otherwise use the standard link_url
+      image_link_url = if params[:image_link] && !params[:image_link].empty?
+                         params[:image_link]
+                       else
+                         link_url
+                       end
+
       # Resolve archive URL (archives the link URL, not the image)
       archive_url = resolve_archive(params[:archive], context, link_url)
 
@@ -70,6 +85,7 @@ module JekyllHighlightCards
         params[:title],
         params[:alt],
         link_url,
+        image_link_url,
         explicit_link,
         archive_url
       )
@@ -183,17 +199,29 @@ module JekyllHighlightCards
     # @param height [String, nil] the image height
     # @param title [String, nil] the title text
     # @param alt [String, nil] the alt text for the image
-    # @param link_url [String] the link URL
+    # @param link_url [String] the link URL (for display)
+    # @param image_link_url [String] the URL the image links to
     # @param explicit_link [Boolean] whether link was explicitly provided
     # @param archive_url [String, nil] the archive URL
     # @return [Hash] template variables with raw and escaped versions
-    def build_template_variables(image_url, width, height, title, alt, link_url, explicit_link, archive_url)
+    def build_template_variables(
+      image_url,
+      width,
+      height,
+      title,
+      alt,
+      link_url,
+      image_link_url,
+      explicit_link,
+      archive_url
+    )
       # Only set link_display if link was explicitly provided (not defaulted to image)
       link_display = explicit_link && link_url ? strip_protocol(link_url) : nil
 
       {
         "image_url" => image_url,
         "link_url" => link_url,
+        "image_link_url" => image_link_url,
         "title" => title,
         "alt" => alt,
         "link_display" => link_display,
@@ -202,6 +230,7 @@ module JekyllHighlightCards
         "height" => height,
         "escaped_image_url" => CGI.escapeHTML(image_url),
         "escaped_link_url" => link_url ? CGI.escapeHTML(link_url) : nil,
+        "escaped_image_link_url" => image_link_url ? CGI.escapeHTML(image_link_url) : nil,
         "escaped_title" => title && !title.empty? ? CGI.escapeHTML(title) : "&nbsp;",
         "escaped_alt" => alt && !alt.empty? ? CGI.escapeHTML(alt) : "",
         "escaped_link_display" => link_display && !link_display.empty? ? CGI.escapeHTML(link_display) : "&nbsp;",
