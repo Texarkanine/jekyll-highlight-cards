@@ -204,8 +204,16 @@ module JekyllHighlightCards
     # @param explicit_link [Boolean] whether link was explicitly provided
     # @param archive_url [String, nil] the archive URL
     # @return [Hash] template variables with raw and escaped versions
-    def build_template_variables(image_url, width, height, title, alt, link_url, image_link_url, explicit_link,
-                                 archive_url)
+    def build_template_variables(
+      image_url,
+      width,
+      height,
+      title,
+      alt,
+      link_url,
+      image_link_url,
+      explicit_link,
+      archive_url)
       # Only set link_display if link was explicitly provided (not defaulted to image)
       link_display = explicit_link && link_url ? strip_protocol(link_url) : nil
 
