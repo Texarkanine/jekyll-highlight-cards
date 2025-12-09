@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.0.0](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v0.3.1...v1.0.0) (2025-12-09)
+
+
+### Features
+
+* **linkcard:** strip trailing slash from display urls ([7b2e3fb](https://github.com/Texarkanine/jekyll-highlight-cards/commit/7b2e3fb0645d6e927da55746711fed0d24147d8a))
+* **polaroid:** add image_link parameter to override image href ([#11](https://github.com/Texarkanine/jekyll-highlight-cards/issues/11)) ([7b2e3fb](https://github.com/Texarkanine/jekyll-highlight-cards/commit/7b2e3fb0645d6e927da55746711fed0d24147d8a))
+
+
+### Bug Fixes
+
+* **deps-dev:** update rubocop-rspec requirement from ~&gt; 2.20 to ~&gt; 3.8 ([#13](https://github.com/Texarkanine/jekyll-highlight-cards/issues/13)) ([08e4a40](https://github.com/Texarkanine/jekyll-highlight-cards/commit/08e4a40c3463d43fc5eab9a4f4f04d335f34182c))
+* **docs:** mention image_link in README ([50450a4](https://github.com/Texarkanine/jekyll-highlight-cards/commit/50450a4b20b4e5fd6ce6f0498bf208016903eb5d))
+* **linkcard:** padding-bottom -&gt; 1.5 so archive doesn't overlap with link url ([7b2e3fb](https://github.com/Texarkanine/jekyll-highlight-cards/commit/7b2e3fb0645d6e927da55746711fed0d24147d8a))
+
 ## [0.3.1](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v0.3.0...v0.3.1) (2025-12-08)
 
 
