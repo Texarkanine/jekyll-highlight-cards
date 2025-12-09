@@ -319,4 +319,51 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
       expect(result).to include("Complex: &quot; and \\")
     end
   end
+
+  describe "image_link parameter" do
+    context "with image_link but no link parameter" do
+      it "links image to image_link URL" do
+        result = render_tag('/photo.jpg image_link="https://custom.com"')
+        expect(result).to include('href="https://custom.com"')
+      end
+
+      it "does not display link text" do
+        result = render_tag('/photo.jpg image_link="https://custom.com"')
+        # Link section should show &nbsp; not the URL as visible text
+        expect(result).to include('<div class="polaroid-link">')
+        expect(result).to match(/polaroid-link[^>]*>\s*&nbsp;/i)
+        # custom.com should only appear in href attribute, not as visible link text
+        expect(result).not_to match(%r{>custom\.com</a>}i)
+      end
+    end
+
+    context "with both link and image_link parameters" do
+      it "links image to image_link URL" do
+        result = render_tag('/photo.jpg link="https://example.com" image_link="https://custom.com"')
+        # Image should link to custom.com
+        expect(result).to match(%r{<a href="https://custom\.com"[^>]*>\s*<img}i)
+      end
+
+      it "displays the link URL text" do
+        result = render_tag('/photo.jpg link="https://example.com" image_link="https://custom.com"')
+        expect(result).to include("example.com")
+      end
+
+      it "image href uses image_link not link parameter" do
+        result = render_tag('/photo.jpg link="https://example.com" image_link="https://custom.com"')
+        # Image <a> tag should link to custom.com
+        expect(result).to match(%r{<a href="https://custom\.com"[^>]*>\s*<img}i)
+        # Link display <a> tag should link to example.com
+        expect(result).to match(%r{<a href="https://example\.com"[^>]*>example\.com</a>}i)
+      end
+    end
+
+    context "with image_link containing special characters" do
+      it "escapes HTML in image_link URL" do
+        result = render_tag('/photo.jpg image_link="https://custom.com?x=<script>"')
+        expect(result).to include("&lt;script&gt;")
+        expect(result).not_to include("<script>")
+      end
+    end
+  end
 end

@@ -1,6 +1,6 @@
 <div class="polaroid-container">
   <div class="polaroid">
-    <a href="{{ escaped_link_url }}"{% unless link_url == image_url %} target="_blank" rel="noopener"{% endunless %}>
+    <a href="{{ escaped_image_link_url }}"{% unless image_link_url == image_url %} target="_blank" rel="noopener"{% endunless %}>
       <img src="{{ escaped_image_url }}" alt="{% if alt %}{{ escaped_alt }}{% elsif title %}{{ escaped_title }}{% endif %}"{% if width %} width="{{ width }}"{% endif %}{% if height %} height="{{ height }}"{% endif %} class="polaroid-image">
     </a>
     <div class="polaroid-title">{{ escaped_title }}</div>
