@@ -1,6 +1,6 @@
 version: 2
 updates:
-  # Node.js dependencies - consolidated for both production and dev dependencies
+  # bundler's rubygem dependencies
   - package-ecosystem: 'bundler'
     directory: '/'
     schedule:
