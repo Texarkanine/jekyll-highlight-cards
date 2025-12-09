@@ -213,7 +213,8 @@ module JekyllHighlightCards
       link_url,
       image_link_url,
       explicit_link,
-      archive_url)
+      archive_url
+    )
       # Only set link_display if link was explicitly provided (not defaulted to image)
       link_display = explicit_link && link_url ? strip_protocol(link_url) : nil
 

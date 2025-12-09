@@ -5,10 +5,8 @@ require "simplecov-cobertura"
 
 # Configure coverage formatter for CI environments (Codecov)
 SimpleCov.start do
-  if ENV["CI"]
-    formatter SimpleCov::Formatter::CoberturaFormatter
-  end
-  
+  formatter SimpleCov::Formatter::CoberturaFormatter if ENV["CI"]
+
   add_filter "/spec/"
   add_filter "/vendor/"
 end
