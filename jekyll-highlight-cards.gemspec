@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.email         = ["texarkanine@protonmail.com"]
 
   spec.summary       = "Jekyll plugin providing linkcard and polaroid Liquid tags with archive integration"
-  spec.description   = "A Jekyll gem that provides two Liquid tags (linkcard and polaroid) for creating " \
+  spec.description   = "A Jekyll plugin that provides two Liquid tags (linkcard and polaroid) for creating " \
                        "styled card components with integrated Internet Archive functionality and image sizing. " \
-                       "Also includes Markdown image sizing hooks."
+                       "Also extends Markdown support to allow specifying image dimensions."
   spec.homepage      = "https://github.com/texarkanine/jekyll-highlight-cards"
   spec.license       = "AGPL-3.0-or-later"
   spec.required_ruby_version = ">= 3.1.0"
