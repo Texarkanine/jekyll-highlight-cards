@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v1.0.0...v1.0.1) (2025-12-12)
+
+
+### Bug Fixes
+
+* **docs:** update gemspec description for rubygems.org ([8066854](https://github.com/Texarkanine/jekyll-highlight-cards/commit/80668542849e947459dab2e2a8b6e629d6984458))
+* **polaroid:** "height: auto;" was missing so images got distorted on narrow screens ([#15](https://github.com/Texarkanine/jekyll-highlight-cards/issues/15)) ([c2a8165](https://github.com/Texarkanine/jekyll-highlight-cards/commit/c2a81658213ae84231287bc04cdf67309dc36d77))
+
 ## [1.0.0](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v0.3.1...v1.0.0) (2025-12-09)
 
 
