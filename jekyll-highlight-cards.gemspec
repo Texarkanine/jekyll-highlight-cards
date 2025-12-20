@@ -22,23 +22,15 @@ Gem::Specification.new do |spec|
   spec.metadata["rubygems_mfa_required"] = "true"
 
   # Specify which files should be added to the gem when it is released.
-  # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
-  spec.files = Dir.chdir(File.expand_path(__dir__)) do
-    `git ls-files -z`.split("\x0").select do |f|
-      f.match(
-        %r{
-          \A(
-            Gemfile(\..*)?|
-            [^/]+\.gemspec|
-            LICENSE|
-            lib/|
-            _sass/|
-            _includes/
-          )
-        }x
-      )
-    end
-  end
+  spec.files = Dir[
+    "*.gemspec",
+    "lib/**/*.rb",
+    "_sass/**/*.scss",
+    "_includes/**/*.html",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ]
 
   spec.require_paths = ["lib"]
 
