@@ -150,18 +150,36 @@ export JEKYLL_HIGHLIGHT_CARDS_ARCHIVE=1
 
 ### CSS Styles
 
-Import defaults and override specific properties:
+**Default usage:**
+
+Import the default styles which include both structure and colors:
 
 ```scss
 @import "highlight-cards";
+```
 
-.link-card {
-  border-color: red;  // Override
+This provides a complete, ready-to-use appearance.
+
+**Full customization:**
+
+For complete control over colors and visual effects, import only the structural styles and define your own colors:
+
+```scss
+@import "highlight-cards-structure";
+
+// Define your own color styles
+.polaroid {
+  border-color: var(--link-color);
+  background-color: var(--body-bg);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  
+  .polaroid-image {
+    border-color: var(--link-color);
+  }
 }
 ```
 
-The default style are structural only - they create the shapes but don't set colors, fonts, etc.
-The recommended approach is to use the default styles and then add aesthetics to the provided classes.
+The structure file contains only layout, positioning, and sizing - no colors, borders, or visual effects. This allows you to fully customize the appearance while maintaining the structural layout.
 
 ### Template Customization
 
