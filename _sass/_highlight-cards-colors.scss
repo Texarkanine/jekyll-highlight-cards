@@ -1,0 +1,39 @@
+/*
+ * jekyll-highlight-cards Color Styles
+ *
+ * This file contains color, border-color, background-color, and visual effect styles.
+ * Use this file along with the structure file for the default visual appearance.
+ *
+ * To use these styles, add to your site's main SCSS:
+ *   @import "highlight-cards-structure";
+ *   @import "highlight-cards-colors";
+ *
+ * Or simply import the default file which includes both.
+ */
+
+/* ============================================================================
+   Polaroid Color Styles
+   ========================================================================= */
+
+.polaroid {
+  border-color: #333;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+
+  .polaroid-image {
+    border-color: #333;
+  }
+}
+
+/* ============================================================================
+   Print Styles
+   ========================================================================= */
+
+@media print {
+  .link-card,
+  .polaroid {
+    box-shadow: none;
+    border-color: #333;
+  }
+}
+
