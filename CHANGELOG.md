@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v1.0.1...v1.1.0) (2025-12-20)
+
+
+### Features
+
+* split SCSS into structure and colors for flexible customization ([#17](https://github.com/Texarkanine/jekyll-highlight-cards/issues/17)) ([aa7271d](https://github.com/Texarkanine/jekyll-highlight-cards/commit/aa7271deeb4666f0ba41ecf389b876a3de479d03))
+
+
+### Bug Fixes
+
+* **build:** Do not include unnecessary files in the gem ([aa7271d](https://github.com/Texarkanine/jekyll-highlight-cards/commit/aa7271deeb4666f0ba41ecf389b876a3de479d03))
+
 ## [1.0.1](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v1.0.0...v1.0.1) (2025-12-12)
 
 
