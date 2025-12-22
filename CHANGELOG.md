@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.1](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v1.1.0...v1.1.1) (2025-12-22)
+
+
+### Bug Fixes
+
+* **css:** Refactor imports to use '[@use](https://github.com/use)' syntax ([#20](https://github.com/Texarkanine/jekyll-highlight-cards/issues/20)) ([14d4f1d](https://github.com/Texarkanine/jekyll-highlight-cards/commit/14d4f1dbd94a1ba6ccc5642e27c8114fd09e288a))
+* **deps-dev:** bump rubocop from 1.81.7 to 1.82.0 in the dev-deps-minor-patch group ([#19](https://github.com/Texarkanine/jekyll-highlight-cards/issues/19)) ([031a996](https://github.com/Texarkanine/jekyll-highlight-cards/commit/031a99634fbdd06741c5f2fcf6f9d098f23173c2))
+* **deps-dev:** bump rubocop in the dev-deps-minor-patch group ([031a996](https://github.com/Texarkanine/jekyll-highlight-cards/commit/031a99634fbdd06741c5f2fcf6f9d098f23173c2))
+
 ## [1.1.0](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v1.0.1...v1.1.0) (2025-12-20)
 
 
