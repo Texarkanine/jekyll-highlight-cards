@@ -37,7 +37,7 @@ bundle install
 Add to your `main.scss` file:
 
 ```scss
-@import "highlight-cards";
+@use "highlight-cards";
 ```
 
 ## Usage
@@ -155,7 +155,7 @@ export JEKYLL_HIGHLIGHT_CARDS_ARCHIVE=1
 Import the default styles which include both structure and colors:
 
 ```scss
-@import "highlight-cards";
+@use "highlight-cards";
 ```
 
 This provides a complete, ready-to-use appearance.
@@ -165,7 +165,7 @@ This provides a complete, ready-to-use appearance.
 For complete control over colors and visual effects, import only the structural styles and define your own colors:
 
 ```scss
-@import "highlight-cards-structure";
+@use "highlight-cards-structure";
 
 // Define your own color styles
 .polaroid {
