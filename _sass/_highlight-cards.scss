@@ -14,5 +14,5 @@
  * All styles use low specificity for easy customization.
  */
 
-@import "highlight-cards-structure";
-@import "highlight-cards-colors";
+@use "highlight-cards-structure";
+@use "highlight-cards-colors";
