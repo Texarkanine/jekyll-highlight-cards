@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.2](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v1.1.1...v1.1.2) (2026-01-01)
+
+
+### Bug Fixes
+
+* **deps-dev:** bump rubocop from 1.82.0 to 1.82.1 in the dev-deps-minor-patch group ([#22](https://github.com/Texarkanine/jekyll-highlight-cards/issues/22)) ([1788b1e](https://github.com/Texarkanine/jekyll-highlight-cards/commit/1788b1e0e00d1b9a5bbf4eaf27e2bb1a1657ed48))
+* **deps-dev:** bump rubocop in the dev-deps-minor-patch group ([1788b1e](https://github.com/Texarkanine/jekyll-highlight-cards/commit/1788b1e0e00d1b9a5bbf4eaf27e2bb1a1657ed48))
+
 ## [1.1.1](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v1.1.0...v1.1.1) (2025-12-22)
 
 
