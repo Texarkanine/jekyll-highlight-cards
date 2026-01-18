@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    jekyll-highlight-cards (1.1.2)
+    jekyll-highlight-cards (2.0.0)
       jekyll (>= 4.0, < 5.0)
       liquid (>= 4.0, < 5.0)
 
