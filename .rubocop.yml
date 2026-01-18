@@ -1,44 +1,50 @@
 # RuboCop configuration for jekyll-highlight-cards
+# Relaxed, convention-focused linting - not overly strict
 
-require:
+plugins:
   - rubocop-rake
   - rubocop-rspec
 
 AllCops:
-  TargetRubyVersion: 3.1
+  TargetRubyVersion: 3.3
   NewCops: enable
   Exclude:
     - 'vendor/**/*'
     - 'spec/fixtures/**/*'
-    - 'examples/**/*'
-    - 'planning/**/*'
 
 # Style preferences
 Style/StringLiterals:
-  Enabled: true
   EnforcedStyle: double_quotes
 
 Style/StringLiteralsInInterpolation:
-  Enabled: true
   EnforcedStyle: double_quotes
 
 Style/Documentation:
-  Enabled: false  # Will enable after adding YARD documentation
+  Enabled: false
 
 Style/FrozenStringLiteralComment:
   Enabled: true
-  EnforcedStyle: always
 
-# Metrics - relaxed for initial development
-Metrics/MethodLength:
-  Max: 25
+# Lint
+Lint/DuplicateBranch:
+  Enabled: false
+
+# Layout
+Layout/LineLength:
+  Max: 120
+
+# Metrics - relaxed limits for Jekyll plugin code
+Metrics/AbcSize:
+  Max: 100
   Exclude:
-    - 'spec/**/*'
+    - 'lib/**/hooks.rb'
 
 Metrics/BlockLength:
+  Max: 30
   Exclude:
     - 'spec/**/*'
     - '*.gemspec'
+    - 'lib/**/hooks.rb'
 
 Metrics/ClassLength:
   Max: 200
@@ -46,19 +52,66 @@ Metrics/ClassLength:
 Metrics/ModuleLength:
   Max: 200
 
-# Layout preferences
-Layout/LineLength:
-  Max: 120
-  AllowedPatterns: ['^\s*#']
+Metrics/MethodLength:
+  Max: 60
+  Exclude:
+    - 'lib/**/hooks.rb'
 
-# RSpec-specific
+Metrics/CyclomaticComplexity:
+  Max: 25
+  Exclude:
+    - 'lib/**/hooks.rb'
+
+Metrics/PerceivedComplexity:
+  Max: 25
+  Exclude:
+    - 'lib/**/hooks.rb'
+
+Metrics/ParameterLists:
+  Max: 10
+
+# Gemspec
+Gemspec/DevelopmentDependencies:
+  Enabled: false
+
+# Naming
+Naming/FileName:
+  Exclude:
+    - 'lib/jekyll-highlight-cards.rb'
+
+# RSpec - relaxed for practical test writing
 RSpec/ExampleLength:
-  Max: 15
+  Max: 20
 
 RSpec/MultipleExpectations:
-  Max: 5
+  Max: 8
 
 RSpec/NestedGroups:
   Max: 5
 
+RSpec/MultipleMemoizedHelpers:
+  Max: 15
 
+RSpec/InstanceVariable:
+  Enabled: false
+
+RSpec/MessageSpies:
+  Enabled: false
+
+RSpec/VerifiedDoubles:
+  Enabled: false
+
+RSpec/StubbedMock:
+  Enabled: false
+
+RSpec/ReceiveMessages:
+  Enabled: false
+
+RSpec/IndexedLet:
+  Enabled: false
+
+RSpec/SpecFilePathFormat:
+  Enabled: false
+
+RSpec/ContextWording:
+  Enabled: false

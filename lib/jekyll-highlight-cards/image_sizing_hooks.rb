@@ -149,7 +149,7 @@ module JekyllHighlightCards
 
       # Check if current line and previous lines are indented
       idx = line_idx
-      while idx > 0
+      while idx.positive?
         line = lines[idx]
         # If line starts with 4+ spaces or tab, it's indented code
         break unless line =~ /^(    |\t)/

@@ -185,9 +185,11 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
       before do
         allow(ENV).to receive(:[]).with("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE").and_return("1")
         stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
-          .to_return(status: 200, body: [%w[timestamp original],
-                                         ["20231201120000",
-                                          "https://example.com"]].to_json, headers: { "Content-Type" => "application/json" })
+          .to_return(
+            status: 200,
+            body: [%w[timestamp original], ["20231201120000", "https://example.com"]].to_json,
+            headers: { "Content-Type" => "application/json" }
+          )
       end
 
       it "archives the link URL not the image URL" do
