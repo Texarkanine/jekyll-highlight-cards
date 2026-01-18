@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.0.0](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v1.1.2...v2.0.0) (2026-01-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* standardize config across Jekyll gem repos ([#26](https://github.com/Texarkanine/jekyll-highlight-cards/issues/26))
+* Drop ostensible support for Ruby 3.1; only 3.3+ is promised
+
+### Features
+
+* standardize config across Jekyll gem repos ([#26](https://github.com/Texarkanine/jekyll-highlight-cards/issues/26)) ([93d93bc](https://github.com/Texarkanine/jekyll-highlight-cards/commit/93d93bc7e922712e3df81c36ab5bbb78749db630))
+
+
+### Bug Fixes
+
+* **deps-dev:** bump rubocop-rspec in the dev-deps-minor-patch group ([169a11f](https://github.com/Texarkanine/jekyll-highlight-cards/commit/169a11f9e9f57e7ed93bedb66c822e4a98ae0da8))
+
+
+### Miscellaneous Chores
+
+* standardize config across Jekyll gem repos ([93d93bc](https://github.com/Texarkanine/jekyll-highlight-cards/commit/93d93bc7e922712e3df81c36ab5bbb78749db630))
+
 ## [1.1.2](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v1.1.1...v1.1.2) (2026-01-01)
 
 
