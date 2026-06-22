@@ -1,22 +1,20 @@
 <div class="polaroid-container">
-  <div class="polaroid">
+  <div class="polaroid{% if archive_url %}{% unless has_title or has_link_display %} polaroid-archive-only{% endunless %}{% endif %}">
     <a href="{{ escaped_image_link_url }}"{% unless image_link_url == image_url %} target="_blank" rel="noopener"{% endunless %}>
-      <img src="{{ escaped_image_url }}" alt="{% if alt %}{{ escaped_alt }}{% elsif title %}{{ escaped_title }}{% endif %}"{% if width %} width="{{ width }}"{% endif %}{% if height %} height="{{ height }}"{% endif %} class="polaroid-image">
+      <img src="{{ escaped_image_url }}" alt="{% if alt %}{{ escaped_alt }}{% elsif has_title %}{{ escaped_title }}{% endif %}"{% if width %} width="{{ width }}"{% endif %}{% if height %} height="{{ height }}"{% endif %} class="polaroid-image">
     </a>
+    {% if has_title %}
     <div class="polaroid-title">{{ escaped_title }}</div>
+    {% endif %}
+    {% if has_link_display %}
     <div class="polaroid-link">
-      {% if link_display %}
       <a href="{{ escaped_link_url }}" target="_blank" rel="noopener">{{ escaped_link_display }}</a>
-      {% else %}
-      &nbsp;
-      {% endif %}
     </div>
+    {% endif %}
+    {% if archive_url %}
     <small class="polaroid-archive">
-      {% if archive_url %}
       (<a href="{{ escaped_archive_url }}" target="_blank" rel="noopener">archive</a>)
-      {% else %}
-      &nbsp;
-      {% endif %}
     </small>
+    {% endif %}
   </div>
 </div>

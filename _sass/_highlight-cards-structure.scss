@@ -72,6 +72,11 @@
   }
 }
 
+/* Add breathing room only when archive stands alone under the image. */
+.polaroid.polaroid-archive-only {
+  padding-bottom: 36px;
+}
+
 /* ============================================================================
    Print Styles
    ========================================================================= */

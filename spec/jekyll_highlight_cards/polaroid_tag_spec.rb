@@ -343,15 +343,46 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
       expect(result).to include("example.com")
     end
 
-    it "keeps archive element rendering behavior when title and link are omitted" do
+    it "renders archive element only when archive URL exists" do
       result_without_archive = render_tag('/photo.jpg archive="none"')
       result_with_archive = render_tag('/photo.jpg archive="https://archive.org/snapshot"')
 
-      expect(result_without_archive).to include('<small class="polaroid-archive">')
-      expect(result_without_archive).to match(/polaroid-archive[^>]*>\s*&nbsp;/i)
+      expect(result_without_archive).not_to include('<small class="polaroid-archive">')
 
       expect(result_with_archive).to include('<small class="polaroid-archive">')
       expect(result_with_archive).to include("archive.org/snapshot")
+    end
+  end
+
+  describe "archive metadata rendering" do
+    it "omits the archive element when archive URL is not available" do
+      result = render_tag('/photo.jpg link="https://example.com" archive="none"')
+
+      expect(result).not_to include('<small class="polaroid-archive">')
+      expect(result).not_to include(">archive</a>")
+    end
+
+    it "renders the archive element when archive URL is available" do
+      result = render_tag('/photo.jpg link="https://example.com" archive="https://archive.org/snapshot"')
+
+      expect(result).to include('<small class="polaroid-archive">')
+      expect(result).to include(">archive</a>")
+      expect(result).to include("archive.org/snapshot")
+    end
+  end
+
+  describe "archive-only layout state" do
+    it "adds archive-only modifier when archive is present without title or link" do
+      result = render_tag('/photo.jpg archive="https://archive.org/snapshot"')
+
+      expect(result).to include('class="polaroid polaroid-archive-only"')
+    end
+
+    it "does not add archive-only modifier when link metadata is present" do
+      result = render_tag('/photo.jpg link="https://example.com" archive="https://archive.org/snapshot"')
+
+      expect(result).to include('class="polaroid"')
+      expect(result).not_to include('class="polaroid polaroid-archive-only"')
     end
   end
 

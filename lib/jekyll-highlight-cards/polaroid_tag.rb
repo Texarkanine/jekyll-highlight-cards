@@ -217,12 +217,16 @@ module JekyllHighlightCards
     )
       # Only set link_display if link was explicitly provided (not defaulted to image)
       link_display = explicit_link && link_url ? strip_protocol(link_url) : nil
+      has_title = title && !title.empty?
+      has_link_display = link_display && !link_display.empty?
 
       {
         "image_url" => image_url,
         "link_url" => link_url,
         "image_link_url" => image_link_url,
         "title" => title,
+        "has_title" => has_title,
+        "has_link_display" => has_link_display,
         "alt" => alt,
         "link_display" => link_display,
         "archive_url" => archive_url,
@@ -231,9 +235,9 @@ module JekyllHighlightCards
         "escaped_image_url" => CGI.escapeHTML(image_url),
         "escaped_link_url" => link_url ? CGI.escapeHTML(link_url) : nil,
         "escaped_image_link_url" => image_link_url ? CGI.escapeHTML(image_link_url) : nil,
-        "escaped_title" => title && !title.empty? ? CGI.escapeHTML(title) : "&nbsp;",
+        "escaped_title" => has_title ? CGI.escapeHTML(title) : nil,
         "escaped_alt" => alt && !alt.empty? ? CGI.escapeHTML(alt) : "",
-        "escaped_link_display" => link_display && !link_display.empty? ? CGI.escapeHTML(link_display) : "&nbsp;",
+        "escaped_link_display" => has_link_display ? CGI.escapeHTML(link_display) : nil,
         "escaped_archive_url" => archive_url ? CGI.escapeHTML(archive_url) : nil
       }
     end

@@ -1,12 +1,16 @@
 # Active Context
 
 ## Current Task: Polaroid Optional Title/Link Rendering
-**Phase:** COMPLEXITY-ANALYSIS - COMPLETE
+**Phase:** QA - PASS
 
 ## What Was Done
-- Classified the request as Level 1 (quick bug fix) because it is an isolated UI rendering correction in a single component area.
-- Captured the user story, constraints, and acceptance criteria in `memory-bank/active/projectbrief.md`.
-- Initialized active memory-bank task tracking files for this run.
+- Added archive-specific metadata coverage to enforce conditional archive element rendering.
+- Added archive-only layout-state coverage to enforce a dedicated `.polaroid-archive-only` modifier when archive is present without title/link.
+- Updated polaroid template rendering logic to conditionally render title and link wrappers only when provided.
+- Updated polaroid template rendering logic to conditionally render archive wrapper only when an archive URL exists.
+- Updated structural styles so `.polaroid.polaroid-archive-only` gets extra bottom padding, creating breathing room only in the archive-only state.
+- Added explicit `has_title` and `has_link_display` variables in `PolaroidTag` template data construction.
+- Ran targeted polaroid spec, full RSpec suite, and RuboCop with all checks passing.
 
 ## Next Step
-- Load the Level 1 build workflow and implement tests first, then code changes for conditional title/link DOM rendering.
+- Ready for user verification and optional commit.
