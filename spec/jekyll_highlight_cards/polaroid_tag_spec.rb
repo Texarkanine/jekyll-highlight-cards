@@ -274,20 +274,18 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
     it "handles empty title gracefully" do
       result = render_tag('/photo.jpg title=""')
       expect(result).to include("/photo.jpg")
-      # Should render without errors
+      expect(result).not_to include('<div class="polaroid-title">')
     end
 
     it "handles empty link gracefully" do
       result = render_tag('/photo.jpg link=""')
       expect(result).to include("/photo.jpg")
-      # Should render without errors
+      expect(result).not_to include('<div class="polaroid-link">')
     end
 
     it "does not show link display when no explicit link provided" do
       result = render_tag("/photo.jpg")
-      # Link section should show &nbsp; not the image path
-      expect(result).to include('<div class="polaroid-link">')
-      expect(result).to match(/polaroid-link[^>]*>\s*&nbsp;/i)
+      expect(result).not_to include('<div class="polaroid-link">')
     end
 
     it "shows link display only when explicit link provided" do
@@ -322,6 +320,41 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
     end
   end
 
+  describe "optional metadata rendering" do
+    it "omits the title element when title is not provided" do
+      result = render_tag('/photo.jpg link="https://example.com"')
+
+      expect(result).not_to include('<div class="polaroid-title">')
+      expect(result).to include('<div class="polaroid-link">')
+    end
+
+    it "omits the link element when link is not provided" do
+      result = render_tag('/photo.jpg title="My Photo"')
+
+      expect(result).to include('<div class="polaroid-title">')
+      expect(result).not_to include('<div class="polaroid-link">')
+    end
+
+    it "renders title and link elements when both are provided" do
+      result = render_tag('/photo.jpg title="My Photo" link="https://example.com"')
+
+      expect(result).to include('<div class="polaroid-title">')
+      expect(result).to include('<div class="polaroid-link">')
+      expect(result).to include("example.com")
+    end
+
+    it "keeps archive element rendering behavior when title and link are omitted" do
+      result_without_archive = render_tag('/photo.jpg archive="none"')
+      result_with_archive = render_tag('/photo.jpg archive="https://archive.org/snapshot"')
+
+      expect(result_without_archive).to include('<small class="polaroid-archive">')
+      expect(result_without_archive).to match(/polaroid-archive[^>]*>\s*&nbsp;/i)
+
+      expect(result_with_archive).to include('<small class="polaroid-archive">')
+      expect(result_with_archive).to include("archive.org/snapshot")
+    end
+  end
+
   describe "image_link parameter" do
     context "with image_link but no link parameter" do
       it "links image to image_link URL" do
@@ -331,9 +364,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
 
       it "does not display link text" do
         result = render_tag('/photo.jpg image_link="https://custom.com"')
-        # Link section should show &nbsp; not the URL as visible text
-        expect(result).to include('<div class="polaroid-link">')
-        expect(result).to match(/polaroid-link[^>]*>\s*&nbsp;/i)
+        expect(result).not_to include('<div class="polaroid-link">')
         # custom.com should only appear in href attribute, not as visible link text
         expect(result).not_to match(%r{>custom\.com</a>}i)
       end
