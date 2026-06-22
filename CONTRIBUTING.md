@@ -120,14 +120,14 @@ This project follows Test-Driven Development:
 
 ### Commit Messages
 
-Use conventional commit format:
+Use conventional commit format of type `chore`, `feat`, or `fix`:
 
 - `feat: Add new feature`
 - `fix: Fix bug in XYZ`
-- `docs: Update README`
-- `test: Add tests for ABC`
-- `refactor: Improve XYZ`
-- `style: Fix Rubocop issues`
+- `chore(docs): Update README`
+- `chore(test): Add tests for ABC`
+- `feat(refactor): Improve XYZ`
+- `chore(style): Fix Rubocop issues`
 
 ## Testing Guidelines
 
