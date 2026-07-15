@@ -40,7 +40,7 @@ Bump `simplecov` ~> 1.0 and `simplecov-cobertura` ~> 4.0, migrate `SimpleCov.add
 5. [x] Run new specs then full suite + RuboCop; fix any fallout
    - Files: `spec/jekyll_highlight_cards/simplecov_config_spec.rb` (RuboCop DescribeClass / MatchWithSimpleRegex)
    - Changes: describe `SimpleCov`; use `include("add_filter")`
-6. [ ] Open PR via `gh` after QA/reflect (Fixes #47; note #46 superseded)
+6. [x] Open PR via `gh` after QA/reflect (Fixes #47; note #46 superseded)
    - Files: n/a (git/gh)
    - Changes: push branch, create PR body per acceptance criteria
 
