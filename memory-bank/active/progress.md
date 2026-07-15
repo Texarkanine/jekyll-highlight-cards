@@ -67,3 +67,10 @@ Bump SimpleCov / simplecov-cobertura majors and migrate `add_filter` → `skip` 
     - Archive waits for operator `/niko-archive` (L2 workflow); PR open proceeds per hard requirements
 * Insights
     - cobertura 4.x already pins simplecov ~> 1.0 — joint bump is mandatory for lock resolution
+
+## 2026-07-15 - ARCHIVE - IN-PROGRESS
+
+* Work completed
+    - Operator invoked `/niko-archive` after PR #48 and reflect
+* Decisions made
+    - Category: enhancements/
