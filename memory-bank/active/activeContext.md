@@ -1,11 +1,12 @@
 # Active Context
 
 ## Current Task: simplecov-1-skip-migration
-**Phase:** QA - COMPLETE
+**Phase:** REFLECT COMPLETE
 
 ## What Was Done
-- Semantic QA PASS: KISS/DRY/YAGNI/completeness/regression/integrity/docs
-- Implementation matches plan; no debris; PR open remains as post-reflect step
+- Wrote `memory-bank/active/reflection/reflection-simplecov-1-skip-migration.md`
+- Reconciled `systemPatterns.md` to document SimpleCov 1.x `skip` API
+- Implementation complete; PR open remains as operator-requested delivery step after reflect
 
 ## Next Step
-- Reflect phase
+- Run `/niko-archive` to archive (L2 standalone). Meanwhile open GitHub PR per operator hard requirements.

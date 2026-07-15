@@ -58,3 +58,12 @@ Bump SimpleCov / simplecov-cobertura majors and migrate `add_filter` → `skip` 
     - No code changes required from QA
 * Insights
     - Joint major bump + DSL rename is the right unit of work vs deps-only Dependabot PR
+
+## 2026-07-15 - REFLECT - COMPLETE
+
+* Work completed
+    - Wrote reflection document; reconciled systemPatterns for SimpleCov `skip`
+* Decisions made
+    - Archive waits for operator `/niko-archive` (L2 workflow); PR open proceeds per hard requirements
+* Insights
+    - cobertura 4.x already pins simplecov ~> 1.0 — joint bump is mandatory for lock resolution
