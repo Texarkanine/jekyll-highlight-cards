@@ -37,3 +37,15 @@ Bump SimpleCov / simplecov-cobertura majors and migrate `add_filter` → `skip` 
     - No plan amendments required
 * Insights
     - No existing SimpleCov config specs; new file is greenfield under established RSpec layout
+
+## 2026-07-15 - BUILD - COMPLETE
+
+* Work completed
+    - TDD: red specs for versions + skip DSL, then gemspec/lockfile bump and `skip` migration
+    - Resolved simplecov 1.0.1 / simplecov-cobertura 4.0.0
+    - Full suite 194/0; RuboCop clean after DescribeClass / include fixes
+* Decisions made
+    - Kept `/spec/` and `/vendor/` matcher strings
+    - Describe target is `SimpleCov` for RuboCop RSpec/DescribeClass
+* Insights
+    - simplecov-cobertura 4.0.0 already requires `simplecov (~> 1.0)` — joint bump is required for lock resolution
