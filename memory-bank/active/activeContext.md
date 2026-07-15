@@ -4,9 +4,8 @@
 **Phase:** REFLECT COMPLETE
 
 ## What Was Done
-- Wrote `memory-bank/active/reflection/reflection-simplecov-1-skip-migration.md`
-- Reconciled `systemPatterns.md` to document SimpleCov 1.x `skip` API
-- Implementation complete; PR open remains as operator-requested delivery step after reflect
+- Reflection complete; PR opened: https://github.com/Texarkanine/jekyll-highlight-cards/pull/48
+- Closed Dependabot PR #46 as superseded by #48
 
 ## Next Step
-- Run `/niko-archive` to archive (L2 standalone). Meanwhile open GitHub PR per operator hard requirements.
+- Run `/niko-archive` to archive this L2 standalone task
