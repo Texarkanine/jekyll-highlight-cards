@@ -67,4 +67,4 @@ Existing dependency major bumps (not brand-new technology). Validated during Bui
 - [x] Technology validation complete
 - [x] Preflight
 - [x] Build
-- [ ] QA
+- [x] QA

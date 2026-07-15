@@ -49,3 +49,12 @@ Bump SimpleCov / simplecov-cobertura majors and migrate `add_filter` → `skip` 
     - Describe target is `SimpleCov` for RuboCop RSpec/DescribeClass
 * Insights
     - simplecov-cobertura 4.0.0 already requires `simplecov (~> 1.0)` — joint bump is required for lock resolution
+
+## 2026-07-15 - QA - COMPLETE
+
+* Work completed
+    - Reviewed implementation against plan constraints; wrote `.qa-validation-status` = PASS
+* Decisions made
+    - No code changes required from QA
+* Insights
+    - Joint major bump + DSL rename is the right unit of work vs deps-only Dependabot PR
