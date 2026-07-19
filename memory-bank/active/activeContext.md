@@ -1,13 +1,13 @@
 # Active Context
 
 ## Current Task: mutation-testing
-**Phase:** BUILD - COMPLETE
+**Phase:** REFLECT - COMPLETE
 
 ## What Was Done
-- Mutant + mutant-rspec scaffold mirrored from jekyll-auto-thumbnails (`config/mutant.yml`, gemspec deps, SimpleCov skip, CONTRIBUTING discipline, techContext).
-- Drove mutation coverage to 100% across all `JekyllHighlightCards*` subjects (2988/2988 kills).
-- RSpec: 444 examples, 0 failures; RuboCop clean; line coverage ~98.7%.
-- Branch `feat/mutation-testing` ready for draft PR.
+- Build delivered 100% Mutant coverage; draft PR #49 opened.
+- QA PASS (requirements complete; RuboCop/docs/gates green).
+- Reflection written to `memory-bank/active/reflection/reflection-mutation-testing.md`.
+- Persistent `systemPatterns.md` / `techContext.md` updated for Mutant.
 
 ## Next Step
-- Open draft PR, then `/niko-qa` → `/niko-reflect` (no archive).
+- Operator: run `/niko-archive` when ready to archive (not run by this subagent).
