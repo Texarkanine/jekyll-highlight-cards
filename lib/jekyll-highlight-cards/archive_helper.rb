@@ -26,21 +26,14 @@ module JekyllHighlightCards
     # @return [String, nil] the archive URL, or nil if not found
     def archive_url_for(url)
       ArchiveHelper.archive_cache[url] ||= begin
-        log_info("Looking up archive for #{url}")
         archive_url = lookup_archive(url)
-        log_info("Archive URL: #{archive_url || ""}")
 
         if archive_save_enabled?
-          log_info("Submitting to SavePageNow: #{url}")
           archive_url = submit_archive(url) || archive_url
-          log_info("SavePageNow archived #{url} -> #{archive_url}")
         end
 
-        archive_url.to_s.empty? ? nil : archive_url
+        archive_url
       end
-    rescue StandardError => e
-      log_debug("Archive lookup failed for #{url}: #{e.message}")
-      nil
     end
 
     # Check if archiving is enabled via environment variables
@@ -72,13 +65,9 @@ module JekyllHighlightCards
     # @param url [String] the URL to look up
     # @return [String, nil] the archive URL if found, nil otherwise
     def lookup_archive(url)
-      log_debug("lookup_archive(#{url})")
-
       encoded_url = URI.encode_www_form_component(url)
       cdx_url_str = "https://web.archive.org/cdx/search/cdx?url=#{encoded_url}&output=json&filter=statuscode:200&limit=-1&fl=timestamp,original"
       cdx_url = URI.parse(cdx_url_str)
-
-      log_debug("CDX lookup URL: #{cdx_url_str}")
 
       response = Net::HTTP.start(
         cdx_url.host,
@@ -91,24 +80,16 @@ module JekyllHighlightCards
       end
 
       unless response.is_a?(Net::HTTPSuccess)
-        log_debug("CDX lookup failed: #{response.code} #{response.message}")
         return nil
       end
 
-      log_debug("CDX lookup found archived page...")
       rows = JSON.parse(response.body)
 
-      # First row is header, so we need at least 2 rows
-      return nil if rows.length <= 1
+      return nil if rows.size < 2
 
-      latest = rows.last
-      timestamp = latest[0]
-      archive_url = "https://web.archive.org/web/#{timestamp}/#{url}"
-
-      log_debug("CDX lookup found archived page: #{archive_url}")
-      archive_url
-    rescue StandardError => e
-      log_debug("CDX lookup error for #{url}: #{e.message}")
+      timestamp, = rows.last
+      "https://web.archive.org/web/#{timestamp}/#{url}"
+    rescue StandardError
       nil
     end
 
@@ -117,35 +98,28 @@ module JekyllHighlightCards
     # @param url [String] the URL to submit for archiving
     # @return [String, nil] the archive URL if successful, nil otherwise
     def submit_archive(url)
-      log_debug("submit_archive(#{url})")
-
       encoded_url = URI.encode_www_form_component(url)
       save_url = URI.parse("https://web.archive.org/save/#{encoded_url}")
 
-      response = Net::HTTP.start(
-        save_url.host,
-        save_url.port,
-        use_ssl: save_url.scheme == "https",
-        open_timeout: 10,
-        read_timeout: 30
-      ) do |http|
-        req = Net::HTTP::Get.new(save_url.request_uri, { "User-Agent" => archive_user_agent })
-        http.request(req)
+      response = begin
+        Net::HTTP.start(
+          save_url.host,
+          save_url.port,
+          use_ssl: save_url.scheme == "https",
+          open_timeout: 10,
+          read_timeout: 30
+        ) do |http|
+          req = Net::HTTP::Get.new(save_url.request_uri, { "User-Agent" => archive_user_agent })
+          http.request(req)
+        end
+      rescue StandardError
+        return nil
       end
 
       location = response["content-location"]
+      return nil if location.to_s.empty?
 
-      if location && !location.empty?
-        archive_url = "https://web.archive.org#{location}"
-        log_info("SavePageNow archived #{url} -> #{archive_url}")
-        archive_url
-      else
-        log_debug("Archive submission returned no location for #{url}")
-        nil
-      end
-    rescue StandardError => e
-      log_debug("Archive submission error for #{url}: #{e.message}")
-      nil
+      "https://web.archive.org#{location}"
     end
   end
 end

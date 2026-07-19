@@ -3,7 +3,6 @@
 require "spec_helper"
 
 RSpec.describe JekyllHighlightCards::ArchiveHelper do
-  # Create a test class that includes the module and ExpressionEvaluator for logging
   let(:helper) do
     Class.new do
       include JekyllHighlightCards::ArchiveHelper
@@ -15,14 +14,7 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
   let(:archive_url) { "https://web.archive.org/web/20231201120000/https://example.com/page" }
 
   before do
-    # Clear the cache before each test
     described_class.archive_cache = {}
-
-    # Reset environment variables
-    ENV.delete("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE")
-    ENV.delete("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE")
-    ENV.delete("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_UA")
-    ENV.delete("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_CONTACT")
   end
 
   describe "#archive_enabled?" do
@@ -73,145 +65,254 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
     end
   end
 
-  describe "#archive_url_for" do
-    context "when archive is found via CDX lookup" do
-      before do
-        ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE"] = "1"
-
-        # Mock CDX API response
-        cdx_response_body = [
-          %w[timestamp original],
-          ["20231201120000", test_url]
-        ].to_json
-
-        stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
-          .to_return(status: 200, body: cdx_response_body, headers: { "Content-Type" => "application/json" })
-      end
-
-      it "returns the archive URL" do
-        result = helper.archive_url_for(test_url)
-        expect(result).to eq(archive_url)
-      end
-
-      it "caches the result" do
-        helper.archive_url_for(test_url)
-        helper.archive_url_for(test_url)
-
-        # Should only make one request due to caching
-        expect(WebMock).to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx}).once
-      end
+  describe "#lookup_archive" do
+    before do
+      allow(Net::HTTP).to receive(:start).and_call_original
+      allow(Net::HTTP::Get).to receive(:new).and_call_original
     end
 
-    context "when archive is not found" do
-      before do
-        ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE"] = "1"
+    it "returns the archive URL from CDX API results" do
+      cdx_response_body = [
+        %w[timestamp original],
+        ["20231201120000", test_url]
+      ].to_json
 
-        # Mock CDX API response with only header
-        cdx_response_body = [%w[timestamp original]].to_json
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        .to_return(status: 200, body: cdx_response_body, headers: { "Content-Type" => "application/json" })
 
-        stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
-          .to_return(status: 200, body: cdx_response_body, headers: { "Content-Type" => "application/json" })
-      end
-
-      it "returns nil" do
-        result = helper.archive_url_for(test_url)
-        expect(result).to be_nil
-      end
+      expect(helper.archive_url_for(test_url)).to eq(archive_url)
     end
 
-    context "when SavePageNow is enabled" do
-      before do
-        ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE"] = "1"
-        ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE"] = "1"
+    it "uses the latest timestamp when multiple snapshots exist" do
+      cdx_response_body = [
+        %w[timestamp original],
+        ["20231201110000", test_url],
+        ["20231201130000", test_url]
+      ].to_json
 
-        # Mock CDX API (no result)
-        stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
-          .to_return(status: 200, body: [%w[timestamp original]].to_json)
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        .to_return(status: 200, body: cdx_response_body)
 
-        # Mock SavePageNow API
-        stub_request(:get, %r{web\.archive\.org/save/})
-          .to_return(
-            status: 200,
-            headers: { "Content-Location" => "/web/20231201130000/https://example.com/page" }
-          )
-      end
-
-      it "submits to SavePageNow and returns the archive URL" do
-        result = helper.archive_url_for(test_url)
-        expect(result).to eq("https://web.archive.org/web/20231201130000/https://example.com/page")
-      end
-
-      it "makes both CDX and SavePageNow requests" do
-        helper.archive_url_for(test_url)
-
-        expect(WebMock).to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx}).once
-        expect(WebMock).to have_requested(:get, %r{web\.archive\.org/save/}).once
-      end
+      expect(helper.archive_url_for(test_url)).to eq(
+        "https://web.archive.org/web/20231201130000/https://example.com/page"
+      )
     end
 
-    context "when CDX lookup fails" do
-      before do
-        ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE"] = "1"
+    it "returns nil when CDX response has only the header row" do
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        .to_return(status: 200, body: [%w[timestamp original]].to_json)
 
-        stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
-          .to_return(status: 500, body: "Internal Server Error")
-      end
-
-      it "returns nil" do
-        result = helper.archive_url_for(test_url)
-        expect(result).to be_nil
-      end
-
-      it "does not raise an exception" do
-        expect { helper.archive_url_for(test_url) }.not_to raise_error
-      end
+      expect(helper.archive_url_for(test_url)).to be_nil
     end
 
-    context "when SavePageNow submission fails" do
-      before do
-        ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE"] = "1"
-        ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE"] = "1"
+    it "returns nil when CDX response is not successful" do
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        .to_return(status: 500, body: "Internal Server Error")
 
-        # Mock CDX API (found result)
-        stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
-          .to_return(status: 200, body: [%w[timestamp original], ["20231201120000", test_url]].to_json)
-
-        # Mock SavePageNow API (fails)
-        stub_request(:get, %r{web\.archive\.org/save/})
-          .to_return(status: 500, body: "Internal Server Error")
-      end
-
-      it "returns the CDX lookup result" do
-        result = helper.archive_url_for(test_url)
-        expect(result).to eq(archive_url)
-      end
+      expect(helper.archive_url_for(test_url)).to be_nil
     end
 
-    context "when network error occurs" do
-      before do
-        ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE"] = "1"
+    it "returns nil when CDX response is not successful even with a JSON body" do
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        .to_return(
+          status: 404,
+          body: [%w[timestamp original], ["20231201120000", test_url]].to_json
+        )
 
-        stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
-          .to_raise(SocketError.new("Failed to open TCP connection"))
-      end
+      expect(helper.archive_url_for(test_url)).to be_nil
+    end
 
-      it "returns nil" do
-        result = helper.archive_url_for(test_url)
-        expect(result).to be_nil
-      end
+    it "returns nil when CDX lookup raises a network error" do
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        .to_raise(SocketError.new("Failed to open TCP connection"))
 
-      it "does not raise an exception" do
-        expect { helper.archive_url_for(test_url) }.not_to raise_error
-      end
+      expect(helper.archive_url_for(test_url)).to be_nil
+    end
+
+    it "returns nil when CDX response body is invalid JSON" do
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        .to_return(status: 200, body: "not-json")
+
+      expect(helper.archive_url_for(test_url)).to be_nil
+    end
+
+    it "connects to web.archive.org over HTTPS with timeouts" do
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        .to_return(
+          status: 200,
+          body: [%w[timestamp original], ["20231201120000", test_url]].to_json
+        )
+
+      helper.archive_url_for(test_url)
+
+      expect(Net::HTTP).to have_received(:start).with(
+        "web.archive.org",
+        443,
+        hash_including(use_ssl: true, open_timeout: 10, read_timeout: 30)
+      )
+    end
+
+    it "requests the CDX path from the parsed CDX URL" do
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        .to_return(
+          status: 200,
+          body: [%w[timestamp original], ["20231201120000", test_url]].to_json
+        )
+
+      helper.archive_url_for(test_url)
+
+      expect(Net::HTTP::Get).to have_received(:new).with(
+        a_string_starting_with("/cdx/search/cdx?url=")
+      )
+    end
+
+    it "requests the CDX endpoint with encoded URL query parameters" do
+      special_url = "https://example.com/page?param=value&other=test"
+
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        .with(query: hash_including("url" => special_url))
+        .to_return(
+          status: 200,
+          body: [%w[timestamp original], ["20231201120000", special_url]].to_json
+        )
+
+      result = helper.archive_url_for(special_url)
+      expect(result).to include(special_url)
     end
   end
 
-  describe "cache behavior" do
+  describe "#submit_archive" do
     before do
-      ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE"] = "1"
+      ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE"] = "1"
+      allow(Net::HTTP).to receive(:start).and_call_original
+      allow(Net::HTTP::Get).to receive(:new).and_call_original
 
       stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
-        .to_return(status: 200, body: [%w[timestamp original], ["20231201120000", test_url]].to_json)
+        .to_return(status: 200, body: [%w[timestamp original]].to_json)
+    end
+
+    it "returns the archive URL from the Content-Location header" do
+      stub_request(:get, %r{web\.archive\.org/save/})
+        .to_return(
+          status: 200,
+          headers: { "Content-Location" => "/web/20231201130000/https://example.com/page" }
+        )
+
+      expect(helper.archive_url_for(test_url)).to eq(
+        "https://web.archive.org/web/20231201130000/https://example.com/page"
+      )
+    end
+
+    it "returns nil when Content-Location is absent" do
+      stub_request(:get, %r{web\.archive\.org/save/})
+        .to_return(status: 200, headers: {})
+
+      expect(helper.archive_url_for(test_url)).to be_nil
+    end
+
+    it "returns nil when Content-Location is empty" do
+      stub_request(:get, %r{web\.archive\.org/save/})
+        .to_return(status: 200, headers: { "Content-Location" => "" })
+
+      expect(helper.archive_url_for(test_url)).to be_nil
+    end
+
+    it "sends the configured User-Agent header" do
+      ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_UA"] = "CustomBot/1.0"
+
+      stub_request(:get, %r{web\.archive\.org/save/})
+        .with(headers: { "User-Agent" => "CustomBot/1.0" })
+        .to_return(
+          status: 200,
+          headers: { "Content-Location" => "/web/20231201130000/https://example.com/page" }
+        )
+
+      helper.archive_url_for(test_url)
+    end
+
+    it "encodes the URL in the save request path" do
+      special_url = "https://example.com/page?param=value&other=test"
+      encoded = URI.encode_www_form_component(special_url)
+
+      stub_request(:get, "https://web.archive.org/save/#{encoded}")
+        .to_return(
+          status: 200,
+          headers: { "Content-Location" => "/web/20231201130000/#{special_url}" }
+        )
+
+      helper.archive_url_for(special_url)
+    end
+
+    it "requests the save path from the parsed save URL" do
+      stub_request(:get, %r{web\.archive\.org/save/})
+        .to_return(
+          status: 200,
+          headers: { "Content-Location" => "/web/20231201130000/https://example.com/page" }
+        )
+
+      helper.archive_url_for(test_url)
+
+      expect(Net::HTTP::Get).to have_received(:new).with(
+        a_string_starting_with("/save/"),
+        { "User-Agent" => helper.archive_user_agent }
+      )
+    end
+
+    it "connects to web.archive.org over HTTPS with timeouts" do
+      stub_request(:get, %r{web\.archive\.org/save/})
+        .to_return(
+          status: 200,
+          headers: { "Content-Location" => "/web/20231201130000/https://example.com/page" }
+        )
+
+      helper.archive_url_for(test_url)
+
+      expect(Net::HTTP).to have_received(:start).with(
+        "web.archive.org",
+        443,
+        hash_including(use_ssl: true, open_timeout: 10, read_timeout: 30)
+      ).twice
+    end
+
+    it "returns nil when submission raises a network error" do
+      stub_request(:get, %r{web\.archive\.org/save/})
+        .to_raise(SocketError.new("Failed to open TCP connection"))
+
+      expect(helper.archive_url_for(test_url)).to be_nil
+    end
+
+    it "falls back to the CDX lookup result when submission fails" do
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        .to_return(
+          status: 200,
+          body: [%w[timestamp original], ["20231201120000", test_url]].to_json
+        )
+
+      stub_request(:get, %r{web\.archive\.org/save/})
+        .to_return(status: 500, body: "Internal Server Error")
+
+      expect(helper.archive_url_for(test_url)).to eq(archive_url)
+    end
+  end
+
+  describe "#archive_url_for" do
+    before do
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        .to_return(
+          status: 200,
+          body: [%w[timestamp original], ["20231201120000", test_url]].to_json
+        )
+    end
+
+    it "returns the archive URL" do
+      expect(helper.archive_url_for(test_url)).to eq(archive_url)
+    end
+
+    it "caches the result for repeated lookups of the same URL" do
+      helper.archive_url_for(test_url)
+      helper.archive_url_for(test_url)
+
+      expect(WebMock).to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx}).once
     end
 
     it "caches results across multiple helper instances" do
@@ -228,7 +329,6 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
       helper1.archive_url_for(test_url)
       helper2.archive_url_for(test_url)
 
-      # Should only make one request due to shared cache
       expect(WebMock).to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx}).once
     end
 
@@ -236,31 +336,69 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
       url1 = "https://example.com/page1"
       url2 = "https://example.com/page2"
 
-      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx\?.*#{Regexp.escape(url1)}.*})
         .to_return(status: 200, body: [%w[timestamp original], ["20231201120000", url1]].to_json)
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx\?.*#{Regexp.escape(url2)}.*})
+        .to_return(status: 200, body: [%w[timestamp original], ["20231201120000", url2]].to_json)
 
       helper.archive_url_for(url1)
       helper.archive_url_for(url2)
 
-      # Should make two requests for different URLs
       expect(WebMock).to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx}).twice
     end
-  end
 
-  describe "URL encoding" do
-    before do
-      ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE"] = "1"
+    it "returns nil when lookup raises an error" do
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        .to_raise(StandardError.new("unexpected failure"))
+
+      expect(helper.archive_url_for(test_url)).to be_nil
     end
 
-    it "properly encodes URLs with special characters" do
-      special_url = "https://example.com/page?param=value&other=test"
+    context "when SavePageNow is enabled but submission fails" do
+      before do
+        ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE"] = "1"
 
-      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
-        .with(query: hash_including("url" => special_url))
-        .to_return(status: 200, body: [%w[timestamp original], ["20231201120000", special_url]].to_json)
+        stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+          .to_return(
+            status: 200,
+            body: [%w[timestamp original], ["20231201120000", test_url]].to_json
+          )
 
-      result = helper.archive_url_for(special_url)
-      expect(result).to include(special_url)
+        stub_request(:get, %r{web\.archive\.org/save/})
+          .to_return(status: 500, body: "Internal Server Error")
+      end
+
+      it "falls back to the CDX lookup result" do
+        expect(helper.archive_url_for(test_url)).to eq(archive_url)
+      end
+    end
+
+    context "when SavePageNow is enabled" do
+      before do
+        ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE"] = "1"
+
+        stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+          .to_return(status: 200, body: [%w[timestamp original]].to_json)
+
+        stub_request(:get, %r{web\.archive\.org/save/#{Regexp.escape(test_url)}|web\.archive\.org/save/https%3A%2F%2Fexample.com%2Fpage})
+          .to_return(
+            status: 200,
+            headers: { "Content-Location" => "/web/20231201130000/https://example.com/page" }
+          )
+      end
+
+      it "submits the original URL to SavePageNow" do
+        helper.archive_url_for(test_url)
+
+        expect(WebMock).to have_requested(:get, %r{web\.archive\.org/save/https:%2F%2Fexample\.com%2Fpage})
+      end
+
+      it "makes both CDX and SavePageNow requests" do
+        helper.archive_url_for(test_url)
+
+        expect(WebMock).to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx}).once
+        expect(WebMock).to have_requested(:get, %r{web\.archive\.org/save/}).once
+      end
     end
   end
 end
