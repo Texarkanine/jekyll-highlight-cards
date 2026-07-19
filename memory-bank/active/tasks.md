@@ -27,9 +27,9 @@ Remediate all 34 findings in `.slobac/2026-07-19T16-26-13/audit.md` for branch-c
 | 22 | linkcard template-not-found | loose-text-oracle | Strengthen: typed `TemplateNotFoundError` |
 | 23–24 | linkcard nested-brace titles | naming-lies | Rename to Liquid evaluation / consecutive expressions (no nested fixture available without inventing unsupported syntax) |
 | 25 | linkcard `returns nil when no title…` | naming-lies | Rename to omits title heading; consider collapsing with existing `does not render a title when none is provided` if identical |
-| 26 | template_renderer File.join spy | over-specified-mock | Delete interaction assertion (keep empty-source → gem path outcome sibling) |
+| 26 | template_renderer File.join spy | over-specified-mock | **Retained** — `File.join("", "_includes")` → `/_includes` (not creatable in tests); only mutation-kill for `!source.empty?` |
 | 27 | template_renderer TemplateRenderError message | presentation-coupled | Typed error + fragment matchers (template name, path, `Errno::ENOENT`) — not full Errno string equality |
-| 28–31 | archive_helper Net::HTTP spies | over-specified-mock | Delete four interaction-only examples; rely on WebMock + `archive_url_for` outcome siblings |
+| 28–31 | archive_helper Net::HTTP spies | over-specified-mock | **Retained** — WebMock outcomes identical under host/port/ssl/timeout mutations; spies are the only kill surface (commented in-spec) |
 | 32 | expression_evaluator Liquid::Template.parse spy | over-specified-mock | Delete; keep `returns the string as-is` |
 | 33 | expression_evaluator debug log exact string | presentation-coupled | `a_string_including` token + error class; keep fallback outcome sibling |
 | 34 | linkcard + archive_helper CDX cache | semantic-redundancy | Delete `linkcard_tag_spec` `caches archive lookup results`; keep `archive_helper_spec` canonical |
@@ -155,5 +155,11 @@ No new technology - validation not required. (Nokogiri not added; presentation p
 - [x] Technology validation complete
 - [x] Pre-Mortem complete
 - [x] Preflight
-- [ ] Build
+- [x] Build
 - [ ] QA
+
+## Build Notes
+
+- Implemented steps 1–7; `bundle exec rspec` 443/0 @ 100% line coverage; `bundle exec mutant run` 2988/0 (100%); RuboCop clean on touched files.
+- Deviations: retained findings 26 & 28–31 (mutant-required spies); restored File.join empty-source check after cwd trap proved impossible (`File.join("", "_includes")` → `/_includes`); ExpressionEvaluator poison-stub outcome test (no `have_received(:parse)`); image-sizing freeze via `String.new(...).freeze` for RuboCop; split used script delete rather than `git mv`.
+- Image sizing: 5 capability specs + `spec/support/image_sizing_document.rb`; monolith removed.

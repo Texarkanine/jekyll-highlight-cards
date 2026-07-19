@@ -136,6 +136,8 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
       expect(helper.archive_url_for(test_url)).to be_nil
     end
 
+    # Net::HTTP connection kwargs are not observable via WebMock response stubs;
+    # these examples are the mutation-kill surface for host/port/ssl/timeouts/path.
     it "connects to web.archive.org over HTTPS with timeouts" do
       stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
         .to_return(
@@ -246,6 +248,7 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
       expect(WebMock).to have_requested(:get, "https://web.archive.org/save/#{encoded}")
     end
 
+    # See lookup_archive: Net::HTTP kwargs/path are mutation-kill only via collaborator spies.
     it "requests the save path from the parsed save URL" do
       stub_request(:get, %r{web\.archive\.org/save/})
         .to_return(

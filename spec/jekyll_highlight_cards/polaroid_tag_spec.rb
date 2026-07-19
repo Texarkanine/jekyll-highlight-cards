@@ -208,7 +208,10 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
         end
 
         it "raises an error" do
-          expect { render_tag("/photo.jpg") }.to raise_error(/Template not found/)
+          expect { render_tag("/photo.jpg") }.to raise_error(
+            JekyllHighlightCards::TemplateNotFoundError,
+            /Template not found/
+          )
         end
       end
     end
@@ -245,7 +248,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
       expect(result).not_to include('target="_blank"')
     end
 
-    it "shows archive anchor when resolve_archive returns a URL" do
+    it "shows an explicit archive URL in the rendered markup" do
       result = render_tag('/photo.jpg link="https://example.com" archive="https://archive.org/snap"')
       expect(result).to include("archive.org/snap")
     end
@@ -359,14 +362,9 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
     end
 
     describe "edge cases" do
-      it "handles empty title gracefully" do
-        result = render_tag('/photo.jpg title=""')
-        expect(result).to include("/photo.jpg")
-      end
-
-      it "handles empty link gracefully" do
+      it "renders nbsp in link area when link is an empty string" do
         result = render_tag('/photo.jpg link=""')
-        expect(result).to include("/photo.jpg")
+        expect(result).to match(/polaroid-link[^>]*>\s*&nbsp;/)
       end
 
       it "handles multiline markup" do
@@ -467,7 +465,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
       expect(result).to include("archive.org/1")
     end
 
-    it "requires the first token to be the image URL" do
+    it "uses an image-only markup token as the img src" do
       result = render_tag("/only-image.jpg")
       expect(result).to include('src="/only-image.jpg"')
     end
@@ -575,8 +573,13 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
 
         it "archives the link URL not the image URL" do
           result = render_tag('/photo.jpg link="https://example.com"')
-          expect(result).to include("web.archive.org")
-          expect(result).to include("20231201120000")
+          expect(result).to include(
+            "web.archive.org/web/20231201120000/https://example.com"
+          )
+          expect(result).not_to include(
+            "web.archive.org/web/20231201120000/https://example.com/photo.jpg"
+          )
+          expect(result).not_to match(%r{web\.archive\.org/web/\d+/[^"]*photo\.jpg})
         end
       end
     end
@@ -637,7 +640,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
       expect(result).not_to include("20231201120000")
     end
 
-    it "uses archive_enabled to auto-lookup when no explicit archive parameter" do
+    it "auto-archives via ENV when no explicit archive parameter is given" do
       allow(ENV).to receive(:[]).with("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE").and_return("1")
       stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
         .to_return(
@@ -786,22 +789,22 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
       expect(result).to include('height="200"')
     end
 
-    it "uses raw title key to drive alt fallback in template" do
+    it "fills img alt from title when alt is omitted" do
       result = render_tag('/photo.jpg title="Visible Title"')
       expect(result).to include('alt="Visible Title"')
     end
 
-    it "uses raw alt key for alt text when provided" do
+    it "uses the alt parameter for img alt when provided" do
       result = render_tag('/photo.jpg alt="Screen Text" title="Visible Title"')
       expect(result).to include('alt="Screen Text"')
     end
 
-    it "uses raw archive_url key to show archive link" do
+    it "renders an archive anchor for an explicit archive URL" do
       result = render_tag('/photo.jpg link="https://example.com" archive="https://archive.org/snap"')
       expect(result).to match(%r{polaroid-archive[^>]*>\s*\(\s*<a[^>]*>archive</a>\s*\)})
     end
 
-    it "hides archive link when raw archive_url is nil" do
+    it "hides the archive anchor when archive is none" do
       result = render_tag('/photo.jpg link="https://example.com" archive="none"')
       expect(result).not_to match(/polaroid-archive[^>]*>\s*\(\s*<a/)
     end
@@ -821,13 +824,13 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
       expect(result).to match(%r{polaroid-link[^>]*>\s*<a[^>]*>example\.com/path</a>})
     end
 
-    it "sets width and height template variables from size" do
+    it "applies width and height attributes from size" do
       result = render_tag("/photo.jpg size=400x300")
       expect(result).to include('width="400"')
       expect(result).to include('height="300"')
     end
 
-    it "sets image_link_url for external target blank detection" do
+    it "adds target blank for an external image_link" do
       result = render_tag('/photo.jpg image_link="https://external.example/img"')
       expect(result).to include('href="https://external.example/img"')
       expect(result).to include('target="_blank"')

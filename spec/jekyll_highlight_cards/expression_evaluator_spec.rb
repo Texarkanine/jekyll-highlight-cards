@@ -64,10 +64,10 @@ RSpec.describe JekyllHighlightCards::ExpressionEvaluator do
         expect(result).to eq("literal-value")
       end
 
-      it "does not parse plain literals as Liquid templates" do
-        allow(Liquid::Template).to receive(:parse).and_call_original
-        evaluator.evaluate_expression("literal-value", context)
-        expect(Liquid::Template).not_to have_received(:parse)
+      it "does not evaluate plain literals through Liquid" do
+        poison = instance_double(Liquid::Template, render: "from-liquid")
+        allow(Liquid::Template).to receive(:parse).and_return(poison)
+        expect(evaluator.evaluate_expression("literal-value", context)).to eq("literal-value")
       end
 
       it "handles URLs" do
@@ -136,13 +136,16 @@ RSpec.describe JekyllHighlightCards::ExpressionEvaluator do
       end
 
       it "logs a debug message including the token and error class on syntax failure" do
-        begin
+        error = begin
           Liquid::Template.parse("{{ invalid")
         rescue StandardError => e
-          @expected_log = "Failed to evaluate '{{ invalid' as Liquid expression: #{e.class}: #{e}"
+          e
         end
         evaluator.evaluate_expression("{{ invalid", context)
-        expect(Jekyll.logger).to have_received(:debug).with("HighlightCards:", @expected_log)
+        expect(Jekyll.logger).to have_received(:debug).with(
+          "HighlightCards:",
+          a_string_including("{{ invalid", error.class.to_s, error.to_s)
+        )
       end
 
       it "falls back to literal string on syntax error when allow_nil is false" do

@@ -110,3 +110,15 @@ Remediate SLOBAC audit findings on mutation-coverage specs under `spec/jekyll_hi
     - Advisory skipped for re-running SLOBAC CLI (out of brief); mutant gate remains the kill-power check
 * Insights
     - `spec/support` is not auto-required by `.rspec`; blanket glob would risk loading `mutant_setup.rb` into normal RSpec
+
+## 2026-07-19 - BUILD - COMPLETE
+
+* Work completed
+    - 29/34 findings remediable without mutant loss; 5 retained (26, 28–31) with in-spec rationale
+    - Image sizing monolith → 5 specs + shared context; freeze/whitespace/presentation smells fixed
+    - Gates: rspec 443/0 @ 100% lines; mutant 2988/0; RuboCop clean
+* Decisions made
+    - Prefer poison-stub Liquid outcome over `have_received(:parse)` for literal skip
+    - Keep Net::HTTP / File.join spies where WebMock/filesystem cannot distinguish mutants
+* Insights
+    - `File.join("", "_includes")` → `/_includes` on this Ruby — cwd traps cannot kill empty-source skip

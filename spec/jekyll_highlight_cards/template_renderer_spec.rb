@@ -102,6 +102,9 @@ RSpec.describe JekyllHighlightCards::TemplateRenderer do
         expect(renderer.find_template_path(mock_site, "linkcard")).to eq(gem_template_path)
       end
 
+      # Empty source joins to "/_includes/..." (absolute). That path is not creatable in
+      # tests, so the empty-skip branch is asserted via the join arguments that would
+      # open it — the only mutation-kill surface for `!source.empty?`.
       it "does not join a user includes path when source is empty" do
         allow(File).to receive(:join).and_call_original
         renderer.find_template_path(mock_site, "linkcard")
@@ -241,10 +244,12 @@ RSpec.describe JekyllHighlightCards::TemplateRenderer do
         path = File.join(template_dir, "test.html")
         expect do
           renderer.render_template(mock_site, "test", {})
-        end.to raise_error(
-          JekyllHighlightCards::TemplateRenderError,
-          "Failed to read template 'test' at #{path}: Errno::ENOENT: No such file or directory - No such file"
-        )
+        end.to raise_error(JekyllHighlightCards::TemplateRenderError) { |error|
+          expect(error.message).to include("Failed to read template 'test'")
+          expect(error.message).to include(path)
+          expect(error.message).to include("Errno::ENOENT")
+          expect(error.message).to include("No such file")
+        }
       end
     end
 

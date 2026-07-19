@@ -65,10 +65,6 @@ RSpec.describe JekyllHighlightCards::LinkcardTag do
       expect(result).not_to include("<h1>")
     end
 
-    it "uses the site from Liquid context registers" do
-      expect { render_tag("https://example.com") }.not_to raise_error
-    end
-
     it "passes the resolved URL to automatic archive lookup" do
       allow(ENV).to receive(:[]).with("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE").and_return("1")
       stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
@@ -121,7 +117,10 @@ RSpec.describe JekyllHighlightCards::LinkcardTag do
       end
 
       it "raises an error" do
-        expect { render_tag("https://example.com") }.to raise_error(/Template not found/)
+        expect { render_tag("https://example.com") }.to raise_error(
+          JekyllHighlightCards::TemplateNotFoundError,
+          /Template not found/
+        )
       end
     end
   end
@@ -299,7 +298,7 @@ RSpec.describe JekyllHighlightCards::LinkcardTag do
       expect(result).to include("https://example.com/liquid-only")
     end
 
-    it "parses nested-looking braces only within Liquid expressions" do
+    it "evaluates a Liquid-only URL and leaves no unrendered tags" do
       context.environments.first["page"] = { "url" => "https://example.com/nested" }
       result = render_tag("{{ page.url }}")
       expect(result).to include("https://example.com/nested")
@@ -326,7 +325,7 @@ RSpec.describe JekyllHighlightCards::LinkcardTag do
       expect(result).to include("Title")
     end
 
-    it "balances nested Liquid braces when parsing consecutive expressions" do
+    it "evaluates consecutive Liquid URL expressions as separate tokens" do
       context.environments.first["page"] = {
         "outer" => "https://example.com/outer",
         "inner" => "https://example.com/inner"
@@ -425,11 +424,6 @@ RSpec.describe JekyllHighlightCards::LinkcardTag do
   end
 
   describe "#resolve_title" do
-    it "returns nil when no title is provided" do
-      result = render_tag("https://example.com")
-      expect(result).not_to include("<h1>")
-    end
-
     it "evaluates a Liquid title variable" do
       context.environments.first["page"] = { "title" => "My Page Title" }
       result = render_tag("https://example.com {{ page.title }}")
@@ -499,20 +493,6 @@ RSpec.describe JekyllHighlightCards::LinkcardTag do
 
       result = render_tag("https://example.com")
       expect(result).to include("web.archive.org/web/20231201120000")
-    end
-
-    it "caches archive lookup results" do
-      allow(ENV).to receive(:[]).with("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE").and_return("1")
-      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
-        .to_return(
-          status: 200,
-          body: [%w[timestamp original], ["20231201120000", "https://example.com"]].to_json,
-          headers: { "Content-Type" => "application/json" }
-        )
-
-      render_tag("https://example.com")
-      render_tag("https://example.com")
-      expect(WebMock).to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx}).once
     end
 
     it "renders without an archive link when lookup fails" do
