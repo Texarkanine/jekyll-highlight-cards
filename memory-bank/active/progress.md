@@ -152,3 +152,10 @@ Remediate SLOBAC audit findings on mutation-coverage specs under `spec/jekyll_hi
     - Deferred items 7 (safe_template_path boundary) and 9 (`http_get` extract) untouched
 * Insights
     - Committing Mutant session JSON fights `/.mutant/` ignore and leaks machine paths; local-only is the reference pattern
+
+## 2026-07-19 - DOCS - COMPLETE (PR #49 discussion_r3611506254)
+
+* Work completed
+    - Clarified `activeContext.md`: `.mutant/results/*` removed from git; `/.mutant/` stays ignored; never commit local Mutant output
+* Decisions made
+    - Policy confirmed with operator: Mutant result JSON is local-only (not committed)
