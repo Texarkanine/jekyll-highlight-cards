@@ -41,28 +41,27 @@ module JekyllHighlightCards
     # @param context [Liquid::Context] the Liquid rendering context
     # @return [String] rendered HTML
     def render(context)
-      # Parse markup
       params = parse_markup(@markup, context)
 
-      # Validate required image_url
-      raise ArgumentError, "polaroid tag requires an image URL" if params[:image_url].to_s.empty?
+      raise ArgumentError, "polaroid tag requires an image URL" if params.fetch(:image_url).empty?
 
-      # Parse size parameter (nil/empty size yields nil dimensions)
       width, height = DimensionParser.parse_dimensions(params[:size])
 
-      # Determine link URL (defaults to image URL)
-      # Track if link was explicitly provided
       explicit_link = !params[:link].to_s.empty?
-      link_url = params[:link].to_s.empty? ? params[:image_url] : params[:link]
+      link_url = if params[:link].to_s.empty?
+                   params.fetch(:image_url)
+                 else
+                   params.fetch(:link)
+                 end
+      image_link_url = if params[:image_link].to_s.empty?
+                         link_url
+                       else
+                         params.fetch(:image_link)
+                       end
+      archive_url = resolve_archive(params[:archive], link_url)
 
-      image_link_url = params[:image_link].to_s.empty? ? link_url : params[:image_link]
-
-      # Resolve archive URL (archives the link URL, not the image)
-      archive_url = resolve_archive(params[:archive], context, link_url)
-
-      # Build template variables
       variables = build_template_variables(
-        params[:image_url],
+        params.fetch(:image_url),
         width,
         height,
         params[:title],
@@ -73,7 +72,6 @@ module JekyllHighlightCards
         archive_url
       )
 
-      # Get site from context and render template
       render_template(context.registers[:site], "polaroid", variables)
     end
 
@@ -92,7 +90,8 @@ module JekyllHighlightCards
       in_liquid = 0
       escaped = false
 
-      markup.each_char do |char|
+      # Trailing space flushes the final token through the whitespace branch
+      (markup + " ").each_char do |char|
         if escaped
           current += char
           escaped = false
@@ -107,14 +106,14 @@ module JekyllHighlightCards
         if char == "{" && !in_quotes
           in_liquid += 1
           current += char
-        elsif char == "}" && !in_quotes && in_liquid.positive?
+        elsif char == "}" && in_liquid.positive?
           in_liquid -= 1
           current += char
-        elsif ['"', "'"].include?(char) && !in_quotes && in_liquid.zero?
+        elsif ['"', "'"].include?(char) && !in_quotes
           in_quotes = true
           quote_char = char
           current += char
-        elsif char == quote_char && in_quotes
+        elsif char == quote_char
           in_quotes = false
           current += char
           quote_char = nil
@@ -125,34 +124,33 @@ module JekyllHighlightCards
           current += char
         end
       end
-      tokens << current
 
       image_url_token = tokens.shift
-      image_url = evaluate_expression(image_url_token, context, allow_nil: false)
+      image_url = evaluate_expression(image_url_token, context)
 
       result = { image_url: image_url }
       tokens.each do |token|
-        next unless token =~ /^(\w+)=(.+)$/
+        next unless token =~ /\A(\w+)=(.+)\z/
 
         key = Regexp.last_match(1).to_sym
         value_token = Regexp.last_match(2)
-        result[key] = evaluate_expression(value_token, context, allow_nil: true)
+        result[key] = evaluate_expression(value_token, context)
       end
 
       result
     end
 
-    # Resolve archive URL (may be explicit, auto-lookup, or opt-out)
+    # Resolve archive URL (may be explicit, auto-lookup, or opt-out).
+    # Named archive params are already Liquid-evaluated in parse_markup.
     #
     # @param source [String, nil] the archive source
-    # @param context [Liquid::Context] the Liquid context (unused but kept for consistency)
     # @param url [String] the target URL to archive
     # @return [String, nil] resolved archive URL
-    def resolve_archive(source, context, url)
-      return nil if source&.downcase == "none"
-      return evaluate_expression(source, context, allow_nil: true) unless source.to_s.empty?
+    def resolve_archive(source, url)
+      return nil if source && source.downcase == "none"
+      return source unless source.to_s.empty?
 
-      archive_enabled? ? archive_url_for(url) : nil
+      archive_enabled? && archive_url_for(url)
     end
 
     # Build template variables hash for rendering
@@ -178,11 +176,9 @@ module JekyllHighlightCards
       explicit_link,
       archive_url
     )
-      link_display = explicit_link ? strip_protocol(link_url) : nil
-      escaped_title = title && !title.empty? ? CGI.escapeHTML(title) : "&nbsp;"
-      escaped_alt = alt && !alt.empty? ? CGI.escapeHTML(alt) : ""
-      escaped_link_display = link_display && !link_display.empty? ? CGI.escapeHTML(link_display) : "&nbsp;"
-      escaped_archive_url = archive_url && CGI.escapeHTML(archive_url)
+      link_display = strip_protocol(link_url) if explicit_link
+      escaped_title = CGI.escapeHTML(title.to_s)
+      escaped_title = "&nbsp;" if escaped_title.empty?
 
       {
         "image_url" => image_url,
@@ -197,9 +193,9 @@ module JekyllHighlightCards
         "escaped_link_url" => CGI.escapeHTML(link_url),
         "escaped_image_link_url" => CGI.escapeHTML(image_link_url),
         "escaped_title" => escaped_title,
-        "escaped_alt" => escaped_alt,
-        "escaped_link_display" => escaped_link_display,
-        "escaped_archive_url" => escaped_archive_url
+        "escaped_alt" => CGI.escapeHTML(alt.to_s),
+        "escaped_link_display" => link_display && CGI.escapeHTML(link_display),
+        "escaped_archive_url" => archive_url && CGI.escapeHTML(archive_url)
       }
     end
 

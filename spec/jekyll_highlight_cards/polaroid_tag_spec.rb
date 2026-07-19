@@ -40,7 +40,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
       context "with image URL only" do
         it "renders the image" do
           result = render_tag("/assets/photo.jpg")
-          expect(result).to include("/assets/photo.jpg")
+          expect(result).to include('src="/assets/photo.jpg"')
           expect(result).to include("<img")
         end
 
@@ -252,7 +252,22 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
 
     it "passes parsed title into the rendered output" do
       result = render_tag('/photo.jpg title="Render Title"')
-      expect(result).to include("Render Title")
+      expect(result).to match(%r{polaroid-title[^>]*>\s*Render Title\s*<}i)
+    end
+
+    it "auto-archives the link URL when archiving is enabled" do
+      allow(ENV).to receive(:[]).with("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE").and_return("1")
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        .to_return(
+          status: 200,
+          body: [%w[timestamp original], ["20240101120000", "https://render-archive.example/"]].to_json,
+          headers: { "Content-Type" => "application/json" }
+        )
+
+      result = render_tag('/photo.jpg link="https://render-archive.example/"')
+      expect(result).to include(
+        "web.archive.org/web/20240101120000/https://render-archive.example/"
+      )
     end
 
     it "shows visible link text only for explicit link parameters" do
@@ -272,6 +287,40 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
         expect(result).to include('class="custom-polaroid"')
         expect(result).to include("/custom.jpg")
       end
+    end
+
+    it "falls back to the gem template when site is absent from registers" do
+      bare_context = Liquid::Context.new({}, {}, {})
+      tag = Liquid::Template.parse("{% polaroid /photo.jpg %}").root.nodelist.first
+      result = tag.render(bare_context)
+      expect(result).to include('src="/photo.jpg"')
+      expect(result).to include("polaroid-container")
+    end
+
+    it "passes alt text through to the img attribute" do
+      result = render_tag('/photo.jpg alt="Screen reader alt"')
+      expect(result).to include('alt="Screen reader alt"')
+    end
+
+    it "passes size dimensions through to width and height attributes" do
+      result = render_tag("/photo.jpg size=111x222")
+      expect(result).to include('width="111"')
+      expect(result).to include('height="222"')
+    end
+
+    it "evaluates liquid archive URLs with the render context" do
+      context.environments.first["page"] = { "archive" => "https://archive.org/from-liquid" }
+      result = render_tag('/photo.jpg link="https://example.com" archive={{ page.archive }}')
+      expect(result).to include("archive.org/from-liquid")
+    end
+
+    it "keeps distinct image, link, and image_link URLs in the markup" do
+      result = render_tag(
+        '/img-only.jpg link="https://link.example/path" image_link="https://image-link.example/i"'
+      )
+      expect(result).to include('src="/img-only.jpg"')
+      expect(result).to match(%r{<a href="https://image-link\.example/i"[^>]*>\s*<img}i)
+      expect(result).to match(%r{<a href="https://link\.example/path"[^>]*>link\.example/path</a>}i)
     end
   end
 
@@ -435,6 +484,66 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
       result = render_tag('/photo.jpg title={{ page.title }}')
       expect(result).to include("Brace Title")
     end
+
+    it "parses a double-quoted image URL as the first token" do
+      result = render_tag('"/quoted-photo.jpg"')
+      expect(result).to include('src="/quoted-photo.jpg"')
+    end
+
+    it "does not open quotes while inside a Liquid expression" do
+      context.environments.first["page"] = { "image" => "/from-liquid.jpg" }
+      result = render_tag('{{ page.image }} title="Quoted Title"')
+      expect(result).to include("/from-liquid.jpg")
+      expect(result).to include("Quoted Title")
+    end
+
+    it "keeps closing braces inside quoted titles literal" do
+      result = render_tag('/photo.jpg title="literal } brace"')
+      expect(result).to include("literal } brace")
+    end
+
+    it "keeps opening braces inside quoted titles literal when archive follows" do
+      result = render_tag('/photo.jpg title="brace { here" archive="none"')
+      expect(result).to include("brace { here")
+      expect(result).not_to include("web.archive.org")
+    end
+
+    it "treats backslashes outside quotes as literal characters" do
+      result = render_tag('/photo.jpg title=foo\\bar')
+      expect(result).to include("foo\\bar")
+    end
+
+    it "closes quoted values after escaped backslashes before the next parameter" do
+      result = render_tag('/photo.jpg title="path\\\\" size=300x200')
+      expect(result).to include("path\\")
+      expect(result).to include('width="300"')
+    end
+
+    it "does not decrement liquid depth for unpaired closing braces" do
+      context.environments.first["page"] = { "title" => "After Brace" }
+      result = render_tag('/photo.jpg/} title={{ page.title }}')
+      expect(result).to include("/photo.jpg/}")
+      expect(result).to include("After Brace")
+    end
+
+    it "parses markup with no trailing whitespace from Liquid" do
+      tag = Liquid::Template.parse("{%polaroid /photo.jpg size=300x200%}").root.nodelist.first
+      result = tag.render(context)
+      expect(result).to include('src="/photo.jpg"')
+      expect(result).to include('width="300"')
+    end
+
+    it "ignores leading whitespace before the image URL" do
+      tag = Liquid::Template.parse("{% polaroid  /photo.jpg %}").root.nodelist.first
+      result = tag.render(context)
+      expect(result).to include('src="/photo.jpg"')
+    end
+
+    it "keeps size parsing working after a single-brace title value" do
+      result = render_tag('/photo.jpg title={foo} size=300x200')
+      expect(result).to include('width="300"')
+      expect(result).to include("{foo}")
+    end
   end
 
   describe "#resolve_archive" do
@@ -483,11 +592,13 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
 
       result = render_tag('/photo.jpg link="https://example.com" archive="NONE"')
       expect(result).not_to include("web.archive.org")
+      expect(result).not_to match(/polaroid-archive[^>]*>\s*\(\s*<a/)
     end
 
     it "does not auto-lookup when archiving is disabled" do
       result = render_tag('/photo.jpg link="https://example.com"')
       expect(result).not_to include("web.archive.org")
+      expect(WebMock).not_to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx})
     end
 
     it "evaluates Liquid expressions in explicit archive URLs" do
@@ -561,6 +672,28 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
 
       result = render_tag('/photo.jpg link="https://example.com" archive="NoNe"')
       expect(result).not_to include("20231201120000")
+      expect(result).not_to match(/polaroid-archive[^>]*>\s*\(\s*<a/)
+    end
+
+    it "looks up the provided link URL when auto-archiving" do
+      allow(ENV).to receive(:[]).with("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE").and_return("1")
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        .to_return(
+          status: 200,
+          body: [%w[timestamp original], ["20240101120000", "https://unique-archive-target.example/"]].to_json,
+          headers: { "Content-Type" => "application/json" }
+        )
+
+      result = render_tag('/photo.jpg link="https://unique-archive-target.example/"')
+      expect(result).to include(
+        "web.archive.org/web/20240101120000/https://unique-archive-target.example/"
+      )
+    end
+
+    it "evaluates an explicit archive liquid expression against context" do
+      context.environments.first["page"] = { "snap" => "https://archive.org/ctx-snap" }
+      result = render_tag('/photo.jpg link="https://example.com" archive={{ page.snap }}')
+      expect(result).to include("archive.org/ctx-snap")
     end
   end
 
@@ -712,23 +845,48 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
           data-archive="{{ archive_url }}"
           data-width="{{ width }}"
           data-height="{{ height }}"
+          data-esc-image="{{ escaped_image_url }}"
+          data-esc-link="{{ escaped_link_url }}"
+          data-esc-image-link="{{ escaped_image_link_url }}"
+          data-esc-title="{{ escaped_title }}"
+          data-esc-alt="{{ escaped_alt }}"
+          data-esc-link-display="{{ escaped_link_display }}"
+          data-esc-archive="{{ escaped_archive_url }}"
         ></div>
       HTML
 
       with_custom_polaroid_template(custom_dir, template) do
         result = render_tag(
-          '/photo.jpg size=10x20 title="T" alt="A" link="https://example.com" ' \
-          'image_link="https://other.example/i" archive="https://archive.org/x"'
+          '/photo.jpg?x=<a> size=10x20 title="T&T" alt="A&A" ' \
+          'link="https://example.com?y=<b>" image_link="https://other.example/i?z=<c>" ' \
+          'archive="https://archive.org/x?q=<d>"'
         )
-        expect(result).to include('data-image="/photo.jpg"')
-        expect(result).to include('data-image-link="https://other.example/i"')
-        expect(result).to include('data-title="T"')
-        expect(result).to include('data-alt="A"')
-        expect(result).to include('data-link-display="example.com"')
-        expect(result).to include('data-archive="https://archive.org/x"')
+        expect(result).to include('data-image="/photo.jpg?x=<a>"')
+        expect(result).to include('data-image-link="https://other.example/i?z=<c>"')
+        expect(result).to include('data-title="T&T"')
+        expect(result).to include('data-alt="A&A"')
+        expect(result).to include('data-link-display="example.com?y=<b>"')
+        expect(result).to include('data-archive="https://archive.org/x?q=<d>"')
         expect(result).to include('data-width="10"')
         expect(result).to include('data-height="20"')
+        expect(result).to include('data-esc-image="/photo.jpg?x=&lt;a&gt;"')
+        expect(result).to include('data-esc-link="https://example.com?y=&lt;b&gt;"')
+        expect(result).to include('data-esc-image-link="https://other.example/i?z=&lt;c&gt;"')
+        expect(result).to include('data-esc-title="T&amp;T"')
+        expect(result).to include('data-esc-alt="A&amp;A"')
+        expect(result).to include('data-esc-link-display="example.com?y=&lt;b&gt;"')
+        expect(result).to include('data-esc-archive="https://archive.org/x?q=&lt;d&gt;"')
       end
+    end
+
+    it "uses distinct escaped URLs when image, link, and image_link differ" do
+      result = render_tag(
+        '/only-image.jpg?a=<1> link="https://only-link.example?b=<2>" ' \
+        'image_link="https://only-image-link.example?c=<3>"'
+      )
+      expect(result).to include('src="/only-image.jpg?a=&lt;1&gt;"')
+      expect(result).to include('href="https://only-image-link.example?c=&lt;3&gt;"')
+      expect(result).to include('href="https://only-link.example?b=&lt;2&gt;"')
     end
   end
 
