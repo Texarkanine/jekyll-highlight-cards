@@ -159,3 +159,10 @@ Remediate SLOBAC audit findings on mutation-coverage specs under `spec/jekyll_hi
     - Clarified `activeContext.md`: `.mutant/results/*` removed from git; `/.mutant/` stays ignored; never commit local Mutant output
 * Decisions made
     - Policy confirmed with operator: Mutant result JSON is local-only (not committed)
+
+## 2026-07-19 - ARCHIVE - READY
+
+* Work completed
+    - Operator invoked `/niko-archive` after CodeRabbit PR feedback fixes and doc clarification
+* Decisions made
+    - Archive current L2 `mutation-testing-slobac-rework` and also the never-archived parent L3 `mutation-testing` reflection (same ephemeral bank)

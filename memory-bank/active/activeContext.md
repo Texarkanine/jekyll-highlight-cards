@@ -1,7 +1,7 @@
 # Active Context
 
 ## Current Task: mutation-testing-slobac-rework
-**Phase:** BUILD - COMPLETE (post-reflect CodeRabbit PR #49 fixes)
+**Phase:** ARCHIVE - READY
 
 ## What Was Done
 - Removed `.mutant/results/*` from git; keep `/.mutant/` ignored (local Mutant output only — never commit)
