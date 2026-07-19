@@ -84,17 +84,23 @@ None - implementation approach is clear (mirror auto-thumbnails archive `2026071
 
 ## Implementation Plan
 
-1. **Scaffold Mutant (PoC complete)**
+1. **Scaffold Mutant (PoC complete — no further TDD cycle)**
     - Files: `jekyll-highlight-cards.gemspec`, `Gemfile.lock`, `config/mutant.yml`, `spec/support/mutant_setup.rb`, `spec/spec_helper.rb`
     - Changes: deps `~> 0.16`; subjects `JekyllHighlightCards*`; SimpleCov skipped under Mutant; archive ENV around-isolation
-2. **Document discipline**
+2. **Document discipline (docs-only)**
     - Files: `CONTRIBUTING.md`, `memory-bank/techContext.md`
     - Changes: Mutation Testing section from auto-thumbnails; Testing Process Mutant CLI note
-3. **Inventory survivors**
-    - Run `bundle exec mutant run` (optionally JSON) once; group by structural cause
-4. **Kill loop (TDD per subject)**
-    - Files: matching `lib/` + `spec/` pairs
-    - For each survivor: classify A vs B; simplify or add observing example under correct describe; prefer `def self.` over `module_function`; stub collaborators not SUT
+3. **Inventory survivors (observation-only)**
+    - Run `bundle exec mutant run` (optionally JSON) once; group by structural cause before coding
+4. **Kill loop — one subject/survivor cluster at a time (strict TDD)**
+    - Files: matching `lib/` + `spec/` pairs for the current survivor cluster
+    - Ordered substeps (must not skip ahead):
+        1. Classify A vs B for the surviving mutant(s)
+        2. If B: write/expand the observing example under the subject’s describe (expect fail or incomplete observation first)
+        3. If A: no new test required — simplify the unobservable implementation
+        4. If B after failing test: implement only enough product/test observation change to kill the mutant
+        5. Re-run scoped `mutant run --fail-fast` / subject filter, then continue
+    - Constraints while looping: prefer `def self.` over `module_function`; stub collaborators not SUT; no `send`/`__send__` for private methods just for Mutant
 5. **Acceptance gates**
     - `bundle exec rspec` green
     - `bundle exec mutant run` 100%
@@ -134,6 +140,12 @@ PoC results (2026-07-19):
 - [x] Implementation plan complete
 - [x] Technology validation complete
 - [x] Pre-Mortem complete
-- [ ] Preflight
+- [x] Preflight
 - [ ] Build
 - [ ] QA
+
+## Preflight Findings
+
+- **PASS** — Plan conventions match gemspec-owned deps + SimpleCov-in-spec_helper patterns; no creative docs required.
+- **TDD encoding** — Amended kill-loop step 4 with explicit classify → test (B) / simplify (A) → implement → re-verify ordering.
+- **Advisory (non-blocking)** — Optional `rake mutant` wrapper deferred (same as auto-thumbnails); CLI fidelity first.

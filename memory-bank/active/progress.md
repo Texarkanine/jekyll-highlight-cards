@@ -28,3 +28,14 @@ Wire Mutant + mutant-rspec into jekyll-highlight-cards (mirror jekyll-auto-thumb
     - Keep scaffold PoC artifacts into build rather than reverting (validated technology)
 * Insights
     - Real `ENV` mutation in archive specs is incompatible with Mutant parallel workers unless isolated per example
+
+## 2026-07-19 - PREFLIGHT - PASS
+
+* Work completed
+    - Validated TDD encoding, conventions, dependencies, completeness
+    - Amended kill-loop step for explicit test-before-code ordering
+    - Wrote `.preflight-status` PASS
+* Decisions made
+    - Advisory only: defer optional `rake mutant` wrapper
+* Insights
+    - Parent authorized proceed through build/QA/reflect without separate `/niko-build` invocation
