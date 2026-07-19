@@ -27,13 +27,14 @@ module JekyllHighlightCards
         template = Liquid::Template.parse(template_content)
         template.render(variables)
       rescue Errno::ENOENT, Errno::EACCES => e
-        raise TemplateRenderError, "Failed to read template '#{template_name}' at #{template_path}: #{e.message}"
+        raise TemplateRenderError, "Failed to read template '#{template_name}' at #{template_path}: #{e.class}: #{e}"
       rescue Encoding::InvalidByteSequenceError => e
-        raise TemplateRenderError, "Invalid encoding in template '#{template_name}' at #{template_path}: #{e.message}"
+        raise TemplateRenderError,
+              "Invalid encoding in template '#{template_name}' at #{template_path}: #{e.class}: #{e}"
       rescue Liquid::SyntaxError, Liquid::Error => e
-        raise TemplateRenderError, "Liquid error in template '#{template_name}': #{e.message}"
+        raise TemplateRenderError, "Liquid error in template '#{template_name}': #{e.class}: #{e}"
       rescue StandardError => e
-        raise TemplateRenderError, "Unexpected error rendering template '#{template_name}': #{e.message}"
+        raise TemplateRenderError, "Unexpected error rendering template '#{template_name}': #{e.class}: #{e}"
       end
     end
 
@@ -57,6 +58,19 @@ module JekyllHighlightCards
       find_gem_template(relative_path)
     end
 
+    # Verify template path is safe (within allowed directory)
+    #
+    # @param allowed_dir [String] the allowed base directory
+    # @param template_path [String] the template path to check
+    # @return [String, nil] template path if safe, nil otherwise
+    def safe_template_path(allowed_dir, template_path)
+      return nil unless File.exist?(template_path)
+
+      expanded_dir = File.expand_path(allowed_dir)
+      expanded_path = File.expand_path(template_path)
+      template_path if expanded_path.start_with?(expanded_dir)
+    end
+
     private
 
     # Validate template name to prevent path traversal attacks
@@ -76,9 +90,11 @@ module JekyllHighlightCards
     # @param relative_path [String] relative path to template
     # @return [String, nil] path to template or nil
     def find_user_template(site, relative_path)
-      return nil unless site&.source
+      source = site&.source
+      # Empty source would File.join to "/_includes/..." — skip it explicitly.
+      return nil unless source.is_a?(String) && !source.empty?
 
-      includes_dir = File.join(site.source, "_includes")
+      includes_dir = File.join(source, "_includes")
       template_path = File.join(includes_dir, relative_path)
 
       safe_template_path(includes_dir, template_path)
@@ -94,20 +110,6 @@ module JekyllHighlightCards
       template_path = File.join(includes_dir, relative_path)
 
       safe_template_path(includes_dir, template_path)
-    end
-
-    # Verify template path is safe (within allowed directory)
-    #
-    # @param allowed_dir [String] the allowed base directory
-    # @param template_path [String] the template path to check
-    # @return [String, nil] template path if safe, nil otherwise
-    def safe_template_path(allowed_dir, template_path)
-      return nil unless File.exist?(template_path)
-
-      expanded_dir = File.expand_path(allowed_dir)
-      expanded_path = File.expand_path(template_path)
-
-      expanded_path.start_with?(expanded_dir) ? template_path : nil
     end
   end
 end

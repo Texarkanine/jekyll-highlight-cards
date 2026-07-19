@@ -19,14 +19,11 @@ module JekyllHighlightCards
     # @param allow_nil [Boolean] whether to allow nil results
     # @return [String, nil] evaluated value or nil if evaluation fails
     def evaluate_expression(token, context, allow_nil: true)
-      return nil if token.nil?
-      return "" if token.empty?
-
       # Strip outer quotes if present
       stripped = strip_outer_quotes(token)
 
       # If the original token was quoted, treat as literal string
-      if stripped != token
+      if !token.nil? && quote_wrapped?(token)
         return stripped if allow_nil
 
         return stripped.empty? ? nil : stripped
@@ -40,20 +37,16 @@ module JekyllHighlightCards
           result = template.render(context)
           return result if allow_nil
 
-          return result.to_s.empty? ? nil : result
+          return nil if result.empty?
+
+          result
         rescue Liquid::SyntaxError, StandardError => e
-          log_debug("Failed to evaluate '#{token}' as Liquid expression: #{e.message}")
-          # Fall back to literal string
-          return token if allow_nil
-
-          return token.empty? ? nil : token
+          log_debug("Failed to evaluate '#{token}' as Liquid expression: #{e.class}: #{e}")
+          token
         end
+      else
+        token
       end
-
-      # Return as literal string
-      return token if allow_nil
-
-      token.empty? ? nil : token
     end
 
     # Check if an expression looks like a Liquid variable lookup
@@ -61,7 +54,7 @@ module JekyllHighlightCards
     # @param expression [String] the expression to check
     # @return [Boolean] true if expression contains Liquid syntax
     def variable_lookup?(expression)
-      return false if expression.nil? || expression.empty?
+      return false if expression.nil?
 
       expression.include?("{{") || expression.include?("{%")
     end
@@ -71,15 +64,21 @@ module JekyllHighlightCards
     # @param value [String] the string to process
     # @return [String] string with outer quotes removed if present
     def strip_outer_quotes(value)
-      return value if value.nil? || value.empty?
-
-      # Check for matching outer quotes
-      if ((value.start_with?('"') && value.end_with?('"')) ||
-         (value.start_with?("'") && value.end_with?("'"))) && (value.length > 1)
-        return value[1..-2]
-      end
+      return nil if value.nil?
+      return value[1..-2] if quote_wrapped?(value)
 
       value
+    end
+
+    # Whether value has matching outer quotes and more than one character
+    #
+    # @param value [String] the string to inspect
+    # @return [Boolean]
+    def quote_wrapped?(value)
+      return false unless value.length >= 2
+
+      (value.start_with?('"') && value.end_with?('"')) ||
+        (value.start_with?("'") && value.end_with?("'"))
     end
 
     # Log debug message

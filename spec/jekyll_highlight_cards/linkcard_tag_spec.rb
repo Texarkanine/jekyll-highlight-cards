@@ -1,235 +1,592 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "tmpdir"
 
 RSpec.describe JekyllHighlightCards::LinkcardTag do
   let(:site) { instance_double(Jekyll::Site, source: "/test/site") }
   let(:registers) { { site: site } }
   let(:context) { Liquid::Context.new({}, {}, registers) }
-  let(:template_path) { File.expand_path("../../_includes/highlight-cards/linkcard.html", __dir__) }
 
-  # Clear archive cache and ENV before each test to ensure isolation
   before do
-    JekyllHighlightCards::ArchiveHelper.instance_variable_set(:@archive_cache, {})
+    JekyllHighlightCards::ArchiveHelper.archive_cache = {}
     allow(ENV).to receive(:[]).and_call_original
-    # Stub any potential archive lookups with empty response (archiving disabled by default)
     stub_request(:get, %r{web\.archive\.org/cdx/search/cdx}).to_return(status: 404)
   end
 
-  # Helper to render a tag
   def render_tag(markup)
-    tag = Liquid::Template.parse("{% linkcard #{markup} %}").root.nodelist.first
+    tag = Liquid::Template.parse("{% linkcard #{markup}%}").root.nodelist.first
     tag.render(context)
   end
 
-  describe "basic usage" do
-    context "with URL only" do
-      it "renders the URL" do
-        result = render_tag("https://example.com")
-        expect(result).to include("https://example.com")
-        expect(result).to include("example.com")
-      end
-
-      it "does not include a title" do
-        result = render_tag("https://example.com")
-        expect(result).not_to include("<h1>")
-      end
+  describe "#initialize" do
+    it "preserves markup for parsing, including surrounding whitespace" do
+      result = render_tag("  https://example.com  ")
+      expect(result).to include('href="https://example.com"')
+      expect(result).to include("example.com</a>")
     end
 
-    context "with URL and title" do
-      it "renders both URL and title" do
-        result = render_tag('https://example.com "My Title"')
-        expect(result).to include("My Title")
-        expect(result).to include("example.com")
-      end
-    end
-
-    context "with URL, title, and explicit archive" do
-      it "renders URL, title, and archive" do
-        result = render_tag('https://example.com "Title" archive:https://archive.org/123')
-        expect(result).to include("example.com")
-        expect(result).to include("Title")
-        expect(result).to include("archive.org/123")
-        expect(result).to include("archive")
-      end
+    it "raises when markup is only whitespace" do
+      expect { render_tag("   ") }.to raise_error(ArgumentError, /requires a URL/)
     end
   end
 
-  describe "archive functionality" do
-    context "with archive opt-out" do
-      it "does not include archive link when archive:none" do
-        result = render_tag("https://example.com archive:none")
-        expect(result).not_to include("archive")
-      end
+  describe "#render" do
+    it "renders a URL-only linkcard" do
+      result = render_tag("https://example.com")
+      expect(result).to include("https://example.com")
+      expect(result).to include("example.com</a>")
+      expect(result).not_to include("<h1>")
     end
 
-    context "with automatic archive lookup" do
-      before do
-        allow(ENV).to receive(:[]).and_call_original
-        allow(ENV).to receive(:[]).with("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE").and_return("1")
-        stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
-          .to_return(
-            status: 200,
-            body: [%w[timestamp original], ["20231201120000", "https://example.com"]].to_json,
-            headers: { "Content-Type" => "application/json" }
-          )
-      end
-
-      it "includes archive link when found" do
-        result = render_tag("https://example.com")
-        expect(result).to include("web.archive.org/web/20231201120000")
-        expect(result).to include("archive")
-      end
-
-      it "caches the archive URL" do
-        render_tag("https://example.com")
-        render_tag("https://example.com")
-        # Second call should have used cache, only one HTTP request made total
-        expect(WebMock).to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx}).once
-      end
+    it "renders URL, title, and explicit archive" do
+      result = render_tag('https://example.com "Title" archive:https://archive.org/123')
+      expect(result).to include("Title")
+      expect(result).to include("archive.org/123")
     end
 
-    context "when archive lookup fails" do
-      before do
-        allow(ENV).to receive(:[]).and_call_original
-        allow(ENV).to receive(:[]).with("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE").and_return("1")
-        stub_request(:get, %r{web\.archive\.org/cdx/search/cdx}).to_return(status: 404)
-      end
-
-      it "renders without archive link" do
-        result = render_tag("https://example.com")
-        expect(result).not_to include("archive")
-      end
-
-      it "does not raise an error" do
-        expect { render_tag("https://example.com") }.not_to raise_error
-      end
-    end
-  end
-
-  describe "Liquid expression evaluation" do
-    before do
-      context.environments.first["page"] = {
-        "url" => "https://example.com/page",
-        "title" => "My Page Title"
-      }
+    it "raises when the URL is missing" do
+      expect { render_tag("") }.to raise_error(ArgumentError, /requires a URL/)
     end
 
-    context "with variable for URL" do
-      it "evaluates the URL variable" do
-        result = render_tag("{{ page.url }}")
-        expect(result).to include("https://example.com/page")
-      end
+    it "raises when the URL resolves to an empty string" do
+      context.environments.first["page"] = { "empty_url" => "" }
+      expect { render_tag("{{ page.empty_url }}") }.to raise_error(ArgumentError, /requires a URL/)
     end
 
-    context "with variable for title" do
-      it "evaluates the title variable" do
-        result = render_tag("https://example.com {{ page.title }}")
-        expect(result).to include("My Page Title")
-      end
-    end
-
-    context "with both URL and title as variables" do
-      it "evaluates both variables" do
-        result = render_tag("{{ page.url }} {{ page.title }}")
-        expect(result).to include("https://example.com/page")
-        expect(result).to include("My Page Title")
-      end
-    end
-  end
-
-  describe "URL display" do
-    it "strips protocol from display" do
+    it "preserves the href URL with protocol in the anchor" do
       result = render_tag("https://example.com/path")
+      expect(result).to include('href="https://example.com/path"')
       expect(result).to include("example.com/path</a>")
     end
 
-    it "strips trailing slash from display" do
-      result = render_tag("https://example.com/path/")
-      expect(result).to include("example.com/path</a>")
-      expect(result).not_to include("/path/</a>")
-    end
-  end
-
-  describe "HTML escaping" do
-    it "escapes HTML in URL" do
-      result = render_tag("https://example.com?a=<script>alert(1)</script>")
-      expect(result).to include("&lt;script&gt;")
-      expect(result).not_to include("<script>alert(1)</script>")
+    it "does not render a title when none is provided" do
+      result = render_tag("https://example.com")
+      expect(result).not_to include("<h1>")
     end
 
-    it "escapes HTML in title" do
-      result = render_tag('https://example.com "Title <b>bold</b>"')
-      expect(result).to include("&lt;b&gt;")
-      expect(result).not_to include("<b>bold</b>")
+    it "passes the resolved URL to automatic archive lookup" do
+      allow(ENV).to receive(:[]).with("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE").and_return("1")
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        .with(query: hash_including("url" => "https://example.com"))
+        .to_return(
+          status: 200,
+          body: [%w[timestamp original], ["20231201120000", "https://example.com"]].to_json,
+          headers: { "Content-Type" => "application/json" }
+        )
+
+      result = render_tag("https://example.com")
+      expect(result).to include("web.archive.org/web/20231201120000")
     end
 
-    it "escapes HTML in archive URL" do
-      result = render_tag("https://example.com archive:https://archive.org/<script>")
-      expect(result).to include("&lt;script&gt;")
+    it "evaluates a Liquid URL variable through the render pipeline" do
+      context.environments.first["page"] = { "url" => "https://example.com/page" }
+      result = render_tag("{{ page.url }}")
+      expect(result).to include("https://example.com/page")
     end
 
-    it "prevents XSS attacks" do
-      result = render_tag('https://example.com "Title <script>alert(1)</script>" archive:none')
-      expect(result).not_to include("<script>alert(1)</script>")
-      expect(result).to include("&lt;script&gt;")
+    it "evaluates a Liquid title variable through the render pipeline" do
+      context.environments.first["page"] = { "title" => "Rendered Title" }
+      result = render_tag("https://example.com {{ page.title }}")
+      expect(result).to include("Rendered Title")
     end
-  end
 
-  describe "error handling" do
-    context "when URL is missing" do
-      it "raises an error" do
-        expect { render_tag("") }.to raise_error(ArgumentError, /requires a URL/)
+    it "evaluates a Liquid archive variable through the render pipeline" do
+      context.environments.first["page"] = { "archive" => "https://archive.org/789" }
+      result = render_tag("https://example.com archive:{{ page.archive }}")
+      expect(result).to include("archive.org/789")
+    end
+
+    it "renders a user-provided site template override" do
+      Dir.mktmpdir do |tmpdir|
+        includes = File.join(tmpdir, "_includes", "highlight-cards")
+        FileUtils.mkdir_p(includes)
+        File.write(File.join(includes, "linkcard.html"), "<custom-linkcard/>")
+
+        custom_site = instance_double(Jekyll::Site, source: tmpdir)
+        custom_context = Liquid::Context.new({}, {}, { site: custom_site })
+        tag = Liquid::Template.parse("{% linkcard https://example.com %}").root.nodelist.first
+        result = tag.render(custom_context)
+        expect(result).to include("<custom-linkcard/>")
       end
     end
 
-    context "when URL is empty" do
-      it "raises an error" do
-        expect { render_tag("   ") }.to raise_error(ArgumentError, /requires a URL/)
-      end
+    it "falls back to the gem template when site is absent from registers" do
+      bare_context = Liquid::Context.new({}, {}, {})
+      tag = Liquid::Template.parse("{% linkcard https://example.com %}").root.nodelist.first
+      result = tag.render(bare_context)
+      expect(result).to include('href="https://example.com"')
+      expect(result).to include("link-card")
     end
 
-    context "when template is not found" do
+    context "when the template is not found" do
       before do
         allow(File).to receive(:exist?).and_return(false)
       end
 
       it "raises an error" do
-        expect { render_tag("https://example.com") }.to raise_error(/Template not found/)
+        expect { render_tag("https://example.com") }.to raise_error(
+          JekyllHighlightCards::TemplateNotFoundError,
+          /Template not found/
+        )
       end
     end
   end
 
-  describe "parameter parsing" do
-    it "handles quoted titles with spaces" do
+  describe "#split_markup" do
+    it "parses an unquoted multi-word title" do
+      result = render_tag("https://example.com My Long Title")
+      expect(result).to include("My Long Title")
+    end
+
+    it "parses a double-quoted title with spaces" do
       result = render_tag('https://example.com "This is a long title"')
       expect(result).to include("This is a long title")
     end
 
-    it "handles escaped quotes in title" do
+    it "parses a single-quoted title" do
+      result = render_tag("https://example.com 'Single quoted title'")
+      expect(result).to include("Single quoted title")
+    end
+
+    it "keeps braces inside quoted titles literal" do
+      result = render_tag('https://example.com "{not liquid}"')
+      expect(result).to include("{not liquid}")
+    end
+
+    it "treats Liquid expressions as single URL tokens" do
+      context.environments.first["page"] = { "url" => "https://example.com/page" }
+      result = render_tag("{{ page.url }}")
+      expect(result).to include("https://example.com/page")
+    end
+
+    it "treats Liquid expressions as single title tokens" do
+      context.environments.first["page"] = { "title" => "My Page Title" }
+      result = render_tag("https://example.com {{ page.title }}")
+      expect(result).to include("My Page Title")
+    end
+
+    it "evaluates both URL and title from Liquid variables" do
+      context.environments.first["page"] = {
+        "url" => "https://example.com/page",
+        "title" => "My Page Title"
+      }
+      result = render_tag("{{ page.url }} {{ page.title }}")
+      expect(result).to include("https://example.com/page")
+      expect(result).to include("My Page Title")
+    end
+
+    it "handles escaped quotes in a quoted title" do
       result = render_tag('https://example.com "Title with \\" quote"')
-      # Quote should be HTML-escaped in output
       expect(result).to include("Title with &quot; quote")
     end
 
-    it "handles escaped backslash in title" do
+    it "handles escaped backslashes in a quoted title" do
       result = render_tag('https://example.com "Title with \\\\ backslash"')
       expect(result).to include("Title with \\ backslash")
     end
 
-    it "handles complex escapes in title" do
+    it "handles complex escapes in a quoted title" do
       result = render_tag('https://example.com "Complex: \\" and \\\\"')
-      # Quote HTML-escaped, backslash literal
       expect(result).to include("Complex: &quot; and \\")
     end
 
-    it "handles archive parameter in any position" do
-      result1 = render_tag('https://example.com "Title" archive:https://archive.org/123')
-      result2 = render_tag('https://example.com archive:https://archive.org/123 "Title"')
-      expect(result1).to include("archive.org/123")
-      expect(result1).to include("Title")
-      expect(result2).to include("archive.org/123")
-      expect(result2).to include("Title")
+    it "parses archive before title" do
+      result = render_tag('https://example.com archive:https://archive.org/123 "Title"')
+      expect(result).to include("archive.org/123")
+      expect(result).to include("Title")
+    end
+
+    it "parses archive after title" do
+      result = render_tag('https://example.com "Title" archive:https://archive.org/123')
+      expect(result).to include("archive.org/123")
+      expect(result).to include("Title")
+    end
+
+    it "does not split on whitespace inside Liquid expressions" do
+      context.environments.first["page"] = { "url" => "https://example.com/page" }
+      result = render_tag("{{ page.url }} extra-title-token")
+      expect(result).to include("https://example.com/page")
+      expect(result).to include("extra-title-token")
+    end
+
+    it "parses a double-quoted URL token" do
+      result = render_tag('"https://example.com"')
+      expect(result).to include('href="https://example.com"')
+    end
+
+    it "parses a single-quoted URL token" do
+      result = render_tag("'https://example.com'")
+      expect(result).to include('href="https://example.com"')
+    end
+
+    it "parses two single-quoted title tokens separately" do
+      result = render_tag("'https://example.com' 'Title Part'")
+      expect(result).to include('href="https://example.com"')
+      expect(result).to include("Title Part")
+    end
+
+    it "keeps closing braces inside quoted titles literal" do
+      result = render_tag('https://example.com "title}suffix"')
+      expect(result).to include("title}suffix")
+    end
+
+    it "does not treat archive-like text in titles as archive parameters" do
+      result = render_tag('https://example.com "mentions archive: later"')
+      expect(result).to include("mentions archive: later")
+      expect(result).not_to include("archive.org")
+    end
+
+    it "parses archive:none as a dedicated archive token" do
+      result = render_tag("https://example.com archive:none Title")
+      expect(result).not_to include("archive")
+    end
+
+    it "accumulates multiple unquoted title tokens" do
+      result = render_tag("https://example.com Part One Part Two")
+      expect(result).to include("Part One Part Two")
+    end
+
+    it "ignores extra whitespace between parameters" do
+      result = render_tag('https://example.com   "Spaced Title"   archive:https://archive.org/123')
+      expect(result).to include("Spaced Title")
+      expect(result).to include("archive.org/123")
+    end
+
+    it "parses tab-separated parameters" do
+      result = render_tag("https://example.com\t\"Tab Title\"")
+      expect(result).to include("Tab Title")
+    end
+
+    it "parses a single-quoted archive URL" do
+      result = render_tag("https://example.com archive:'https://archive.org/quoted'")
+      expect(result).to include("archive.org/quoted")
+    end
+
+    it "parses a Liquid archive token with spaces" do
+      context.environments.first["page"] = { "archive" => "https://archive.org/liquid" }
+      result = render_tag("https://example.com archive:{{ page.archive }}")
+      expect(result).to include("archive.org/liquid")
+    end
+
+    it "parses a Liquid URL followed by an unquoted title" do
+      context.environments.first["page"] = { "url" => "https://example.com/page" }
+      result = render_tag("{{ page.url }} Plain Title")
+      expect(result).to include("https://example.com/page")
+      expect(result).to include("Plain Title")
+    end
+
+    it "parses nested braces only inside Liquid expressions" do
+      context.environments.first["page"] = { "url" => "https://example.com/page" }
+      result = render_tag("{{ page.url }} \"brace { literal } title\"")
+      expect(result).to include("https://example.com/page")
+      expect(result).to include("brace { literal } title")
+    end
+
+    it "parses archive:none before an unquoted title" do
+      result = render_tag("https://example.com archive:none Optional Title")
+      expect(result).not_to include("archive")
+      expect(result).to include("Optional Title")
+    end
+
+    it "does not create empty tokens from repeated whitespace" do
+      result = render_tag('https://example.com   "Title"')
+      expect(result).to include("<h1>Title</h1>")
+      expect(result).not_to match(%r{<h1>\s*</h1>})
+    end
+
+    it "ignores empty tokens produced by trailing whitespace" do
+      result = render_tag("https://example.com   ")
+      expect(result).not_to include("<h1>")
+    end
+
+    it "parses a Liquid-only URL token without surrounding whitespace" do
+      context.environments.first["page"] = { "url" => "https://example.com/liquid-only" }
+      result = render_tag("{{ page.url }}")
+      expect(result).to include("https://example.com/liquid-only")
+    end
+
+    it "evaluates a Liquid-only URL and leaves no unrendered tags" do
+      context.environments.first["page"] = { "url" => "https://example.com/nested" }
+      result = render_tag("{{ page.url }}")
+      expect(result).to include("https://example.com/nested")
+      expect(result).not_to include("{{")
+    end
+
+    it "preserves an opening brace inside a quoted title" do
+      result = render_tag('https://example.com "Title { prefix"')
+      expect(result).to include("Title { prefix")
+    end
+
+    it "preserves braces in an unquoted URL path" do
+      result = render_tag("https://example.com?q={value}")
+      expect(result).to include("{value}")
+    end
+
+    it "parses consecutive Liquid expressions as separate tokens" do
+      context.environments.first["page"] = {
+        "url" => "https://example.com/page",
+        "title" => "Title"
+      }
+      result = render_tag("{{ page.url }} {{ page.title }}")
+      expect(result).to include("https://example.com/page")
+      expect(result).to include("Title")
+    end
+
+    it "evaluates consecutive Liquid URL expressions as separate tokens" do
+      context.environments.first["page"] = {
+        "outer" => "https://example.com/outer",
+        "inner" => "https://example.com/inner"
+      }
+      result = render_tag("{{ page.outer }} {{ page.inner }}")
+      expect(result).to include("https://example.com/outer")
+      expect(result).to include("https://example.com/inner")
+      expect(result).not_to include("{{")
+    end
+
+    it "parses a single-quoted title containing a double quote" do
+      result = render_tag(%q(https://example.com 'My "nickname"'))
+      expect(result).to include("My &quot;nickname&quot;")
+    end
+
+    it "parses a bare URL without a title" do
+      result = render_tag("https://example.com")
+      expect(result).to include('href="https://example.com"')
+      expect(result).not_to include("<h1>")
+    end
+
+    it "treats backslashes outside quoted values as literal characters" do
+      result = render_tag("https://example.com foo\\ bar")
+      expect(result).to include("foo\\ bar")
+    end
+
+    it "recognizes archive:none after a quoted title containing an opening brace" do
+      result = render_tag('https://example.com "brace { here" archive:none')
+      expect(result).not_to include("archive")
+      expect(result).to include("brace { here")
+    end
+
+    it "does not merge tokens after a quoted title when archive:none follows" do
+      allow(ENV).to receive(:[]).with("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE").and_return("1")
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx}).to_return(status: 404)
+
+      result = render_tag('https://example.com "brace { here" archive:none')
+      expect(result).not_to include("archive")
+      expect(WebMock).not_to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx})
+    end
+
+    it "does not treat a closing brace inside a quoted title as ending a Liquid expression" do
+      result = render_tag('https://example.com "literal } brace"')
+      expect(result).to include("literal } brace")
+    end
+
+    it "does not open quotes while parsing a Liquid URL expression" do
+      context.environments.first["page"] = { "url" => "https://example.com/page" }
+      result = render_tag('{{ page.url }} "Quoted Title"')
+      expect(result).to include("https://example.com/page")
+      expect(result).to include("<h1>Quoted Title</h1>")
+    end
+
+    it "closes a quoted value before an archive opt-out that follows escaped backslashes" do
+      allow(ENV).to receive(:[]).with("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE").and_return("1")
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        .to_return(
+          status: 200,
+          body: [%w[timestamp original], ["20231201120000", "https://example.com"]].to_json,
+          headers: { "Content-Type" => "application/json" }
+        )
+
+      result = render_tag('https://example.com "path\\\\" archive:none')
+      expect(result).not_to include("web.archive.org")
+      expect(result).to include("path\\")
+    end
+
+    it "does not treat a trailing brace in the URL as a Liquid delimiter when it is not paired" do
+      context.environments.first["page"] = { "url" => "https://example.com/page" }
+      result = render_tag("https://example.com/} {{ page.url }}")
+      expect(result).to include('href="https://example.com/}"')
+      expect(result).to include("https://example.com/page")
+    end
+
+    it "keeps a closing brace inside a single-quoted title literal" do
+      result = render_tag("https://example.com 'title with } brace'")
+      expect(result).to include("title with } brace")
+    end
+  end
+
+  describe "#resolve_url" do
+    it "evaluates a Liquid URL variable" do
+      context.environments.first["page"] = { "url" => "https://example.com/page" }
+      result = render_tag("{{ page.url }}")
+      expect(result).to include("https://example.com/page")
+    end
+
+    it "returns a literal URL unchanged" do
+      result = render_tag("https://example.com/path")
+      expect(result).to include('href="https://example.com/path"')
+    end
+
+    it "raises when the URL token is empty" do
+      expect { render_tag("") }.to raise_error(ArgumentError, /requires a URL/)
+    end
+  end
+
+  describe "#resolve_title" do
+    it "evaluates a Liquid title variable" do
+      context.environments.first["page"] = { "title" => "My Page Title" }
+      result = render_tag("https://example.com {{ page.title }}")
+      expect(result).to include("My Page Title")
+    end
+
+    it "evaluates a literal quoted title" do
+      result = render_tag('https://example.com "Plain Title"')
+      expect(result).to include("Plain Title")
+    end
+  end
+
+  describe "#resolve_archive" do
+    it "opts out when archive:none is specified" do
+      result = render_tag("https://example.com archive:none")
+      expect(result).not_to include("archive")
+    end
+
+    it "opts out when archive:none uses different casing" do
+      result = render_tag("https://example.com archive:NONE")
+      expect(result).not_to include("archive")
+    end
+
+    it "ignores an empty explicit archive value" do
+      result = render_tag("https://example.com archive:")
+      expect(result).not_to include("archive")
+    end
+
+    it "falls back to automatic lookup when archive is an empty token" do
+      allow(ENV).to receive(:[]).with("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE").and_return("1")
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        .to_return(
+          status: 200,
+          body: [%w[timestamp original], ["20231201120000", "https://example.com"]].to_json,
+          headers: { "Content-Type" => "application/json" }
+        )
+
+      result = render_tag("https://example.com archive:")
+      expect(result).to include("web.archive.org/web/20231201120000")
+    end
+
+    it "evaluates a Liquid archive variable" do
+      context.environments.first["page"] = { "archive" => "https://archive.org/456" }
+      result = render_tag("https://example.com archive:{{ page.archive }}")
+      expect(result).to include("archive.org/456")
+    end
+
+    it "does not look up an archive URL when archiving is disabled" do
+      render_tag("https://example.com")
+      expect(WebMock).not_to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx})
+    end
+
+    it "uses an explicit archive URL" do
+      result = render_tag("https://example.com archive:https://archive.org/123")
+      expect(result).to include("archive.org/123")
+    end
+
+    it "looks up an archive URL when archiving is enabled" do
+      allow(ENV).to receive(:[]).with("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE").and_return("1")
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        .with(query: hash_including("url" => "https://example.com"))
+        .to_return(
+          status: 200,
+          body: [%w[timestamp original], ["20231201120000", "https://example.com"]].to_json,
+          headers: { "Content-Type" => "application/json" }
+        )
+
+      result = render_tag("https://example.com")
+      expect(result).to include("web.archive.org/web/20231201120000")
+    end
+
+    it "renders without an archive link when lookup fails" do
+      allow(ENV).to receive(:[]).with("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE").and_return("1")
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx}).to_return(status: 404)
+
+      result = render_tag("https://example.com")
+      expect(result).not_to include("archive")
+    end
+  end
+
+  describe "#build_template_variables" do
+    it "strips the protocol from the display URL" do
+      result = render_tag("https://example.com/path")
+      expect(result).to include('href="https://example.com/path"')
+      expect(result).to include("example.com/path</a>")
+      expect(result).not_to include("https://example.com/path</a>")
+    end
+
+    it "strips http protocol from the display URL" do
+      result = render_tag("http://example.com/path")
+      expect(result).to include('href="http://example.com/path"')
+      expect(result).to include("example.com/path</a>")
+      expect(result).not_to include("http://example.com/path</a>")
+    end
+
+    it "strips a trailing slash from the display URL" do
+      result = render_tag("https://example.com/path/")
+      expect(result).to include('href="https://example.com/path/"')
+      expect(result).to include("example.com/path</a>")
+      expect(result).not_to include("/path/</a>")
+    end
+
+    it "includes a title heading when a title is present" do
+      result = render_tag('https://example.com "Visible Title"')
+      expect(result).to include("<h1>Visible Title</h1>")
+    end
+
+    it "omits a title heading when no title is provided" do
+      result = render_tag("https://example.com")
+      expect(result).not_to include("<h1>")
+    end
+
+    it "escapes HTML in the URL" do
+      result = render_tag("https://example.com?a=<script>alert(1)</script>")
+      expect(result).to include("&lt;script&gt;")
+      expect(result).not_to include("<script>alert(1)</script>")
+    end
+
+    it "escapes HTML in the title" do
+      result = render_tag('https://example.com "Title <b>bold</b>"')
+      expect(result).to include("&lt;b&gt;")
+      expect(result).not_to include("<b>bold</b>")
+    end
+
+    it "escapes HTML in the archive URL" do
+      result = render_tag("https://example.com archive:https://archive.org/<script>")
+      expect(result).to include("&lt;script&gt;")
+    end
+
+    it "prevents XSS in title and URL fields" do
+      result = render_tag('https://example.com "Title <script>alert(1)</script>" archive:none')
+      expect(result).not_to include("<script>alert(1)</script>")
+      expect(result).to include("&lt;script&gt;")
+    end
+
+    it "includes an archive link when an archive URL is present" do
+      result = render_tag("https://example.com archive:https://archive.org/123")
+      expect(result).to include('href="https://archive.org/123"')
+      expect(result).to include(">archive</a>")
+    end
+  end
+
+  describe "#strip_protocol" do
+    it "removes https from display text while preserving the href" do
+      result = render_tag("https://example.com")
+      expect(result).to include('href="https://example.com"')
+      expect(result).to include("example.com</a>")
+      expect(result).not_to include("https://example.com</a>")
+    end
+
+    it "removes http from display text while preserving the href" do
+      result = render_tag("http://example.com")
+      expect(result).to include('href="http://example.com"')
+      expect(result).to include("example.com</a>")
+      expect(result).not_to include("http://example.com</a>")
     end
   end
 end

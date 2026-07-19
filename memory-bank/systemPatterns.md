@@ -10,4 +10,4 @@ Development gems (RSpec, RuboCop, SimpleCov, WebMock, etc.) are declared in `jek
 
 ## Coverage Config Lives in Spec Helper
 
-SimpleCov (and the Cobertura formatter under `CI`) is configured only in `spec/spec_helper.rb` using SimpleCov 1.x `skip` (not deprecated `add_filter`). Skip paths there are load-bearing for Codecov cleanliness; changing the SimpleCov DSL without keeping equivalent exclusions will pollute coverage reports.
+SimpleCov (and the Cobertura formatter under `CI`) is configured only in `spec/spec_helper.rb` using SimpleCov 1.x `skip` (not deprecated `add_filter`). Skip paths there are load-bearing for Codecov cleanliness; changing the SimpleCov DSL without keeping equivalent exclusions will pollute coverage reports. SimpleCov is skipped when Mutant is loaded. Mutation testing is configured in `config/mutant.yml` (`mutant` / `mutant-rspec`); kill discipline lives in `CONTRIBUTING.md`.

@@ -26,10 +26,6 @@ module JekyllHighlightCards
     # @param tag_name [String] the name of the tag
     # @param markup [String] the tag markup containing parameters
     # @param tokens [Array] parse tokens (unused)
-    def initialize(tag_name, markup, tokens)
-      super
-      @markup = markup.strip
-    end
 
     # Render the linkcard tag
     #
@@ -40,7 +36,7 @@ module JekyllHighlightCards
       parsed = split_markup(@markup)
 
       # Resolve URL (required)
-      url = resolve_url(parsed[:url], context)
+      url = resolve_url(parsed.fetch(:url), context)
       raise ArgumentError, "linkcard tag requires a URL" if url.nil? || url.empty?
 
       # Resolve title (optional)
@@ -66,71 +62,60 @@ module JekyllHighlightCards
     # @param markup [String] the tag markup
     # @return [Hash] parsed components
     def split_markup(markup)
-      # Split by whitespace, keeping quoted strings and Liquid expressions together
-      # Handles escaped quotes (\") and backslashes (\\) within quoted strings
       tokens = []
       current = ""
       in_quotes = false
       quote_char = nil
-      in_liquid = 0 # Track nested Liquid expressions
-      escaped = false # Track if next character is escaped
+      in_liquid = 0
+      escaped = false
 
-      markup.each_char do |char|
-        # Handle escape sequences when in quotes
+      "#{markup} ".each_char do |char|
         if escaped
-          current += char # Add the escaped character directly
+          current += char
           escaped = false
           next
         end
 
-        # Check for escape character when in quotes
         if char == "\\" && in_quotes
           escaped = true
-          next # Don't add backslash to output, it's just the escape marker
+          next
         end
 
-        # Track Liquid expression boundaries
         if char == "{" && !in_quotes
           in_liquid += 1
           current += char
-        elsif char == "}" && !in_quotes && in_liquid.positive?
+        elsif char == "}" && in_liquid.positive?
           in_liquid -= 1
           current += char
-        # Track quote boundaries
-        elsif ['"', "'"].include?(char) && !in_quotes && in_liquid.zero?
+        elsif char == '"' && !in_quotes
           in_quotes = true
           quote_char = char
           current += char
-        elsif char == quote_char && in_quotes
+        elsif char == quote_char
           in_quotes = false
           current += char
           quote_char = nil
-        # Split on whitespace only if not in quotes or Liquid expression
         elsif char.match?(/\s/) && !in_quotes && in_liquid.zero?
-          tokens << current unless current.empty?
+          tokens << current
           current = ""
         else
           current += char
         end
       end
-      tokens << current unless current.empty?
+      tokens.reject!(&:empty?)
 
-      # First token is URL, remaining tokens may be title or archive parameter
-      result = {
-        url: tokens.shift,
-        title: nil,
-        archive: nil
-      }
+      result = {}
+      result[:url] = tokens.shift
 
-      # Process remaining tokens
+      title_tokens = []
       tokens.each do |token|
         if token.start_with?("archive:")
-          result[:archive] = token.sub(/^archive:/, "")
+          result[:archive] = token.delete_prefix("archive:")
         else
-          # Accumulate title tokens
-          result[:title] = result[:title].nil? ? token : "#{result[:title]} #{token}"
+          title_tokens << token
         end
       end
+      result[:title] = title_tokens.join(" ") unless title_tokens.empty?
 
       result
     end
@@ -141,9 +126,7 @@ module JekyllHighlightCards
     # @param context [Liquid::Context] the Liquid context
     # @return [String] resolved URL
     def resolve_url(token, context)
-      return nil if token.nil? || token.empty?
-
-      evaluate_expression(token, context, allow_nil: false)
+      evaluate_expression(token, context)
     end
 
     # Resolve title from source (may be Liquid expression or literal)
@@ -152,9 +135,7 @@ module JekyllHighlightCards
     # @param context [Liquid::Context] the Liquid context
     # @return [String, nil] resolved title
     def resolve_title(source, context)
-      return nil if source.nil? || source.empty?
-
-      evaluate_expression(source, context, allow_nil: true)
+      evaluate_expression(source, context)
     end
 
     # Resolve archive URL (may be explicit, auto-lookup, or opt-out)
@@ -168,12 +149,9 @@ module JekyllHighlightCards
       return nil if source && source.downcase == "none"
 
       # Check for explicit archive URL
-      return evaluate_expression(source, context, allow_nil: true) if source && !source.empty?
+      return evaluate_expression(source, context) if source && !source.empty?
 
-      # Auto-lookup if enabled
-      return archive_url_for(url) if archive_enabled?
-
-      nil
+      archive_enabled? && archive_url_for(url)
     end
 
     # Build template variables hash for rendering
@@ -183,19 +161,17 @@ module JekyllHighlightCards
     # @param archive_url [String, nil] the archive URL
     # @return [Hash] template variables with raw and escaped versions
     def build_template_variables(url, title, archive_url)
-      display_url = strip_protocol(url)
-      display_url = display_url.sub(%r{/$}, "")
+      display_url = strip_protocol(url).delete_suffix("/")
 
-      {
-        "url" => url,
-        "display_url" => display_url,
+      variables = {
         "title" => title,
         "archive_url" => archive_url,
         "escaped_url" => CGI.escapeHTML(url),
-        "escaped_display_url" => CGI.escapeHTML(display_url),
-        "escaped_title" => title ? CGI.escapeHTML(title) : nil,
-        "escaped_archive_url" => archive_url ? CGI.escapeHTML(archive_url) : nil
+        "escaped_display_url" => CGI.escapeHTML(display_url)
       }
+      variables["escaped_title"] = CGI.escapeHTML(title) if title
+      variables["escaped_archive_url"] = CGI.escapeHTML(archive_url) if archive_url
+      variables
     end
 
     # Strip protocol from URL for display
@@ -203,7 +179,7 @@ module JekyllHighlightCards
     # @param url [String] the URL
     # @return [String] URL without protocol
     def strip_protocol(url)
-      url.sub(%r{^https?://}, "")
+      url.delete_prefix("https://").delete_prefix("http://")
     end
   end
 end
