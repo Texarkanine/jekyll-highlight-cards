@@ -1,12 +1,13 @@
 # Active Context
 
 ## Current Task: mutation-testing
-**Phase:** PREFLIGHT - COMPLETE (PASS)
+**Phase:** BUILD - COMPLETE
 
 ## What Was Done
-- Preflight validated plan against codebase; amended kill-loop for explicit TDD ordering.
-- `.preflight-status` = PASS.
-- Scaffold already green under `mutant test`.
+- Mutant + mutant-rspec scaffold mirrored from jekyll-auto-thumbnails (`config/mutant.yml`, gemspec deps, SimpleCov skip, CONTRIBUTING discipline, techContext).
+- Drove mutation coverage to 100% across all `JekyllHighlightCards*` subjects (2988/2988 kills).
+- RSpec: 444 examples, 0 failures; RuboCop clean; line coverage ~98.7%.
+- Branch `feat/mutation-testing` ready for draft PR.
 
 ## Next Step
-- Build: docs + survivor inventory + kill loop to 100% + draft PR (operator-authorized end-to-end).
+- Open draft PR, then `/niko-qa` → `/niko-reflect` (no archive).

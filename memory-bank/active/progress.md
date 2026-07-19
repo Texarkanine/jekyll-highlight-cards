@@ -39,3 +39,17 @@ Wire Mutant + mutant-rspec into jekyll-highlight-cards (mirror jekyll-auto-thumb
     - Advisory only: defer optional `rake mutant` wrapper
 * Insights
     - Parent authorized proceed through build/QA/reflect without separate `/niko-build` invocation
+
+## 2026-07-19 - BUILD - COMPLETE
+
+* Work completed
+    - Scaffold + ENV isolation for Mutant parallel workers
+    - Kill loop to 100% mutation coverage (DimensionParser, ExpressionEvaluator, ArchiveHelper, ImageSizingHooks, LinkcardTag, PolaroidTag, TemplateRenderer)
+    - CONTRIBUTING Mutation Testing section + techContext Mutant CLI note
+    - RuboCop clean; `bundle exec rspec` 444/0; `bundle exec mutant run` 2988 kills / 0 alive
+* Decisions made
+    - Prefer `def self.` over `module_function` for DimensionParser
+    - Public observability helpers where needed (ImageSizingHooks, TemplateRenderer#safe_template_path)
+    - No CI Mutant job (out of scope)
+* Insights
+    - Describe-prefix selection and no-SUT-stubs dominated calendar time, as in auto-thumbnails
