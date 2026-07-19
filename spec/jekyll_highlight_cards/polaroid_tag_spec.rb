@@ -252,7 +252,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
 
     it "passes parsed title into the rendered output" do
       result = render_tag('/photo.jpg title="Render Title"')
-      expect(result).to match(%r{polaroid-title[^>]*>\s*Render Title\s*<}i)
+      expect(result).to match(/polaroid-title[^>]*>\s*Render Title\s*</i)
     end
 
     it "auto-archives the link URL when archiving is enabled" do
@@ -272,7 +272,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
 
     it "shows visible link text only for explicit link parameters" do
       result = render_tag('/photo.jpg link="https://example.com"')
-      expect(result).to match(/polaroid-link[^>]*>\s*<a[^>]*>example\.com<\/a>/)
+      expect(result).to match(%r{polaroid-link[^>]*>\s*<a[^>]*>example\.com</a>})
     end
 
     it "renders without archive when archiving is disabled" do
@@ -481,7 +481,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
 
     it "tokenizes opening braces for liquid expressions" do
       context.environments.first["page"] = { "title" => "Brace Title" }
-      result = render_tag('/photo.jpg title={{ page.title }}')
+      result = render_tag("/photo.jpg title={{ page.title }}")
       expect(result).to include("Brace Title")
     end
 
@@ -521,7 +521,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
 
     it "does not decrement liquid depth for unpaired closing braces" do
       context.environments.first["page"] = { "title" => "After Brace" }
-      result = render_tag('/photo.jpg/} title={{ page.title }}')
+      result = render_tag("/photo.jpg/} title={{ page.title }}")
       expect(result).to include("/photo.jpg/}")
       expect(result).to include("After Brace")
     end
@@ -540,7 +540,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
     end
 
     it "keeps size parsing working after a single-brace title value" do
-      result = render_tag('/photo.jpg title={foo} size=300x200')
+      result = render_tag("/photo.jpg title={foo} size=300x200")
       expect(result).to include('width="300"')
       expect(result).to include("{foo}")
     end
@@ -777,7 +777,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
     it "escapes HTML in archive URLs" do
       result = render_tag('/photo.jpg link="https://example.com" archive="https://archive.org/<script>"')
       expect(result).to include("&lt;script&gt;")
-      expect(result).not_to include('archive.org/<script>')
+      expect(result).not_to include("archive.org/<script>")
     end
 
     it "includes width and height attributes when size is set" do
@@ -798,7 +798,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
 
     it "uses raw archive_url key to show archive link" do
       result = render_tag('/photo.jpg link="https://example.com" archive="https://archive.org/snap"')
-      expect(result).to match(/polaroid-archive[^>]*>\s*\(\s*<a[^>]*>archive<\/a>\s*\)/)
+      expect(result).to match(%r{polaroid-archive[^>]*>\s*\(\s*<a[^>]*>archive</a>\s*\)})
     end
 
     it "hides archive link when raw archive_url is nil" do
@@ -818,7 +818,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
 
     it "renders escaped link display text for explicit links" do
       result = render_tag('/photo.jpg link="https://example.com/path"')
-      expect(result).to match(/polaroid-link[^>]*>\s*<a[^>]*>example\.com\/path<\/a>/)
+      expect(result).to match(%r{polaroid-link[^>]*>\s*<a[^>]*>example\.com/path</a>})
     end
 
     it "sets width and height template variables from size" do
@@ -833,6 +833,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
       expect(result).to include('target="_blank"')
     end
 
+    # rubocop:disable RSpec/ExampleLength, RSpec/MultipleExpectations -- observing all template locals for Mutant
     it "passes raw template variables through to the template" do
       custom_dir = File.join("/tmp", "polaroid-vars-#{Process.pid}")
       template = <<~HTML
@@ -878,6 +879,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
         expect(result).to include('data-esc-archive="https://archive.org/x?q=&lt;d&gt;"')
       end
     end
+    # rubocop:enable RSpec/ExampleLength, RSpec/MultipleExpectations
 
     it "uses distinct escaped URLs when image, link, and image_link differ" do
       result = render_tag(
@@ -893,12 +895,12 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
   describe "#strip_protocol" do
     it "strips http from link display text" do
       result = render_tag('/photo.jpg link="http://example.com/path"')
-      expect(result).to match(/polaroid-link[^>]*>\s*<a[^>]*>example\.com\/path<\/a>/)
+      expect(result).to match(%r{polaroid-link[^>]*>\s*<a[^>]*>example\.com/path</a>})
     end
 
     it "strips https from link display text" do
       result = render_tag('/photo.jpg link="https://example.com/path"')
-      expect(result).to match(/polaroid-link[^>]*>\s*<a[^>]*>example\.com\/path<\/a>/)
+      expect(result).to match(%r{polaroid-link[^>]*>\s*<a[^>]*>example\.com/path</a>})
     end
   end
 end

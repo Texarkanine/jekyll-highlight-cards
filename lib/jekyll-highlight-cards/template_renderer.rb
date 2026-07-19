@@ -29,7 +29,8 @@ module JekyllHighlightCards
       rescue Errno::ENOENT, Errno::EACCES => e
         raise TemplateRenderError, "Failed to read template '#{template_name}' at #{template_path}: #{e.class}: #{e}"
       rescue Encoding::InvalidByteSequenceError => e
-        raise TemplateRenderError, "Invalid encoding in template '#{template_name}' at #{template_path}: #{e.class}: #{e}"
+        raise TemplateRenderError,
+              "Invalid encoding in template '#{template_name}' at #{template_path}: #{e.class}: #{e}"
       rescue Liquid::SyntaxError, Liquid::Error => e
         raise TemplateRenderError, "Liquid error in template '#{template_name}': #{e.class}: #{e}"
       rescue StandardError => e

@@ -42,7 +42,7 @@ RSpec.configure do |config|
   ].freeze
 
   config.around do |example|
-    saved = archive_env_keys.to_h { |key| [key, ENV[key]] }
+    saved = archive_env_keys.to_h { |key| [key, ENV.fetch(key, nil)] }
     archive_env_keys.each { |key| ENV.delete(key) }
     example.run
   ensure

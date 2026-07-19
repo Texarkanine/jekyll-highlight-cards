@@ -285,7 +285,7 @@ RSpec.describe JekyllHighlightCards::LinkcardTag do
     it "does not create empty tokens from repeated whitespace" do
       result = render_tag('https://example.com   "Title"')
       expect(result).to include("<h1>Title</h1>")
-      expect(result).not_to match(/<h1>\s*<\/h1>/)
+      expect(result).not_to match(%r{<h1>\s*</h1>})
     end
 
     it "ignores empty tokens produced by trailing whitespace" do

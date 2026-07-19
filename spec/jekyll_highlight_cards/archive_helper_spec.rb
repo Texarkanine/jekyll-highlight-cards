@@ -227,7 +227,9 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
           headers: { "Content-Location" => "/web/20231201130000/https://example.com/page" }
         )
 
-      helper.archive_url_for(test_url)
+      expect(helper.archive_url_for(test_url)).to include("web.archive.org/web/")
+      expect(WebMock).to have_requested(:get, %r{web\.archive\.org/save/})
+        .with(headers: { "User-Agent" => "CustomBot/1.0" })
     end
 
     it "encodes the URL in the save request path" do
@@ -240,7 +242,8 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
           headers: { "Content-Location" => "/web/20231201130000/#{special_url}" }
         )
 
-      helper.archive_url_for(special_url)
+      expect(helper.archive_url_for(special_url)).to include("web.archive.org/web/")
+      expect(WebMock).to have_requested(:get, "https://web.archive.org/save/#{encoded}")
     end
 
     it "requests the save path from the parsed save URL" do
@@ -380,7 +383,11 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
         stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
           .to_return(status: 200, body: [%w[timestamp original]].to_json)
 
-        stub_request(:get, %r{web\.archive\.org/save/#{Regexp.escape(test_url)}|web\.archive\.org/save/https%3A%2F%2Fexample.com%2Fpage})
+        save_pattern = %r{
+          web\.archive\.org/save/#{Regexp.escape(test_url)}|
+          web\.archive\.org/save/https%3A%2F%2Fexample.com%2Fpage
+        }x
+        stub_request(:get, save_pattern)
           .to_return(
             status: 200,
             headers: { "Content-Location" => "/web/20231201130000/https://example.com/page" }

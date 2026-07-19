@@ -61,7 +61,7 @@ RSpec.describe JekyllHighlightCards::ImageSizingHooks do
       end
 
       it "processes content when lines are frozen" do
-        allow(mock_document).to receive(:content).and_return("![Alt](image.jpg =300x200)".freeze)
+        allow(mock_document).to receive(:content).and_return("![Alt](image.jpg =300x200)")
         described_class.process_pre_render(mock_document)
         expect(@content).to include("<!-- IMG_SIZE:300:200 -->")
       end
@@ -256,7 +256,7 @@ RSpec.describe JekyllHighlightCards::ImageSizingHooks do
         described_class.process_post_render(mock_document)
         expect(@output).to include('width="300"')
         expect(@output).to include('height="200"')
-        expect(@output).to match(/<img width="300"/)
+        expect(@output).to include('<img width="300"')
       end
 
       it "auto-links the image" do
@@ -287,19 +287,19 @@ RSpec.describe JekyllHighlightCards::ImageSizingHooks do
 
       it "processes output when the string is frozen" do
         allow(mock_document).to receive(:output)
-          .and_return('<img src="image.jpg" alt="Alt"><!-- IMG_SIZE:300:200 -->'.freeze)
+          .and_return('<img src="image.jpg" alt="Alt"><!-- IMG_SIZE:300:200 -->')
         described_class.process_post_render(mock_document)
         expect(@output).to include('width="300"')
       end
 
       it "separates width and height attributes with a space" do
         described_class.process_post_render(mock_document)
-        expect(@output).to match(/width="300" height="200"/)
+        expect(@output).to include('width="300" height="200"')
       end
 
       it "inserts attributes immediately after the img opening tag" do
         described_class.process_post_render(mock_document)
-        expect(@output).to match(/<img width="300" height="200" src="image\.jpg"/)
+        expect(@output).to include('<img width="300" height="200" src="image.jpg"')
         expect(@output.scan("<img").length).to eq(1)
       end
     end
@@ -361,7 +361,7 @@ RSpec.describe JekyllHighlightCards::ImageSizingHooks do
       it "applies dimensions without auto-linking" do
         described_class.process_post_render(mock_document)
         expect(@output).to include('width="300"')
-        expect(@output).not_to include('<a href=')
+        expect(@output).not_to include("<a href=")
       end
     end
 
@@ -634,7 +634,7 @@ RSpec.describe JekyllHighlightCards::ImageSizingHooks do
     end
 
     it "returns true for tab-indented lines" do
-      lines = ["text\n", "\tcode\n"]
+      lines = %W[text\n \tcode\n]
       expect(described_class.in_code_fence?(lines, 1)).to be(true)
     end
 
@@ -668,7 +668,8 @@ RSpec.describe JekyllHighlightCards::ImageSizingHooks do
     end
 
     it "uses a length-based slice rather than the whole line" do
-      expect(described_class.backtick_count_before("a`b`c", 3)).to eq(1)
+      expect(described_class.backtick_count_before("```tail", 2)).to eq(2)
+      expect(described_class.backtick_count_before("```tail", 3)).to eq(3)
     end
   end
 

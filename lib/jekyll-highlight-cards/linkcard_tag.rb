@@ -26,9 +26,6 @@ module JekyllHighlightCards
     # @param tag_name [String] the name of the tag
     # @param markup [String] the tag markup containing parameters
     # @param tokens [Array] parse tokens (unused)
-    def initialize(tag_name, markup, tokens)
-      super
-    end
 
     # Render the linkcard tag
     #
@@ -72,7 +69,7 @@ module JekyllHighlightCards
       in_liquid = 0
       escaped = false
 
-      (markup + " ").each_char do |char|
+      "#{markup} ".each_char do |char|
         if escaped
           current += char
           escaped = false

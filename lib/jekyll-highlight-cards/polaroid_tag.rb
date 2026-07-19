@@ -91,7 +91,7 @@ module JekyllHighlightCards
       escaped = false
 
       # Trailing space flushes the final token through the whitespace branch
-      (markup + " ").each_char do |char|
+      "#{markup} ".each_char do |char|
         if escaped
           current += char
           escaped = false

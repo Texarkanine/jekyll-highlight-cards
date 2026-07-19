@@ -28,9 +28,7 @@ module JekyllHighlightCards
       ArchiveHelper.archive_cache[url] ||= begin
         archive_url = lookup_archive(url)
 
-        if archive_save_enabled?
-          archive_url = submit_archive(url) || archive_url
-        end
+        archive_url = submit_archive(url) || archive_url if archive_save_enabled?
 
         archive_url
       end
@@ -79,9 +77,7 @@ module JekyllHighlightCards
         http.request(Net::HTTP::Get.new(cdx_url.request_uri))
       end
 
-      unless response.is_a?(Net::HTTPSuccess)
-        return nil
-      end
+      return nil unless response.is_a?(Net::HTTPSuccess)
 
       rows = JSON.parse(response.body)
 
@@ -113,8 +109,9 @@ module JekyllHighlightCards
           http.request(req)
         end
       rescue StandardError
-        return nil
+        nil
       end
+      return nil if response.nil?
 
       location = response["content-location"]
       return nil if location.to_s.empty?
