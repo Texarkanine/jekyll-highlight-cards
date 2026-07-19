@@ -156,7 +156,7 @@ No new technology - validation not required. (Nokogiri not added; presentation p
 - [x] Pre-Mortem complete
 - [x] Preflight
 - [x] Build
-- [ ] QA
+- [x] QA
 
 ## Build Notes
 

@@ -122,3 +122,12 @@ Remediate SLOBAC audit findings on mutation-coverage specs under `spec/jekyll_hi
     - Keep Net::HTTP / File.join spies where WebMock/filesystem cannot distinguish mutants
 * Insights
     - `File.join("", "_includes")` → `/_includes` on this Ruby — cwd traps cannot kill empty-source skip
+
+## 2026-07-19 - QA - PASS
+
+* Work completed
+    - Semantic review vs rework brief: requirements met; retained findings documented as mutant-required
+    - Verified key renames/strengthens present; deleted vacuous/redundant examples absent
+    - Wrote `.qa-validation-status` PASS
+* Decisions made
+    - No trivial QA fixes required
