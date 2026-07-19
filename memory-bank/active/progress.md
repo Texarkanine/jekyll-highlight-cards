@@ -99,3 +99,14 @@ Remediate SLOBAC audit findings on mutation-coverage specs under `spec/jekyll_hi
     - Rename raw-key polaroid examples to HTML outcomes; keep dump example for locals
 * Insights
     - Empty-title vacuous example is already covered by nbsp sibling; empty `link=""` still needs strengthen
+
+## 2026-07-19 - PREFLIGHT - PASS
+
+* Work completed
+    - Validated TDD encoding, conventions, dependency impact, completeness
+    - Amended plan: per-step test-only TDD; `require_relative` for support; `git mv` split; confirmed `link=""` nbsp contract
+    - Wrote `.preflight-status` PASS
+* Decisions made
+    - Advisory skipped for re-running SLOBAC CLI (out of brief); mutant gate remains the kill-power check
+* Insights
+    - `spec/support` is not auto-required by `.rspec`; blanket glob would risk loading `mutant_setup.rb` into normal RSpec

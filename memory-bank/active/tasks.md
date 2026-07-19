@@ -69,49 +69,59 @@ This rework edits the suite itself. “Behaviors” are post-remediation suite c
 
 ## Implementation Plan
 
+All steps are **test-suite remediations** (no `lib/` changes planned). For each unit: edit/add/delete the example(s) first → run the affected example(s) → only if a product bug is discovered (unexpected), stop and escalate — do not “fix” smells by changing production code.
+
 1. **Typed template-not-found oracles (findings 1, 22)**
+   - TDD: change the two `raise_error` examples → run those examples → expect green (typed oracle only; no lib change)
    - Files: `spec/jekyll_highlight_cards/polaroid_tag_spec.rb`, `linkcard_tag_spec.rb`
    - Changes: `raise_error(JekyllHighlightCards::TemplateNotFoundError, /Template not found/)`
-   - Verify: targeted examples green
 
 2. **Polaroid naming-lies + vacuous empty fields (findings 2–13)**
+   - TDD: apply renames/deletes/strengthens in the examples → run `polaroid_tag_spec.rb` → green before next unit
    - Files: `polaroid_tag_spec.rb`
    - Changes: renames per disposition map; delete empty-title vacuous duplicate; strengthen empty-link and archive link-vs-image; rename raw-key examples to HTML outcomes
-   - Verify: `bundle exec rspec spec/jekyll_highlight_cards/polaroid_tag_spec.rb`
 
 3. **Linkcard vacuous / naming / redundancy (findings 20–21, 23–25, 34)**
+   - TDD: edit/delete examples → run `linkcard_tag_spec.rb` → green
    - Files: `linkcard_tag_spec.rb`
    - Changes: delete site-registers vacuous example; rename nested-brace examples; rename `#resolve_title` nil example (dedupe if identical to sibling); delete `caches archive lookup results`
-   - Verify: linkcard spec green
 
 4. **TemplateRenderer + ExpressionEvaluator smell cleanup (findings 26–27, 32–33)**
+   - TDD: edit/delete examples → run both specs → green
    - Files: `template_renderer_spec.rb`, `expression_evaluator_spec.rb`
    - Changes: delete File.join / Liquid::Template.parse interaction examples; loosen TemplateRenderError + debug-log presentation pins
-   - Verify: both specs green
 
 5. **ArchiveHelper over-specified Net::HTTP spies (findings 28–31)**
+   - TDD: delete four spy-only examples → run `archive_helper_spec.rb` → green (WebMock outcome siblings must still pass)
    - Files: `archive_helper_spec.rb`
-   - Changes: delete four spy-only examples (lookup HTTPS/timeouts, CDX Get.new, save Get.new, submit HTTPS/timeouts)
-   - Verify: archive_helper spec green; confirm WebMock outcome siblings still cover CDX/save
+   - Changes: delete lookup HTTPS/timeouts, CDX Get.new, save Get.new, submit HTTPS/timeouts examples
 
 6. **Image sizing smell fixes then monolithic split (findings 14–19)**
-   - Files: `image_sizing_hooks_spec.rb` → split into:
+   - TDD (smell fixes first, while still one file): strengthen freeze + whitespace examples; delete presentation-coupled examples → run file → green
+   - TDD (split): extract support → `git mv` monolith to first split file → peel remaining describes into new files → run each new file after creation → delete empty leftover if any
+   - Files: `image_sizing_hooks_spec.rb` →
      - `spec/support/image_sizing_document.rb` — shared `mock_document` helper / shared context
-     - `image_sizing_pre_render_spec.rb` — `.process_pre_render` (incl. strengthened freeze + whitespace-reject)
-     - `image_sizing_post_render_spec.rb` — `.process_post_render` (incl. freeze; without presentation-coupled order examples)
-     - `image_sizing_helpers_spec.rb` — helper-method describes (`.markdown_inline_check_position` … `.in_inline_code?`)
+     - `image_sizing_pre_render_spec.rb` — `.process_pre_render`
+     - `image_sizing_post_render_spec.rb` — `.process_post_render`
+     - `image_sizing_helpers_spec.rb` — helper-method describes
      - `image_sizing_integration_spec.rb` — integration describe
      - `image_sizing_hooks_registration_spec.rb` — Jekyll hook registration describe
-   - Delete original `image_sizing_hooks_spec.rb` after move
-   - Verify: all new files green; example count preserved minus deleted 18–19
+   - Prefer `git mv` for history; example count preserved minus deleted 18–19
+   - Load shared helper via `require_relative "../support/image_sizing_document"` in each split file (`.rspec` does not auto-require `spec/support/**`; do not add a blanket support glob — `mutant_setup.rb` must stay Mutant-only)
 
 7. **Regression gates**
-   - `bundle exec rspec` (full suite + coverage)
-   - `bundle exec mutant run` (must stay 100%; if not, add outcome assertions only — no spy revival)
-   - `bundle exec rubocop` on touched specs/support
+   - TDD/regression: full `bundle exec rspec` → `bundle exec mutant run` (must stay 100%; if not, strengthen outcome examples only — no spy revival) → `bundle exec rubocop` on touched specs/support
+   - Mutant config (`config/mutant.yml`) currently lists support as `mutant_setup.rb` only — no per-spec subject paths to update after split
 
 8. **Memory bank close-out during build/QA**
-   - Update `tasks.md` checklist statuses; no CONTRIBUTING/doc changes expected unless Mutant subject list paths change
+   - Update `tasks.md` checklist statuses; no CONTRIBUTING/doc changes expected
+
+### Preflight Amendments
+
+- Explicit per-step TDD ordering for test-only remediations (edit example → run → no lib/ unless product bug).
+- Confirmed `link=""` ⇒ `explicit_link == false` ⇒ `polaroid-link` nbsp (strengthen oracle is valid).
+- Shared support must use `require_relative`, not a `spec/support` Dir glob.
+- Prefer `git mv` when splitting the monolith.
 
 ## Technology Validation
 
@@ -144,6 +154,6 @@ No new technology - validation not required. (Nokogiri not added; presentation p
 - [x] Implementation plan complete
 - [x] Technology validation complete
 - [x] Pre-Mortem complete
-- [ ] Preflight
+- [x] Preflight
 - [ ] Build
 - [ ] QA
