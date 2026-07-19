@@ -87,3 +87,15 @@ Remediate SLOBAC audit findings on mutation-coverage specs under `spec/jekyll_hi
     - Treat audit as authoritative finding list; prefer prescribed remediations while preserving mutant-kill power
 * Insights
     - Largest structural item is splitting `image_sizing_hooks_spec.rb`; most other findings are local rename/strengthen/delete
+
+## 2026-07-19 - PLAN - COMPLETE
+
+* Work completed
+    - Full disposition map for 34 findings (rename / strengthen / delete)
+    - Implementation plan: typed oracles → polaroid → linkcard → renderer/evaluator → archive spies → image-sizing fix+split → gates
+* Decisions made
+    - Delete only when a stronger sibling already locks the contract
+    - No Nokogiri; drop presentation-order examples instead
+    - Rename raw-key polaroid examples to HTML outcomes; keep dump example for locals
+* Insights
+    - Empty-title vacuous example is already covered by nbsp sibling; empty `link=""` still needs strengthen

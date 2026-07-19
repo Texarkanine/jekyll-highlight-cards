@@ -1,12 +1,13 @@
 # Active Context
 
 ## Current Task: mutation-testing-slobac-rework
-**Phase:** COMPLEXITY-ANALYSIS - COMPLETE
+**Phase:** PLAN - COMPLETE
 
 ## What Was Done
-- Cleared stale post-reflect ephemeral state; committed rework initiation
-- Classified **Level 2**: PR-feedback remediation of test smells across multiple branch-changed specs; prescribed remediations; no product architecture change
-- Scope anchored to `.slobac/2026-07-19T16-26-13/audit.md` (34 findings)
+- Level 2 plan written for all 34 SLOBAC findings with per-finding disposition (rename / strengthen / delete)
+- Prefer delete only when a stronger sibling already locks the contract; Mutant 100% is a hard gate after deletes
+- Image sizing monolith split into pre/post/helpers/integration/registration + shared support helper
+- No new dependencies (skip Nokogiri; drop presentation-order examples instead)
 
 ## Next Step
-- Load Level 2 workflow and enter PLAN phase
+- Preflight validation (autonomous for Level 2)
