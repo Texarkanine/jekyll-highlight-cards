@@ -48,4 +48,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "simplecov", "~> 1.0"
   spec.add_development_dependency "simplecov-cobertura", "~> 4.0"
   spec.add_development_dependency "webmock", "~> 3.18"
+  spec.add_development_dependency "mutant", "~> 0.16"
+  spec.add_development_dependency "mutant-rspec", "~> 0.16"
 end
