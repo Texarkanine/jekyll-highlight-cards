@@ -131,3 +131,11 @@ Remediate SLOBAC audit findings on mutation-coverage specs under `spec/jekyll_hi
     - Wrote `.qa-validation-status` PASS
 * Decisions made
     - No trivial QA fixes required
+
+## 2026-07-19 - REFLECT - COMPLETE
+
+* Work completed
+    - Wrote `reflection/reflection-mutation-testing-slobac-rework.md`
+    - Persistent files: no updates needed
+* Insights
+    - WebMock cannot kill Net::HTTP kwargs; treat SLOBAC spy-deletes as provisional until mutant confirms
