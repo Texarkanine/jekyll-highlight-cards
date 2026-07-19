@@ -35,3 +35,26 @@ CI continues to use RSpec/SimpleCov as today; Mutant CI job is out of scope. A d
 2. `bundle exec mutant run` reports 100% mutation coverage.
 3. Discipline docs and config match the auto-thumbnails reference pattern.
 4. Draft PR exists on `feat/mutation-testing` for operator review.
+
+## Rework
+
+### Trigger
+
+Post-reflect PR feedback / review: SLOBAC audit of branch-changed specs under `spec/jekyll_highlight_cards` (`.slobac/2026-07-19T16-26-13/audit.md`).
+
+### User Story
+
+As a gem maintainer, I want the mutation-coverage tests added on `feat/mutation-testing` free of the SLOBAC smells identified in that audit, so that the suite asserts real contracts without brittle mocks, vacuous oracles, or misleading names.
+
+### Requirements
+
+1. Address all **34** findings in the audit (or document a reasoned rejection with operator agreement).
+2. Prefer the audit's prescribed remediations: rename vs strengthen for naming-lies; typed error oracles for loose-text-oracle; outcome assertions over collaborator spies for over-specified-mock; structural/parsed checks for presentation-coupled; positive empty-field contracts for vacuous-assertion; split `image_sizing_hooks_spec.rb` for monolithic-test-file; delete the redundant linkcard archive-cache example for semantic-redundancy.
+3. Preserve mutation-kill power and line coverage — remediations must not trade smell cleanup for weaker oracles that leave mutants alive.
+4. Keep changes in the test suite / support unless a product bug is discovered; do not weaken SUT contracts to silence findings.
+
+### Acceptance Criteria
+
+1. Each of the 34 audit findings is remediated or explicitly deferred with rationale.
+2. `bundle exec rspec` remains green at the project coverage target.
+3. `bundle exec mutant run` remains at 100% mutation coverage (or any coverage drop is explained and approved).

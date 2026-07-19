@@ -70,3 +70,11 @@ Wire Mutant + mutant-rspec into jekyll-highlight-cards (mirror jekyll-auto-thumb
     - Reconciled `systemPatterns.md` for Mutant
 * Insights
     - Parallel subject kill + inventory-first approach transferred well from auto-thumbnails
+
+## 2026-07-19 - REWORK INITIATED
+
+* Operator disposition: **rework** (post-reflect PR feedback / review), not archive
+* Feedback source: `.slobac/2026-07-19T16-26-13/audit.md`
+* Scope: investigate and fix SLOBAC findings on tests introduced/changed on `feat/mutation-testing` under `spec/jekyll_highlight_cards`
+* Findings summary (34): 17 naming-lies, 6 over-specified-mock, 4 presentation-coupled, 3 vacuous-assertion, 2 loose-text-oracle, 1 monolithic-test-file, 1 semantic-redundancy
+* Key remediations prescribed: rename-or-strengthen mismatched examples; typed error oracles; delete Net::HTTP / File.join / Liquid::Template interaction spies; parse HTML instead of presentation pins; split `image_sizing_hooks_spec.rb`; drop redundant linkcard archive-cache example
