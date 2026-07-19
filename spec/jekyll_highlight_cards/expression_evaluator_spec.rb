@@ -64,6 +64,12 @@ RSpec.describe JekyllHighlightCards::ExpressionEvaluator do
         expect(result).to eq("literal-value")
       end
 
+      it "does not parse plain literals as Liquid templates" do
+        allow(Liquid::Template).to receive(:parse).and_call_original
+        evaluator.evaluate_expression("literal-value", context)
+        expect(Liquid::Template).not_to have_received(:parse)
+      end
+
       it "handles URLs" do
         result = evaluator.evaluate_expression("https://example.com", context)
         expect(result).to eq("https://example.com")
@@ -95,9 +101,30 @@ RSpec.describe JekyllHighlightCards::ExpressionEvaluator do
         result = evaluator.evaluate_expression('""', context, allow_nil: false)
         expect(result).to be_nil
       end
+
+      it "returns nil when allow_nil is false and Liquid result is empty" do
+        result = evaluator.evaluate_expression("{{ page.nonexistent }}", context, allow_nil: false)
+        expect(result).to be_nil
+      end
+
+      it "returns non-empty Liquid results when allow_nil is false" do
+        expect(evaluator.evaluate_expression("{{ page.title }}", context, allow_nil: false)).to eq("Test Title")
+      end
+
+      it "returns the literal when allow_nil is false and token is not a lookup" do
+        expect(evaluator.evaluate_expression("literal-value", context, allow_nil: false)).to eq("literal-value")
+      end
+
+      it "returns stripped content when allow_nil is false and quoted value is non-empty" do
+        expect(evaluator.evaluate_expression('"Title"', context, allow_nil: false)).to eq("Title")
+      end
     end
 
     context "with invalid Liquid expressions" do
+      before do
+        allow(Jekyll.logger).to receive(:debug)
+      end
+
       it "falls back to literal string on syntax error" do
         result = evaluator.evaluate_expression("{{ invalid", context)
         expect(result).to eq("{{ invalid")
@@ -106,6 +133,20 @@ RSpec.describe JekyllHighlightCards::ExpressionEvaluator do
       it "handles malformed tags" do
         result = evaluator.evaluate_expression("{% invalid %", context)
         expect(result).to eq("{% invalid %")
+      end
+
+      it "logs a debug message including the token and error class on syntax failure" do
+        begin
+          Liquid::Template.parse("{{ invalid")
+        rescue StandardError => e
+          @expected_log = "Failed to evaluate '{{ invalid' as Liquid expression: #{e.class}: #{e}"
+        end
+        evaluator.evaluate_expression("{{ invalid", context)
+        expect(Jekyll.logger).to have_received(:debug).with("HighlightCards:", @expected_log)
+      end
+
+      it "falls back to literal string on syntax error when allow_nil is false" do
+        expect(evaluator.evaluate_expression("{{ invalid", context, allow_nil: false)).to eq("{{ invalid")
       end
     end
 
@@ -153,6 +194,60 @@ RSpec.describe JekyllHighlightCards::ExpressionEvaluator do
     end
   end
 
+  describe "#quote_wrapped?" do
+    it "returns true for matching double quotes" do
+      expect(evaluator.quote_wrapped?('"value"')).to be true
+    end
+
+    it "returns true for matching single quotes" do
+      expect(evaluator.quote_wrapped?("'value'")).to be true
+    end
+
+    it "returns true for empty double-quoted string" do
+      expect(evaluator.quote_wrapped?('""')).to be true
+    end
+
+    it "returns true for empty single-quoted string" do
+      expect(evaluator.quote_wrapped?("''")).to be true
+    end
+
+    it "returns false for unquoted strings" do
+      expect(evaluator.quote_wrapped?("value")).to be false
+    end
+
+    it "returns false for a single double-quote character" do
+      expect(evaluator.quote_wrapped?('"')).to be false
+    end
+
+    it "returns false for a single single-quote character" do
+      expect(evaluator.quote_wrapped?("'")).to be false
+    end
+
+    it "returns false for empty string" do
+      expect(evaluator.quote_wrapped?("")).to be false
+    end
+
+    it "returns false when double quotes are mismatched" do
+      expect(evaluator.quote_wrapped?('"value')).to be false
+    end
+
+    it "returns false when only the end has a double quote" do
+      expect(evaluator.quote_wrapped?('value"')).to be false
+    end
+
+    it "returns false when single quotes are mismatched at the end" do
+      expect(evaluator.quote_wrapped?("'value")).to be false
+    end
+
+    it "returns false when only the end has a single quote" do
+      expect(evaluator.quote_wrapped?("value'")).to be false
+    end
+
+    it "returns false for mixed quote styles" do
+      expect(evaluator.quote_wrapped?("\"value'")).to be false
+    end
+  end
+
   describe "#strip_outer_quotes" do
     it "strips double quotes" do
       expect(evaluator.strip_outer_quotes('"value"')).to eq("value")
@@ -188,6 +283,18 @@ RSpec.describe JekyllHighlightCards::ExpressionEvaluator do
 
     it "handles empty string" do
       expect(evaluator.strip_outer_quotes("")).to eq("")
+    end
+
+    it "does not strip a lone double-quote character" do
+      expect(evaluator.strip_outer_quotes('"')).to eq('"')
+    end
+
+    it "does not strip a lone single-quote character" do
+      expect(evaluator.strip_outer_quotes("'")).to eq("'")
+    end
+
+    it "requires matching single quotes on both ends" do
+      expect(evaluator.strip_outer_quotes("'value")).to eq("'value")
     end
   end
 

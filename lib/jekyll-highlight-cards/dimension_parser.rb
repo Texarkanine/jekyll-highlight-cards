@@ -11,8 +11,7 @@ module JekyllHighlightCards
   # - Units: Supports px, em, %, etc. (e.g., "400pxx300px")
   #
   # @example
-  #   include DimensionParser
-  #   width, height = parse_dimensions("300x200")  #=> ["300", "200"]
+  #   width, height = DimensionParser.parse_dimensions("300x200")  #=> ["300", "200"]
   module DimensionParser
     # Parse dimension string into width and height components
     #
@@ -25,7 +24,7 @@ module JekyllHighlightCards
     #   parse_dimensions("x200")     #=> [nil, "200"]
     #   parse_dimensions("300")      #=> ["300", nil]
     #   parse_dimensions("400px")    #=> ["400px", nil]
-    def parse_dimensions(dim_str)
+    def self.parse_dimensions(dim_str)
       return [nil, nil] if dim_str.nil? || dim_str.empty?
 
       # Determine the separator:
@@ -34,29 +33,22 @@ module JekyllHighlightCards
       # - Otherwise, check if there's an 'x' that's a separator (not part of a unit like "px")
       #   An 'x' is a separator if it's at the end, followed by a digit, or at the start
       if dim_str.include?("xx")
-        # Find the position of "xx"
         idx = dim_str.index("xx")
-        # Split at the second 'x' (include first 'x' in width, skip both 'x's for height)
-        width = dim_str[0..idx].empty? ? nil : dim_str[0..idx]
+        width = dim_str[...(idx + 1)]
         height = dim_str[(idx + 2)..]
-        height = nil if height.nil? || height.empty?
+        height = nil if height.empty?
         [width, height]
-      elsif dim_str =~ /x\d/ || dim_str =~ /(?<![a-z])x$/i || dim_str.start_with?("x")
-        # Single 'x' separator in one of these cases:
-        # 1. Followed by a digit: "300x200", "10emx20em"
-        # 2. At end but NOT preceded by a letter: "300x"
-        # 3. At start: "x200"
-        # This matches "300x", "300x200", "x200", "10emx20em", but NOT "400px"
-        parts = dim_str.split("x", 2)
-        width = parts[0].empty? ? nil : parts[0]
-        height = parts[1].nil? || parts[1].empty? ? nil : parts[1]
+      elsif dim_str.match?(/x\d|(?<![a-z])x\z/) || dim_str.start_with?("x")
+        width_str, height_str = dim_str.split("x", 2)
+        width = width_str
+        width = nil if width.empty?
+        height = height_str
+        height = nil if height.empty?
         [width, height]
       else
         # No separator found - treat as width only
         [dim_str, nil]
       end
     end
-
-    module_function :parse_dimensions
   end
 end

@@ -17,4 +17,5 @@ Jekyll 4 plugin gem written in Ruby, tested with RSpec, linted with RuboCop. Pac
 
 - RSpec configured via `.rspec` and `spec/spec_helper.rb`
 - Run suite: `bundle exec rspec`
-- Coverage: SimpleCov (+ `simplecov-cobertura` when `CI` is set); Codecov upload on release workflow
+- Coverage via SimpleCov (with `simplecov-cobertura` formatter); output under `coverage/`. SimpleCov is skipped when Mutant is loaded (see `spec/spec_helper.rb`).
+- Mutation testing via Mutant + `mutant-rspec`, configured in `config/mutant.yml`. Kill discipline (A/B buckets, no ignore cheats, no SUT stubs) is documented in `CONTRIBUTING.md`. Invoke with `bundle exec mutant test` / `bundle exec mutant run`.

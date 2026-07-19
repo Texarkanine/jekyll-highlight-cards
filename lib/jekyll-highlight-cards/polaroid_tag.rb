@@ -33,7 +33,6 @@ module JekyllHighlightCards
   #   {% polaroid /img.jpg link="https://example.com" image_link="https://other.com" %}
   class PolaroidTag < Liquid::Tag
     include ArchiveHelper
-    include DimensionParser
     include ExpressionEvaluator
     include TemplateRenderer
 
@@ -59,7 +58,7 @@ module JekyllHighlightCards
       raise ArgumentError, "polaroid tag requires an image URL" if params[:image_url].nil? || params[:image_url].empty?
 
       # Parse size parameter if present
-      width, height = parse_dimensions(params[:size]) if params[:size]
+      width, height = DimensionParser.parse_dimensions(params[:size]) if params[:size]
 
       # Determine link URL (defaults to image URL)
       # Track if link was explicitly provided

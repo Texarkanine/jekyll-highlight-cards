@@ -78,6 +78,18 @@ RSpec.describe JekyllHighlightCards::DimensionParser do
       it "handles very large numbers" do
         expect(described_class.parse_dimensions("9999x9999")).to eq(%w[9999 9999])
       end
+
+      it "treats leading x with non-digit height as height-only" do
+        expect(described_class.parse_dimensions("xabc")).to eq([nil, "abc"])
+      end
+
+      it "treats xx with empty height as width only" do
+        expect(described_class.parse_dimensions("50xx")).to eq(["50x", nil])
+      end
+
+      it "does not treat trailing newline as end-of-string x separator" do
+        expect(described_class.parse_dimensions("300x\n")).to eq(["300x\n", nil])
+      end
     end
   end
 end

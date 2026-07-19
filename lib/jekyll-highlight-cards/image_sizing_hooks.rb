@@ -21,8 +21,6 @@ module JekyllHighlightCards
   # @note Images inside code fences and inline code are not processed
   # @note Sized images are automatically wrapped in <a> tags (if not already)
   module ImageSizingHooks
-    extend DimensionParser
-
     # Process document content before rendering
     # Converts ![alt](src =WxH) to ![alt](src)<!-- IMG_SIZE:W:H -->
     #
@@ -58,7 +56,7 @@ module JekyllHighlightCards
             size = Regexp.last_match(3).strip
 
             # Parse dimensions using DimensionParser
-            width, height = parse_dimensions(size)
+            width, height = DimensionParser.parse_dimensions(size)
 
             # Build marker comment
             "![#{alt}](#{src})<!-- IMG_SIZE:#{width}:#{height} -->"
