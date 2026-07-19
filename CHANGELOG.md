@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v2.0.0...v2.1.0) (2026-07-19)
+
+
+### Features
+
+* **test:** add Mutant mutation testing at 100% coverage ([#49](https://github.com/Texarkanine/jekyll-highlight-cards/issues/49)) ([e4e63dc](https://github.com/Texarkanine/jekyll-highlight-cards/commit/e4e63dc259ee767d0db31cb86e1b03e298f76f0d))
+
 ## [2.0.0](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v1.1.2...v2.0.0) (2026-01-18)
 
 
