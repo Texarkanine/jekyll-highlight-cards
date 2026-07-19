@@ -1,8 +1,8 @@
 # Progress
 
-Wire Mutant + mutant-rspec into jekyll-highlight-cards (mirror jekyll-auto-thumbnails), reach 100% mutation coverage, open draft PR on `feat/mutation-testing`.
+Remediate SLOBAC audit findings on mutation-coverage specs under `spec/jekyll_highlight_cards` (post-reflect rework on `feat/mutation-testing`), preserving RSpec green and 100% Mutant coverage.
 
-**Complexity:** Level 3
+**Complexity:** Level 2
 
 ## 2026-07-19 - COMPLEXITY-ANALYSIS - COMPLETE
 
@@ -78,3 +78,12 @@ Wire Mutant + mutant-rspec into jekyll-highlight-cards (mirror jekyll-auto-thumb
 * Scope: investigate and fix SLOBAC findings on tests introduced/changed on `feat/mutation-testing` under `spec/jekyll_highlight_cards`
 * Findings summary (34): 17 naming-lies, 6 over-specified-mock, 4 presentation-coupled, 3 vacuous-assertion, 2 loose-text-oracle, 1 monolithic-test-file, 1 semantic-redundancy
 * Key remediations prescribed: rename-or-strengthen mismatched examples; typed error oracles; delete Net::HTTP / File.join / Liquid::Template interaction spies; parse HTML instead of presentation pins; split `image_sizing_hooks_spec.rb`; drop redundant linkcard archive-cache example
+
+## 2026-07-19 - COMPLEXITY-ANALYSIS - COMPLETE
+
+* Work completed
+    - Classified Level 2 (bug-fix / quality remediation across multiple spec files; remediations prescribed by audit; no architectural change)
+* Decisions made
+    - Treat audit as authoritative finding list; prefer prescribed remediations while preserving mutant-kill power
+* Insights
+    - Largest structural item is splitting `image_sizing_hooks_spec.rb`; most other findings are local rename/strengthen/delete
