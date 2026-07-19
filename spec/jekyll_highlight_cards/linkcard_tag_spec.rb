@@ -111,6 +111,14 @@ RSpec.describe JekyllHighlightCards::LinkcardTag do
       end
     end
 
+    it "falls back to the gem template when site is absent from registers" do
+      bare_context = Liquid::Context.new({}, {}, {})
+      tag = Liquid::Template.parse("{% linkcard https://example.com %}").root.nodelist.first
+      result = tag.render(bare_context)
+      expect(result).to include('href="https://example.com"')
+      expect(result).to include("link-card")
+    end
+
     context "when the template is not found" do
       before do
         allow(File).to receive(:exist?).and_return(false)

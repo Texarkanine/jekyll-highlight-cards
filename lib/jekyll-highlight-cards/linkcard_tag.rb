@@ -49,7 +49,7 @@ module JekyllHighlightCards
       variables = build_template_variables(url, title, archive_url)
 
       # Get site from context
-      site = context.registers.fetch(:site)
+      site = context.registers[:site]
 
       # Render template
       render_template(site, "linkcard", variables)

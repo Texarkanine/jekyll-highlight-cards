@@ -27,6 +27,13 @@ RSpec.describe JekyllHighlightCards::ImageSizingHooks do
       expect(described_class.img_link_prefix(output, match)).to eq("   ")
       expect(described_class.img_link_prefix(output, match).length).to eq(match.begin(2))
     end
+
+    it "uses character offsets when the prefix contains multibyte characters" do
+      # "é" is two UTF-8 bytes; MatchData#begin is character-based.
+      output = 'é<img src="image.jpg"><!-- IMG_SIZE:100:100 -->'
+      match = output.match(described_class::SIZED_IMG_HTML_PATTERN)
+      expect(described_class.img_link_prefix(output, match)).to eq("é")
+    end
   end
 
   describe ".unclosed_anchor_count" do

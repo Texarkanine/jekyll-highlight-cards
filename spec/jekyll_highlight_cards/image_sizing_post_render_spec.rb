@@ -55,7 +55,8 @@ RSpec.describe JekyllHighlightCards::ImageSizingHooks do
         allow(mock_document).to receive(:output)
           .and_return('<img src="image&amp;file.jpg" alt="Alt"><!-- IMG_SIZE:300:200 -->')
         described_class.process_post_render(mock_document)
-        expect(@output).to include('<a href="image&amp;amp;file.jpg">')
+        expect(@output).to include('<a href="image&amp;file.jpg">')
+        expect(@output).not_to include("&amp;amp;")
       end
 
       it "processes output when the document output string is frozen" do

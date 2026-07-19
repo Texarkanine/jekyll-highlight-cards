@@ -139,3 +139,16 @@ Remediate SLOBAC audit findings on mutation-coverage specs under `spec/jekyll_hi
     - Persistent files: no updates needed
 * Insights
     - WebMock cannot kill Net::HTTP kwargs; treat SLOBAC spy-deletes as provisional until mutant confirms
+
+## 2026-07-19 - BUILD - COMPLETE (PR #49 CodeRabbit items 1,2,3,5,6,8)
+
+* Work completed
+    - Removed tracked `.mutant/results/*.json` from the index (gitignore `/.mutant/` retained; aligns with auto-thumbnails)
+    - `img_link_prefix`: character slice instead of `byteslice`
+    - Auto-link href: `CGI.escapeHTML(CGI.unescapeHTML(src))` + updated oracle (no double-escape)
+    - `LinkcardTag#render`: `registers[:site]` like polaroid; added absent-site fallback example
+* Decisions made
+    - Do not regenerate/sanitize mutation JSON into git — untrack instead so local paths never ship
+    - Deferred items 7 (safe_template_path boundary) and 9 (`http_get` extract) untouched
+* Insights
+    - Committing Mutant session JSON fights `/.mutant/` ignore and leaks machine paths; local-only is the reference pattern

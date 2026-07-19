@@ -39,7 +39,7 @@ module JekyllHighlightCards
     end
 
     def self.img_link_prefix(output, match)
-      output.byteslice(0, match.begin(2))
+      output[0, match.begin(2)]
     end
 
     def self.process_pre_render(document)
@@ -126,7 +126,7 @@ module JekyllHighlightCards
         if already_linked
           modified_img
         else
-          %(<a href="#{CGI.escapeHTML(src)}">#{modified_img}</a>)
+          %(<a href="#{CGI.escapeHTML(CGI.unescapeHTML(src))}">#{modified_img}</a>)
         end
       end
 
