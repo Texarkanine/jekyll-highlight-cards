@@ -55,3 +55,12 @@ Ship an opt-in Jekyll subcommand that freezes Internet Archive URLs into highlig
     - Single-line remains end-of-markup splice; multiline must not cram onto URL line or against `%}`
 * Insights
     - Author review cost for large freezes depends on indent-faithful diffs, not just “surgical” byte inserts
+
+## 2026-08-01 - BUILD - IN-PROGRESS
+
+* Work completed
+    - Prerequisites verified (preflight PASS); creative decisions reviewed
+* Decisions made
+    - Proceeding with Option B architecture and Option B CLI/env policy as planned
+* Insights
+    - Step 1 is refactor-under-green via existing tag specs before any freeze units

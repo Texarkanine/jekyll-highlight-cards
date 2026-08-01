@@ -1,14 +1,14 @@
 # Active Context
 
 **Current Task:** Freeze archive URLs via Jekyll subcommand
-**Phase:** PREFLIGHT - COMPLETE
+**Phase:** BUILD - IN-PROGRESS
 **Complexity:** Level 3
 
 ## What Was Done
 
-- Preflight PASS (with advisory): TDD ordering amended per unit; creative decisions intact
-- Operator clarified multiline insert: new line + copy last content line indent (I4/I5); plan/creative updated
+- Preflight PASS; multiline insert contract locked (I4/I5)
+- Entering Build: implement plan steps 1–7 with TDD
 
 ## Next Step
 
-Operator runs `/niko-build`
+Execute implementation plan step 1 (shared markup extract under green tag specs)
