@@ -166,3 +166,13 @@ Ship freeze-archives, then rework: add `highlight_cards.noarchive` regex list so
     - No code changes required in QA
 * Insights
     - archiveable check before cache prevents noarchive from serving stale cached hits for skipped URLs
+
+## 2026-08-01 - REFLECT - COMPLETE (rework)
+
+* Work completed
+    - Wrote reflection-noarchive-config.md
+    - Persistent MB left unchanged (no factual invalidation)
+* Decisions made
+    - Standalone L2 rework → next operator step is `/niko-archive`
+* Insights
+    - Eligibility must precede archive_cache so noarchive cannot be bypassed by a prior hit
