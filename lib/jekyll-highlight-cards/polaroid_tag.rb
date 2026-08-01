@@ -58,7 +58,7 @@ module JekyllHighlightCards
                        else
                          params.fetch(:image_link)
                        end
-      archive_url = resolve_archive(params[:archive], link_url)
+      archive_url = resolve_archive(params[:archive], link_url, explicit_link: explicit_link)
 
       variables = build_template_variables(
         params.fetch(:image_url),
@@ -145,10 +145,12 @@ module JekyllHighlightCards
     #
     # @param source [String, nil] the archive source
     # @param url [String] the target URL to archive
+    # @param explicit_link [Boolean] whether +link=+ was provided (self-link is not an archive target)
     # @return [String, nil] resolved archive URL
-    def resolve_archive(source, url)
+    def resolve_archive(source, url, explicit_link: true)
       return nil if source && source.downcase == "none"
       return source unless source.to_s.empty?
+      return nil unless explicit_link
 
       archive_enabled? && archive_url_for(url)
     end

@@ -25,6 +25,8 @@ module JekyllHighlightCards
     # @param url [String] the original URL to archive
     # @return [String, nil] the archive URL, or nil if not found
     def archive_url_for(url)
+      return nil unless archiveable_url?(url)
+
       ArchiveHelper.archive_cache[url] ||= begin
         archive_url = lookup_archive(url)
 
@@ -57,6 +59,23 @@ module JekyllHighlightCards
     end
 
     private
+
+    # Whether +url+ is eligible for CDX lookup / SavePageNow submission.
+    #
+    # Requires an absolute http(s) URI with a host. Rejects Internet Archive
+    # hosts so Wayback / archive.org URLs are not re-submitted.
+    #
+    # @param url [String] candidate URL
+    # @return [Boolean] true if the URL may be archived
+    def archiveable_url?(url)
+      uri = URI.parse(url.to_s)
+      return false unless uri.is_a?(URI::HTTP) && uri.host
+      return false if %w[archive.org web.archive.org].include?(uri.host.downcase)
+
+      true
+    rescue URI::InvalidURIError
+      false
+    end
 
     # Look up the latest archived snapshot for a URL via Internet Archive CDX API
     #
