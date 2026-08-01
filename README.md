@@ -149,7 +149,10 @@ Or in your shell config:
 export JEKYLL_HIGHLIGHT_CARDS_ARCHIVE=1
 ```
 
-Build-time lookup still requires `JEKYLL_HIGHLIGHT_CARDS_ARCHIVE=1` (or `_SAVE=1`). That path remains the forgetful fallback for tags you never freeze.
+| Flag | Description |
+|------|-------------|
+| `JEKYLL_HIGHLIGHT_CARDS_ARCHIVE` | Enable build-time lookup to see if there is an IA snapshot available |
+| `JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE` | Enable once-only lookup to submit a site to the IA if no snapshot was available |
 
 You can selectively skip archive attempts for URLs that match site-configured regexes. Patterns are matched against the full URL string; use anchors when needed.
 
