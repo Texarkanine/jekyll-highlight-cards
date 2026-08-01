@@ -143,12 +143,13 @@ flowchart LR
    - Changes: formatting-aware surgical insert — single-line splice vs multiline new line with last-content-line indent (see `creative-source-scan-rewrite.md`)
    - Done: I1–I5 + quote/tab edges green
 
-5. [ ] **FreezeArchives command**
+5. [x] **FreezeArchives command**
    - Files: `lib/jekyll-highlight-cards/commands/freeze_archives.rb`, `spec/jekyll_highlight_cards/freeze_archives/command_spec.rb` (temp site fixture), require from `lib/jekyll-highlight-cards.rb`
    - TDD ordering: stub C1–C6 → failing tests → red → implement command + wiring → green
    - Changes: `Jekyll::Command#init_with_program`; `--dry-run`, `--save`; site configure + read; locator→analyzer→`archive_url_for`→inserter; summary output
    - Creative ref: `creative-cli-env-policy.md`
    - Docs: [Jekyll custom commands](https://jekyllrb.com/docs/plugins/commands/)
+   - Done: C1–C6 + Mercenary registration green
 
 6. [ ] **Documentation** (prose — no executable-behavior tests)
    - Files: `README.md`, `CHANGELOG.md` (Unreleased)
