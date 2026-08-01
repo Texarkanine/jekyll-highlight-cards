@@ -25,3 +25,13 @@ Ship an opt-in Jekyll subcommand that freezes Internet Archive URLs into highlig
     - Freeze does not require `JEKYLL_HIGHLIGHT_CARDS_ARCHIVE=1`
 * Insights
     - Surgical insert preserves author formatting better than full tag rebuild
+
+## 2026-08-01 - PLAN - COMPLETE
+
+* Work completed
+    - Full L3 plan in `tasks.md`: components, TDD behaviors, 7 implementation steps, challenges, pre-mortem
+* Decisions made
+    - Command: `freeze-archives` with `--dry-run` / `--save`
+    - Behavior-preserving markup extract before freeze units
+* Insights
+    - `archive_url_for` is already ungated by `archive_enabled?` (tags gate separately) — freeze can call it directly
