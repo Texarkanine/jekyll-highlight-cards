@@ -65,3 +65,14 @@ Add ArchiveHelper / PolaroidTag guards so auto-archive skips relative paths, arc
     - None beyond shipping skip-only guards as planned
 * Insights
     - Guard C must live at PolaroidTag because `link_url` already defaults to `image_url` before ArchiveHelper sees it
+
+## 2026-08-01 - POST-REFLECT - PR FEEDBACK
+
+* Work completed
+    - Opened draft PR #54
+    - Strengthened specs per CodeRabbit: `ARCHIVE_SAVE` on negative paths; Guard C uses absolute image URL
+    - Pushed `7ed4240` to `archive-guards`
+* Decisions made
+    - Dismissed CodeRabbit ask to remove memory-bank from the PR (Niko process artifacts)
+* Insights
+    - Relative image URL made Guard C example pass via Guard A alone
