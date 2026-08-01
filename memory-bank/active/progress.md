@@ -13,3 +13,14 @@ Add ArchiveHelper / PolaroidTag guards so auto-archive skips relative paths, arc
     - Skip-only behavior; Wayback URL unwrapping remains out of scope
 * Insights
     - Observed in consuming-site builds with `JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE=1`
+
+## 2026-08-01 - PLAN - COMPLETE
+
+* Work completed
+    - Mapped behaviors A/B/C to existing RSpec files
+    - Planned `archiveable_url?` gate in `ArchiveHelper#archive_url_for` and polaroid auto-lookup skip for `!explicit_link`
+* Decisions made
+    - Guard C applies only to auto-lookup; explicit `archive=` without `link=` still honored
+    - Host skip is exact `archive.org` / `web.archive.org` (case-insensitive), not other archive hosts
+* Insights
+    - LinkCard inherits A/B automatically via shared helper — no separate LinkCard change required
