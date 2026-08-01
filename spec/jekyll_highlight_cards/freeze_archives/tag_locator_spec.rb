@@ -53,5 +53,15 @@ RSpec.describe JekyllHighlightCards::FreezeArchives::TagLocator do
       expect(span[:markup]).to eq("https://example.com Title ")
       expect(text[span[:range]]).to end_with("-%}")
     end
+
+    it "locates tags with a leading whitespace-control opener {%-" do
+      text = "{%- linkcard https://example.com Title %}"
+      span = locator.locate(text).first
+
+      expect(span).not_to be_nil
+      expect(span[:tag]).to eq("linkcard")
+      expect(span[:markup]).to eq("https://example.com Title ")
+      expect(text[span[:range]]).to start_with("{%-")
+    end
   end
 end

@@ -243,6 +243,7 @@ RSpec.describe JekyllHighlightCards::Commands::FreezeArchives do
         MD
         stub_cdx_hit
         messages = []
+        Jekyll.logger.log_level = :warn
         allow(Jekyll.logger).to receive(:info).and_wrap_original do |orig, *args|
           messages << args
           orig.call(*args)
@@ -253,6 +254,19 @@ RSpec.describe JekyllHighlightCards::Commands::FreezeArchives do
 
         freeze_msgs = messages.filter_map { |topic, msg| msg if topic == "freeze-archives:" }
         expect(freeze_msgs).to include(a_string_including(target_url))
+        expect(Jekyll.logger.level).to eq(:warn)
+      end
+    end
+
+    it "restores Jekyll.logger log level after forcing info for the hand-run" do
+      Dir.mktmpdir do |dir|
+        write_site(dir, "{% linkcard https://example.com Title %}\n")
+        stub_cdx_hit
+        Jekyll.logger.log_level = :error
+
+        described_class.process(site_options(dir).merge("quiet" => false))
+
+        expect(Jekyll.logger.level).to eq(:error)
       end
     end
   end

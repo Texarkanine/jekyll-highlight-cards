@@ -38,6 +38,7 @@ module JekyllHighlightCards
         # @return [Hash] summary counts +:frozen+, +:skipped+, +:miss+, +:written+
         def process(options)
           previous_save = ENV.fetch("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE", nil)
+          previous_log_level = Jekyll.logger.level
           ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE"] = "1" if options["save"]
 
           site = Jekyll::Site.new(configuration_from_options(options))
@@ -56,6 +57,7 @@ module JekyllHighlightCards
           summary
         ensure
           restore_save_env(previous_save, options)
+          Jekyll.logger.log_level = previous_log_level if previous_log_level
         end
 
         private

@@ -74,6 +74,21 @@ RSpec.describe JekyllHighlightCards::FreezeArchives::ArchiveInserter do
       expect(result).to include('archive="https://example.com/q?\\"weird\\""')
     end
 
+    it "round-trips escaped polaroid archive URLs through PolaroidMarkup" do
+      nasty = 'https://example.com/q?"weird"'
+      token = inserter.send(:archive_token, "polaroid", nasty)
+      parsed = JekyllHighlightCards::PolaroidMarkup.parse("/img.jpg #{token}")
+      stripper = Class.new { include JekyllHighlightCards::ExpressionEvaluator }.new
+
+      expect(stripper.strip_outer_quotes(parsed[:archive])).to eq(nasty)
+    end
+
+    it "preserves leading whitespace-control opener {%-" do
+      content = "{%- linkcard https://example.com Title %}\n"
+      result = inserter.insert(content, span_for(content, "linkcard"), archive_url)
+      expect(result).to eq("{%- linkcard https://example.com Title archive:#{archive_url} %}\n")
+    end
+
     it "copies tab indentation from the last content line" do
       content = "{% linkcard\n\thttps://example.com\n%}"
       result = inserter.insert(content, span_for(content, "linkcard"), archive_url)
