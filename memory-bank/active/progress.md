@@ -35,3 +35,14 @@ Ship an opt-in Jekyll subcommand that freezes Internet Archive URLs into highlig
     - Behavior-preserving markup extract before freeze units
 * Insights
     - `archive_url_for` is already ungated by `archive_enabled?` (tags gate separately) — freeze can call it directly
+
+## 2026-08-01 - PREFLIGHT - COMPLETE
+
+* Work completed
+    - Validated plan against codebase, creative docs, TDD encoding, gemspec packing
+    - Amended implementation steps with explicit test-before-code ordering
+    - Wrote `.preflight-status` PASS
+* Decisions made
+    - Deferred optional `--path`/`--limit` as advisory follow-up
+* Insights
+    - No existing freeze/command code to conflict with

@@ -106,8 +106,8 @@ flowchart LR
 - Framework: RSpec + WebMock (`bundle exec rspec`)
 - Test location: `spec/jekyll_highlight_cards/`
 - Conventions: describe/context/it; WebMock for archive.org; ENV isolation in `spec_helper`
-- New test files: `freeze_archives_tag_locator_spec.rb`, `freeze_archives_markup_analyzer_spec.rb`, `freeze_archives_archive_inserter_spec.rb`, `freeze_archives_command_spec.rb` (names may nest under `freeze_archives/`)
-- Existing: extend tag specs only if markup extract requires behavior-preserving moves
+- New test files (under `spec/jekyll_highlight_cards/freeze_archives/`): `markup_analyzer_spec.rb`, `tag_locator_spec.rb`, `archive_inserter_spec.rb`, `command_spec.rb`
+- Existing: `linkcard_tag_spec.rb` / `polaroid_tag_spec.rb` remain the green harness for step 1 extract
 
 ### Integration Tests
 
@@ -115,35 +115,39 @@ flowchart LR
 
 ## Implementation Plan
 
-1. **Extract shared markup parsing (behavior-preserving)**
-   - Files: `lib/jekyll-highlight-cards/linkcard_tag.rb`, `polaroid_tag.rb`, new shared module (e.g. `markup_tokenizer.rb` / `linkcard_markup.rb` / `polaroid_markup.rb`)
-   - Changes: move tokenizers/parsers; tags delegate; existing tag specs stay green
+1. **Extract shared markup parsing (behavior-preserving refactor)**
+   - Files: `lib/jekyll-highlight-cards/linkcard_tag.rb`, `polaroid_tag.rb`, new shared module(s) (e.g. `linkcard_markup.rb` / `polaroid_markup.rb`), existing `linkcard_tag_spec.rb` / `polaroid_tag_spec.rb`
+   - TDD ordering: no new behavior — run existing tag specs (must be green) → extract parsers under green → re-run those specs (must stay green). Do not add freeze features in this step.
    - Creative ref: `creative-source-scan-rewrite.md`
 
-2. **MarkupAnalyzer (TDD)**
-   - Files: analyzer + `spec/.../freeze_archives_markup_analyzer_spec.rb`
-   - Changes: classify candidate vs skip for A1–A8 using shared parsers + `archiveable_url?`
+2. **MarkupAnalyzer**
+   - Files: analyzer under `lib/jekyll-highlight-cards/freeze_archives/`, `spec/jekyll_highlight_cards/freeze_archives/markup_analyzer_spec.rb`
+   - TDD ordering: stub empty examples for A1–A8 → implement failing assertions → run (red) → implement analyzer → run (green)
+   - Changes: classify candidate vs skip using shared parsers + `archiveable_url?`
 
-3. **TagLocator (TDD)**
-   - Files: locator + locator spec
+3. **TagLocator**
+   - Files: locator + `spec/jekyll_highlight_cards/freeze_archives/tag_locator_spec.rb`
+   - TDD ordering: stub L1–L2 → failing tests → red → implement locator → green
    - Changes: return spans `{tag:, markup:, range:}` for linkcard/polaroid
 
-4. **ArchiveInserter (TDD)**
-   - Files: inserter + inserter spec
-   - Changes: I1–I3 surgical insert
+4. **ArchiveInserter**
+   - Files: inserter + `spec/jekyll_highlight_cards/freeze_archives/archive_inserter_spec.rb`
+   - TDD ordering: stub I1–I3 (+ quote edge) → failing tests → red → implement inserter → green
+   - Changes: surgical insert of archive tokens
 
-5. **FreezeArchives command (TDD)**
-   - Files: `lib/jekyll-highlight-cards/commands/freeze_archives.rb`, command/integration spec, require from `lib/jekyll-highlight-cards.rb`
-   - Changes: `Jekyll::Command#init_with_program`; `--dry-run`, `--save`; site configure + read; wire locator→analyzer→`archive_url_for`→inserter; summary output
+5. **FreezeArchives command**
+   - Files: `lib/jekyll-highlight-cards/commands/freeze_archives.rb`, `spec/jekyll_highlight_cards/freeze_archives/command_spec.rb` (temp site fixture), require from `lib/jekyll-highlight-cards.rb`
+   - TDD ordering: stub C1–C6 → failing tests → red → implement command + wiring → green
+   - Changes: `Jekyll::Command#init_with_program`; `--dry-run`, `--save`; site configure + read; locator→analyzer→`archive_url_for`→inserter; summary output
    - Creative ref: `creative-cli-env-policy.md`
    - Docs: [Jekyll custom commands](https://jekyllrb.com/docs/plugins/commands/)
 
-6. **Documentation**
+6. **Documentation** (prose — no executable-behavior tests)
    - Files: `README.md`, `CHANGELOG.md` (Unreleased)
-   - Changes: how to run, dry-run first, commit workflow, CDX-without-`ARCHIVE=1`, `--save` / `_SAVE`
+   - Changes: how to run, recommend `--dry-run` first, commit workflow, CDX-without-`ARCHIVE=1`, `--save` / `_SAVE`, literal-URL-only limitation
 
 7. **Verify**
-   - `bundle exec rspec`; `bundle exec rubocop` on touched files
+   - `bundle exec rspec` (full suite); `bundle exec rubocop` on touched files
 
 ## Technology Validation
 
@@ -164,6 +168,13 @@ No new technology - validation not required. Uses existing Jekyll `Jekyll::Comma
 - **Implemented as Generator “for convenience”**: forbidden by brief/invariants; C6 guards
 - **Shared extract rewritten instead of moved, silent tag regressions**: step 1 requires existing suite green before freeze features
 
+## Preflight Findings
+
+- PASS (amended): Per-unit TDD ordering made explicit on steps 1–5 (step 1 = refactor-under-green via existing tag specs)
+- PASS: Creative docs present; no conflicting freeze implementation in codebase
+- PASS: Requirements mapped to concrete steps; gemspec `lib/**/*.rb` already packs new files
+- Advisory (no plan change): optional `--path` / `--limit` for large sites could be a follow-up; v1 freezes the whole site source set
+
 ## Status
 
 - [x] Component analysis complete
@@ -172,6 +183,6 @@ No new technology - validation not required. Uses existing Jekyll `Jekyll::Comma
 - [x] Implementation plan complete
 - [x] Technology validation complete
 - [x] Pre-Mortem complete
-- [ ] Preflight
+- [x] Preflight
 - [ ] Build
 - [ ] QA

@@ -1,14 +1,14 @@
 # Active Context
 
 **Current Task:** Freeze archive URLs via Jekyll subcommand
-**Phase:** PLAN - COMPLETE
+**Phase:** PREFLIGHT - COMPLETE
 **Complexity:** Level 3
 
 ## What Was Done
 
-- Planned `jekyll freeze-archives`: locator + shared markup analysis + surgical insert; CLI policy from creative docs
-- TDD behaviors A/L/I/C mapped; 7-step implementation plan; no new dependencies
+- Preflight PASS (with advisory): TDD ordering amended per unit; creative decisions intact
+- Ready for operator-initiated build
 
 ## Next Step
 
-Preflight phase to validate the plan
+Operator runs `/niko-build`
