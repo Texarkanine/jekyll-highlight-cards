@@ -11,6 +11,7 @@ A Jekyll plugin providing styled card components for links and images with Inter
 - **`{% polaroid %}`** - Polaroid-style image cards with titles, links, and archive support
 - **Markdown Image Sizing** - Extended syntax for image dimensions: `![alt](image.jpg =300x200)`
 - **Internet Archive Integration** - Automatic lookup and archival for both tags
+- **`jekyll freeze-archives`** - Opt-in command to freeze archive URLs into source
 - **Customizable** - Override HTML templates and CSS styles
 
 ## Installation
@@ -147,6 +148,30 @@ Or in your shell config:
 # In .bashrc, .zshrc, etc.
 export JEKYLL_HIGHLIGHT_CARDS_ARCHIVE=1
 ```
+
+Build-time lookup still requires `JEKYLL_HIGHLIGHT_CARDS_ARCHIVE=1` (or `_SAVE=1`). That path remains the forgetful fallback for tags you never freeze.
+
+### Freeze archives into source
+
+To look up Internet Archive snapshots once and write them into your source tags (so builds skip re-lookup), run the opt-in Jekyll subcommand:
+
+```bash
+# Rehearse first — reports planned edits, writes nothing
+bundle exec jekyll freeze-archives --dry-run
+
+# Write archive: / archive= into eligible tags
+bundle exec jekyll freeze-archives
+```
+
+Review the diff, then commit. The command does **not** commit for you, and it does **not** run as part of `jekyll build`.
+
+**How it differs from build-time lookup**
+
+- Invoking `freeze-archives` performs CDX lookup — you do **not** need `JEKYLL_HIGHLIGHT_CARDS_ARCHIVE=1`.
+- SavePageNow stays gated: set `JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE=1` or pass `--save`.
+- Only **literal** http(s) URLs are frozen. Liquid targets like `{{ page.url }}` are skipped; build-time auto-lookup still covers those when enabled.
+- Tags that already have `archive:` / `archive=` / `archive:none` are left alone.
+- Failed lookups do not invent archive attributes.
 
 ### CSS Styles
 

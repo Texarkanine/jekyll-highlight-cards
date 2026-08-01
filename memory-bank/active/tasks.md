@@ -151,7 +151,7 @@ flowchart LR
    - Docs: [Jekyll custom commands](https://jekyllrb.com/docs/plugins/commands/)
    - Done: C1–C6 + Mercenary registration green
 
-6. [ ] **Documentation** (prose — no executable-behavior tests)
+6. [x] **Documentation** (prose — no executable-behavior tests)
    - Files: `README.md`, `CHANGELOG.md` (Unreleased)
    - Changes: how to run, recommend `--dry-run` first, commit workflow, CDX-without-`ARCHIVE=1`, `--save` / `_SAVE`, literal-URL-only limitation
 
