@@ -46,3 +46,12 @@ Ship an opt-in Jekyll subcommand that freezes Internet Archive URLs into highlig
     - Deferred optional `--path`/`--limit` as advisory follow-up
 * Insights
     - No existing freeze/command code to conflict with
+
+## 2026-08-01 - PLAN AMENDMENT - COMPLETE
+
+* Work completed
+    - Locked multiline ArchiveInserter contract: new line before closer, indent copied from last content line (I4/I5)
+* Decisions made
+    - Single-line remains end-of-markup splice; multiline must not cram onto URL line or against `%}`
+* Insights
+    - Author review cost for large freezes depends on indent-faithful diffs, not just “surgical” byte inserts

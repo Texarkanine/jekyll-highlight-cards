@@ -72,7 +72,27 @@ Key insights:
 ## Implementation Notes
 
 - Extract markup tokenization/parse helpers (or a thin `Markup` module) used by both tags and the freeze analyzer
-- Locator: per-file scan for tag name + markup + `%}`; process each match independently
-- Inserter: linkcard → ` archive:<url>`; polaroid → ` archive="<url>"` (escape quotes in URL if needed)
+- Locator: per-file scan for tag name + markup + `%}`; process each match independently (must support multiline spans)
+- Inserter token forms: linkcard → `archive:<url>`; polaroid → `archive="<url>"` (escape embedded `"` if needed)
+- **Insert placement (formatting contract):**
+  - **Single-line tag** (`{% linkcard URL Title %}`): splice ` <token>` after the last non-whitespace of the markup, preserving any author whitespace before `%}`
+  - **Multiline tag**: insert a **new line** immediately before the line that contains the closing `%}`, copying the indentation (leading whitespace) of the **last content line** inside the tag (the last non-empty line before the closer). Example:
+
+    ```liquid
+    {% linkcard
+        https://example.com
+    %}
+    ```
+
+    becomes:
+
+    ```liquid
+    {% linkcard
+        https://example.com
+        archive:https://web.archive.org/...
+    %}
+    ```
+
+  - Never rebuild or reindent existing lines; only add the archive line/token
 - Skip when archive target contains Liquid delimiters or fails `archiveable_url?`
 - Command orchestrates; no Generator registration

@@ -82,9 +82,11 @@ flowchart LR
 - L2 ignores unrelated Liquid tags
 
 **Inserter**
-- I1 linkcard insert yields ` archive:<url>` before `%}`
-- I2 polaroid insert yields ` archive="<url>"` before `%}`
-- I3 preserves surrounding title/params
+- I1 single-line linkcard → splices ` archive:<url>` after last non-whitespace markup; preserves leading indent and trailing space before `%}`
+- I2 single-line polaroid → same with ` archive="<url>"`
+- I3 preserves surrounding title/params (no rebuild)
+- I4 multiline linkcard (URL on its own indented line, `%}` on following line) → inserts a **new line** before the closer, same indent as the last content line, containing `archive:<url>` (not crammed onto the URL line or against `%}`)
+- I5 multiline polaroid → same placement with `archive="<url>"`
 
 **Command / integration**
 - C1 `--dry-run` with CDX hit → report planned edit, file unchanged
@@ -100,6 +102,8 @@ flowchart LR
 - URL with quotes in polaroid insert → escaped or safely quoted
 - Multiple candidates in one file → all processed independently
 - Cache: repeated URL in two tags → one lookup (ArchiveHelper cache)
+- Multiline indent may be spaces or tabs — copy that prefix verbatim from the last content line
+- Closer line may be `%}` or ` %}` — new archive line still goes immediately above it
 
 ### Test Infrastructure
 
@@ -132,8 +136,8 @@ flowchart LR
 
 4. **ArchiveInserter**
    - Files: inserter + `spec/jekyll_highlight_cards/freeze_archives/archive_inserter_spec.rb`
-   - TDD ordering: stub I1–I3 (+ quote edge) → failing tests → red → implement inserter → green
-   - Changes: surgical insert of archive tokens
+   - TDD ordering: stub I1–I5 (+ quote / tab-indent edges) → failing tests → red → implement inserter → green
+   - Changes: formatting-aware surgical insert — single-line splice vs multiline new line with last-content-line indent (see `creative-source-scan-rewrite.md`)
 
 5. **FreezeArchives command**
    - Files: `lib/jekyll-highlight-cards/commands/freeze_archives.rb`, `spec/jekyll_highlight_cards/freeze_archives/command_spec.rb` (temp site fixture), require from `lib/jekyll-highlight-cards.rb`
@@ -159,6 +163,7 @@ No new technology - validation not required. Uses existing Jekyll `Jekyll::Comma
 - **Freeze vs `archive_enabled?`**: tags gate auto-lookup with env; freeze calls `archive_url_for` directly (already ungated) — document; do not weaken tag path
 - **Site file enumeration**: use `Jekyll::Site` configure + `read` and walk pages/docs/posts that have paths under source; skip binary/theme gems
 - **Quote escaping in polaroid archive URLs**: prefer double-quoted attr; escape embedded `"`; test edge case
+- **Multiline formatting**: naive insert-before-`%}` produces ugly diffs — mitigated by I4/I5 indent-copy contract
 - **Command discovery**: ensure command class is loaded when gem loads (require in entrypoint); gem must be in `:jekyll_plugins` (already true for consumers)
 
 ## Pre-Mortem
@@ -174,6 +179,7 @@ No new technology - validation not required. Uses existing Jekyll `Jekyll::Comma
 - PASS: Creative docs present; no conflicting freeze implementation in codebase
 - PASS: Requirements mapped to concrete steps; gemspec `lib/**/*.rb` already packs new files
 - Advisory (no plan change): optional `--path` / `--limit` for large sites could be a follow-up; v1 freezes the whole site source set
+- Post-preflight plan amendment (operator): multiline inserter must add an indented archive line matching last content line — I4/I5 + creative notes updated; does not reopen architecture
 
 ## Status
 

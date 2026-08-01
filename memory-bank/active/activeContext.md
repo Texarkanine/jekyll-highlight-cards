@@ -7,7 +7,7 @@
 ## What Was Done
 
 - Preflight PASS (with advisory): TDD ordering amended per unit; creative decisions intact
-- Ready for operator-initiated build
+- Operator clarified multiline insert: new line + copy last content line indent (I4/I5); plan/creative updated
 
 ## Next Step
 
