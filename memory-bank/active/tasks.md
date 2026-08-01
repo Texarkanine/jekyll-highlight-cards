@@ -78,7 +78,11 @@ No new technology - validation not required (stdlib `Regexp` + existing Jekyll `
 - [x] Pre-Mortem complete
 - [x] Preflight
 - [x] Build
-- [ ] QA
+- [x] QA
+
+## QA Findings
+
+- PASS: requirements complete via shared `archiveable_url?` gate; skip-only (no `archive:none`); docs present; no debris/TODOs; call sites wired
 
 ## Preflight Findings
 

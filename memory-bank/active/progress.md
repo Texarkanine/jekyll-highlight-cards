@@ -157,3 +157,12 @@ Ship freeze-archives, then rework: add `highlight_cards.noarchive` regex list so
     - Memoize compiled regexps in ArchiveHelper.noarchive_regexp_cache keyed by site+raw list
 * Insights
     - Skip-only semantics keep freeze from writing archive:none so config changes can reattempt
+
+## 2026-08-01 - QA - COMPLETE (rework)
+
+* Work completed
+    - Semantic QA PASS for noarchive config rework
+* Decisions made
+    - No code changes required in QA
+* Insights
+    - archiveable check before cache prevents noarchive from serving stale cached hits for skipped URLs
