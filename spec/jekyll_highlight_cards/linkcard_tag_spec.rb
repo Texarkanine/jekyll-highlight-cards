@@ -602,4 +602,11 @@ RSpec.describe JekyllHighlightCards::LinkcardTag do
       expect(result).not_to include("http://example.com</a>")
     end
   end
+
+  describe JekyllHighlightCards::LinkcardMarkup do
+    it "does not let quoted closing braces end a Liquid expression early" do
+      tokens = described_class.tokenize('https://example.com title={{ "}}" }}')
+      expect(tokens).to eq(["https://example.com", 'title={{ "}}" }}'])
+    end
+  end
 end

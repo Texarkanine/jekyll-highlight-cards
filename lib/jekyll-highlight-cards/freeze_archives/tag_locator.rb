@@ -7,7 +7,8 @@ module JekyllHighlightCards
     # Supports multiline tags. Returns structural spans for analysis/insert —
     # does not decide freeze eligibility.
     class TagLocator
-      TAG_PATTERN = /{%\s*(linkcard|polaroid)\s+([\s\S]*?)%}/
+      # Optional +- before +%}+ is Liquid whitespace control — keep it out of +:markup+
+      TAG_PATTERN = /{%\s*(linkcard|polaroid)\s+([\s\S]*?)-?%}/
 
       # Find highlight-card tag spans in +text+
       #

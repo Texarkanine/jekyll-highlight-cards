@@ -36,8 +36,7 @@ module JekyllHighlightCards
         parsed = LinkcardMarkup.split(markup)
         return nil if parsed.key?(:archive)
 
-        target = parsed[:url]
-        candidate_for(target)
+        candidate_for(strip_outer_quotes(parsed[:url]))
       end
 
       def analyze_polaroid(markup)

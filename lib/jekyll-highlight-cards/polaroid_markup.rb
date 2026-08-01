@@ -56,7 +56,7 @@ module JekyllHighlightCards
         if char == "{" && !in_quotes
           in_liquid += 1
           current += char
-        elsif char == "}" && in_liquid.positive?
+        elsif char == "}" && in_liquid.positive? && !in_quotes
           in_liquid -= 1
           current += char
         elsif ['"', "'"].include?(char) && !in_quotes

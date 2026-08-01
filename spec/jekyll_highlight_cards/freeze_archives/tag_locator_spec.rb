@@ -45,5 +45,13 @@ RSpec.describe JekyllHighlightCards::FreezeArchives::TagLocator do
       expect(spans.first[:tag]).to eq("linkcard")
       expect(spans.first[:markup]).to include("https://example.com")
     end
+
+    it "does not fold whitespace-control dash into markup" do
+      text = "{% linkcard https://example.com Title -%}"
+      span = locator.locate(text).first
+
+      expect(span[:markup]).to eq("https://example.com Title ")
+      expect(text[span[:range]]).to end_with("-%}")
+    end
   end
 end

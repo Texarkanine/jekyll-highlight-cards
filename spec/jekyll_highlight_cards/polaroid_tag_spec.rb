@@ -930,4 +930,12 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
       expect(result).to match(%r{polaroid-link[^>]*>\s*<a[^>]*>example\.com/path</a>})
     end
   end
+
+  describe JekyllHighlightCards::PolaroidMarkup do
+    it "does not let quoted closing braces end a Liquid expression early" do
+      parsed = described_class.parse('/img.jpg title={{ "}}" }} link="https://example.com"')
+      expect(parsed[:title]).to eq('{{ "}}" }}')
+      expect(parsed[:link]).to eq('"https://example.com"')
+    end
+  end
 end

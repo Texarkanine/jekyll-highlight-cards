@@ -79,5 +79,19 @@ RSpec.describe JekyllHighlightCards::FreezeArchives::ArchiveInserter do
       result = inserter.insert(content, span_for(content, "linkcard"), archive_url)
       expect(result).to eq("{% linkcard\n\thttps://example.com\n\tarchive:#{archive_url}\n%}")
     end
+
+    it "preserves indented closer indentation on multiline tags" do
+      content = "  {% linkcard\n      https://example.com\n  %}\n"
+      result = inserter.insert(content, span_for(content, "linkcard"), archive_url)
+      expect(result).to eq(
+        "  {% linkcard\n      https://example.com\n      archive:#{archive_url}\n  %}\n"
+      )
+    end
+
+    it "preserves Liquid whitespace-control closer -%}" do
+      content = "{% linkcard https://example.com Title -%}\n"
+      result = inserter.insert(content, span_for(content, "linkcard"), archive_url)
+      expect(result).to eq("{% linkcard https://example.com Title archive:#{archive_url} -%}\n")
+    end
   end
 end

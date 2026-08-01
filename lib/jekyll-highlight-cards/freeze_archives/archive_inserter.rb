@@ -25,11 +25,11 @@ module JekyllHighlightCards
 
       def rewrite_tag(tag_text, tag, archive_url)
         token = archive_token(tag, archive_url)
-        closer_index = tag_text.rindex("%}")
-        raise ArgumentError, "tag span missing closing %}" unless closer_index
+        match = tag_text.match(/\A(?<head>[\s\S]*?)(?<closer>-?%})\z/)
+        raise ArgumentError, "tag span missing closing %}" unless match
 
-        head = tag_text[0...closer_index]
-        closer = tag_text[closer_index..]
+        head = match[:head]
+        closer = match[:closer]
 
         if head.include?("\n")
           insert_multiline(head, closer, token)
@@ -47,13 +47,14 @@ module JekyllHighlightCards
 
       def insert_multiline(head, closer, token)
         lines = head.split("\n", -1)
-        # Drop trailing empty segment produced by a newline immediately before %}
-        lines.pop if lines.last == ""
+        # Drop trailing whitespace-only segment before %} and keep its indent for the closer
+        closer_indent = ""
+        closer_indent = lines.pop if lines.last&.strip&.empty?
 
         last_content = lines.reverse.find { |line| !line.strip.empty? }
         indent = last_content ? last_content[/\A[ \t]*/] : ""
 
-        "#{lines.join("\n")}\n#{indent}#{token}\n#{closer}"
+        "#{lines.join("\n")}\n#{indent}#{token}\n#{closer_indent}#{closer}"
       end
 
       def archive_token(tag, archive_url)

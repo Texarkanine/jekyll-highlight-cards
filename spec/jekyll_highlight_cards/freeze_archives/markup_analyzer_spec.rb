@@ -57,5 +57,10 @@ RSpec.describe JekyllHighlightCards::FreezeArchives::MarkupAnalyzer do
 
       expect(analyzer.analyze("linkcard", "https://x.com/foo Title")).to be_nil
     end
+
+    it "A10: freezes linkcard URLs with outer quotes" do
+      result = analyzer.analyze("linkcard", '"https://example.com" Title')
+      expect(result).to eq(target_url: "https://example.com")
+    end
   end
 end
