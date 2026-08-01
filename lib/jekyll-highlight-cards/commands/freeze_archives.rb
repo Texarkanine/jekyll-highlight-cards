@@ -96,15 +96,22 @@ module JekyllHighlightCards
         private
 
         def source_files(site)
-          paths = []
-          site.pages.each { |page| paths << page.path if page.path }
+          paths = site.pages.map { |page| resolve_source_path(site, page.path) }
           site.collections.each_value do |collection|
-            collection.docs.each { |doc| paths << doc.path if doc.path }
+            paths.concat(collection.docs.map { |doc| resolve_source_path(site, doc.path) })
           end
 
-          paths.uniq.select do |path|
+          paths.compact.uniq.select do |path|
             File.file?(path) && path.start_with?(site.source)
           end
+        end
+
+        # Jekyll::Page#path is source-relative; Document#path is absolute.
+        def resolve_source_path(site, path)
+          return nil if path.to_s.empty?
+          return path if File.absolute_path?(path)
+
+          site.in_source_dir(path)
         end
 
         def process_file(path, summary)

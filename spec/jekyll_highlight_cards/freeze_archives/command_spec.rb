@@ -169,6 +169,26 @@ RSpec.describe JekyllHighlightCards::Commands::FreezeArchives do
         expect(freeze_generators).to be_empty
       end
     end
+
+    it "freezes eligible tags on source-relative pages (not only collection docs)" do
+      Dir.mktmpdir do |dir|
+        File.write(File.join(dir, "_config.yml"), "title: Freeze Test\n")
+        page = File.join(dir, "about.md")
+        File.write(page, <<~MD)
+          ---
+          title: About
+          ---
+          {% linkcard https://example.com Title %}
+        MD
+        stub_cdx_hit
+
+        summary = described_class.process(site_options(dir))
+
+        expect(File.read(page)).to include("archive:#{archive_url}")
+        expect(summary[:frozen]).to eq(1)
+        expect(summary[:written]).to eq(1)
+      end
+    end
   end
 
   describe ".init_with_program" do

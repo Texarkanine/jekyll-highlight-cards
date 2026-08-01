@@ -74,3 +74,14 @@ Ship an opt-in Jekyll subcommand that freezes Internet Archive URLs into highlig
     - Runner restores `_SAVE` env after `--save`; dry-run increments frozen without writing
 * Insights
     - Applying inserts reverse-sorted by range.begin keeps multi-edit files correct without re-locating
+
+## 2026-08-01 - QA - COMPLETE
+
+* Work completed
+    - Semantic review against plan + creative docs
+    - Fixed page source-path resolution; added regression test; re-verified (480 examples, 0 failures)
+    - Wrote `.qa-validation-status` PASS
+* Decisions made
+    - Treat relative `Page#path` as a QA bugfix (plan already required scanning pages)
+* Insights
+    - Posts (`Document#path` absolute) masked the page-path bug in C1–C6 fixtures

@@ -197,4 +197,10 @@ No new technology - validation not required. Uses existing Jekyll `Jekyll::Comma
 - [x] Pre-Mortem complete
 - [x] Preflight
 - [x] Build
-- [ ] QA
+- [x] QA
+
+### QA Results
+
+- PASS
+- Finding (fixed): `source_files` skipped `Jekyll::Page` paths because they are source-relative — resolve via `site.in_source_dir`; regression test added
+- No other KISS/DRY/YAGNI/completeness blockers; docs match command behavior
