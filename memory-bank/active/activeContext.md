@@ -1,15 +1,15 @@
 # Active Context
 
 **Current Task:** Freeze archive URLs via Jekyll subcommand
-**Phase:** QA - COMPLETE
+**Phase:** REFLECT - COMPLETE
 **Complexity:** Level 3
 
 ## What Was Done
 
-- Build PASS (7/7 steps); full suite green
-- QA PASS: fixed page path resolution (`Page#path` is relative) + regression test
-- 480 examples, 0 failures; RuboCop clean
+- Reflection written: `memory-bank/active/reflection/reflection-freeze-archives-jekyll-subcommand.md`
+- Reconciled persistent MB: `systemPatterns.md` (command + shared markup), `productContext.md` (freeze use case)
+- Build + QA PASS earlier this session
 
 ## Next Step
 
-Reflect phase (`/niko-reflect` / automatic Level 3 transition)
+Run `/niko-archive` to create the archive document and finalize the current project.

@@ -85,3 +85,13 @@ Ship an opt-in Jekyll subcommand that freezes Internet Archive URLs into highlig
     - Treat relative `Page#path` as a QA bugfix (plan already required scanning pages)
 * Insights
     - Posts (`Document#path` absolute) masked the page-path bug in C1–C6 fixtures
+
+## 2026-08-01 - REFLECT - COMPLETE
+
+* Work completed
+    - Wrote reflection for freeze-archives-jekyll-subcommand
+    - Updated systemPatterns + productContext for command / freeze use case
+* Decisions made
+    - Standalone L3 task → next operator step is `/niko-archive`
+* Insights
+    - Integration fixtures should cover page + collection doc when both are in scope
