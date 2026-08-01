@@ -77,6 +77,13 @@ No new technology - validation not required
 - **Tests only assert return value, still allow SavePageNow under `_SAVE=1` for bad URLs**: assert no WebMock requests (or disable net connect) in A/B examples
 - **Wrong layer — only PolaroidTag fixed, LinkCard still archives relative/Wayback URLs**: centralize A/B in `ArchiveHelper` (issue design); LinkCard inherits automatically
 
+## Preflight Findings
+
+- PASS: TDD ordering is per-unit (steps 1–2 tests, 3–4 implementation)
+- PASS: A/B centralized in ArchiveHelper; LinkCard inherits via `include ArchiveHelper`
+- PASS: Guard C scoped to polaroid auto-lookup only
+- Advisory (no plan change): optional follow-up to skip other archive hosts (`archive.is`, etc.) remains out of issue scope
+
 ## Status
 
 - [x] Initialization complete
@@ -84,6 +91,6 @@ No new technology - validation not required
 - [x] Implementation plan complete
 - [x] Technology validation complete
 - [x] Pre-Mortem complete
-- [ ] Preflight
+- [x] Preflight
 - [ ] Build
 - [ ] QA

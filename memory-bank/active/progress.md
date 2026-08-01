@@ -24,3 +24,13 @@ Add ArchiveHelper / PolaroidTag guards so auto-archive skips relative paths, arc
     - Host skip is exact `archive.org` / `web.archive.org` (case-insensitive), not other archive hosts
 * Insights
     - LinkCard inherits A/B automatically via shared helper — no separate LinkCard change required
+
+## 2026-08-01 - PREFLIGHT - COMPLETE
+
+* Work completed
+    - Validated plan against ArchiveHelper / PolaroidTag / LinkCard and RSpec layout
+    - Wrote `.preflight-status` PASS
+* Decisions made
+    - No plan amendments required
+* Insights
+    - LinkCard already includes ArchiveHelper, so Guards A/B cover both tags without a LinkCard edit
