@@ -1,12 +1,5 @@
 # Changelog
 
-## [Unreleased]
-
-### Features
-
-* Add `jekyll freeze-archives` subcommand to freeze Internet Archive URLs into `linkcard` / `polaroid` source tags (`--dry-run`, `--save`)
-* Add `highlight_cards.noarchive` config (list of unanchored regexes) to skip archive attempts for matching URLs in build-time lookup and `freeze-archives`
-
 ## [2.1.0](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v2.0.0...v2.1.0) (2026-07-19)
 
 
