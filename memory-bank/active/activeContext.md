@@ -1,14 +1,14 @@
 # Active Context
 
 **Current Task:** Configurable noarchive URL skip list
-**Phase:** PLAN - COMPLETE
+**Phase:** PREFLIGHT - COMPLETE
 **Complexity:** Level 2
 
 ## What Was Done
 
-- L2 plan for `highlight_cards.noarchive` regex skip list
-- Design: extend `archiveable_url?` / `archive_url_for` with optional `site:`; match full URL; skip-only (no `archive:none`); wire tags + freeze; document in README
+- Preflight PASS: TDD per-unit ordering fixed; all ArchiveHelper call sites covered
+- Advisory: memoize compiled regexes per site if cheap
 
 ## Next Step
 
-Preflight validation
+Build phase

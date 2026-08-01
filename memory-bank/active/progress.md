@@ -137,3 +137,13 @@ Ship freeze-archives, then rework: add `highlight_cards.noarchive` regex list so
     - Optional `site:` on `archiveable_url?` / `archive_url_for`; match full URL string; RegexpError propagates
 * Insights
     - Analyzer and `archive_url_for` both must see site so CDX never runs for matches
+
+## 2026-08-01 - PREFLIGHT - COMPLETE (rework)
+
+* Work completed
+    - Preflight PASS for noarchive L2 plan
+    - Amended plan steps 1–3 with explicit test-before-code ordering
+* Decisions made
+    - Keep optional `site:` threading approach
+* Insights
+    - Four lib call sites must all receive site for the feature to work end-to-end

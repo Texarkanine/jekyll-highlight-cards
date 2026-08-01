@@ -35,16 +35,16 @@ Add `highlight_cards.noarchive` (array of regex strings in `_config.yml`) so URL
 
 1. **Gate + config read (ArchiveHelper)**
    - Files: `lib/jekyll-highlight-cards/archive_helper.rb`, `spec/jekyll_highlight_cards/archive_helper_spec.rb`
-   - Changes: Thread optional `site:` into `archiveable_url?` / `archive_url_for`. After existing URI/host guards, if any compiled `highlight_cards.noarchive` pattern matches the full URL string, return false/nil. Compile via `Regexp.new`; let `RegexpError` propagate. Missing/empty list → no-op.
+   - TDD: First add failing examples in `archive_helper_spec.rb` for match-skip (no HTTP), non-match, empty/missing config, multi-pattern, invalid regex raise, regression of existing guards with `site:` present. Then implement: optional `site:` on `archiveable_url?` / `archive_url_for`; after URI/host guards, match full URL against compiled `highlight_cards.noarchive` patterns (`Regexp.new`; `RegexpError` propagates); missing/empty list → no-op.
 2. **Wire tags (build-time path)**
-   - Files: `lib/jekyll-highlight-cards/linkcard_tag.rb`, `polaroid_tag.rb` (+ specs only if needed)
-   - Changes: Pass `site:` from `context.registers[:site]` into `archive_url_for` on the auto-lookup path (explicit archive / `none` unchanged).
+   - Files: `lib/jekyll-highlight-cards/linkcard_tag.rb`, `polaroid_tag.rb`, and the existing tag spec that covers auto-archive lookup (extend one path with a site `noarchive` config)
+   - TDD: First add a failing example proving auto-lookup does not HTTP when the URL matches site `noarchive`. Then pass `site:` from `context.registers[:site]` into `archive_url_for` on the auto-lookup path only (explicit archive / `none` unchanged).
 3. **Wire freeze-archives**
-   - Files: `lib/jekyll-highlight-cards/freeze_archives/markup_analyzer.rb`, `commands/freeze_archives.rb`, related specs
-   - Changes: Construct analyzer with site (or pass site into `analyze` / `archiveable_url?`); call `archive_url_for(target, site: site)` so CDX never runs for noarchive matches. Matching URLs count as skipped candidates (no miss lookup).
+   - Files: `lib/jekyll-highlight-cards/freeze_archives/markup_analyzer.rb`, `commands/freeze_archives.rb`, `spec/jekyll_highlight_cards/freeze_archives/markup_analyzer_spec.rb`, `command_spec.rb`
+   - TDD: First add failing examples: analyzer rejects noarchive URL when given site; command with `noarchive` config does not CDX and leaves source without `archive`/`none`. Then construct analyzer with site (or pass site into eligibility); call `archive_url_for(target, site: site)`. Matching URLs count as skipped (no miss lookup).
 4. **Docs**
    - Files: `README.md` (Internet Archive section)
-   - Changes: Document `highlight_cards.noarchive` with a short YAML example (e.g. skip `x\.com`); note skip-only semantics (no `archive:none` write).
+   - Changes: Document `highlight_cards.noarchive` with a short YAML example (e.g. skip `x\.com`); note skip-only semantics (no `archive:none` write). No behavior tests for prose.
 
 ## Technology Validation
 
@@ -76,6 +76,12 @@ No new technology - validation not required (stdlib `Regexp` + existing Jekyll `
 - [x] Implementation plan complete
 - [x] Technology validation complete
 - [x] Pre-Mortem complete
-- [ ] Preflight
+- [x] Preflight
 - [ ] Build
 - [ ] QA
+
+## Preflight Findings
+
+- TDD ordering amended per unit (tests before code on steps 1–3); docs step remains prose-only
+- All lib call sites of `archive_url_for` / `archiveable_url?` accounted for (helper, both tags, analyzer, freeze command)
+- Advisory: memoize compiled `Regexp`s per site/config object during a run to avoid recompiling on every URL — implement inside step 1 if cheap
