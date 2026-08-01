@@ -1,0 +1,16 @@
+# Progress
+
+Ship an opt-in Jekyll subcommand that freezes Internet Archive URLs into highlight-card source tags so authors can commit once and skip repeated build-time lookups.
+
+**Complexity:** Level 3
+
+## 2026-08-01 - COMPLEXITY-ANALYSIS - COMPLETE
+
+* Work completed
+    - Intent clarified and approved: Jekyll subcommand (not build lifecycle) freezes missing archive URLs into source
+    - Classified as Level 3 (complete feature: command + scan/rewrite + ArchiveHelper reuse)
+* Decisions made
+    - Packaging shape fixed to Jekyll subcommand per operator
+    - Build-time env-gated auto-lookup remains as fallback
+* Insights
+    - Tags already accept explicit `archive=` / `archive:none`; the gap is an authoring tool that writes that path
