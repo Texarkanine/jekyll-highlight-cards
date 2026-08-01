@@ -105,3 +105,17 @@ Ship an opt-in Jekyll subcommand that freezes Internet Archive URLs into highlig
     - Presentation of log separators is not a unit-test contract
 * Insights
     - Already-frozen tags skip silently (no CDX); kill/re-run is safe for written files
+
+## 2026-08-01 - REWORK - INITIATED
+
+* Work completed
+    - Operator chose rework (not archive) after REFLECT COMPLETE
+    - Scope creep from manual QA: configurable URL skip-list for archive attempts
+* Decisions made
+    - Config: `highlight_cards.noarchive` — list of regex strings under highlight cards
+    - On match: skip archive attempt only; do not write `archive:none` (so changing regex later can reattempt)
+    - Tags that already have an archive attribute are left alone
+    - Gate lives with existing `archiveable_url?` filters (same place as archive.org / non-http(s) skips)
+    - Affects both build-time auto-lookup and `jekyll freeze-archives`
+* Insights
+    - This is eligibility, not freeze-write policy; shared ArchiveHelper is the choke point

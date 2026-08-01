@@ -37,3 +37,25 @@ Tags the author never froze still use the existing env-gated build-time auto-loo
 3. Running `jekyll build` alone does not rewrite source for this feature.
 4. Failed / empty lookups do not invent archive attributes.
 5. Tests cover command behavior (scan, skip, insert) and docs describe the opt-in workflow.
+
+## Rework
+
+### User Story
+
+As a Jekyll site author, I want a `_config.yml` list of URL regexes under `highlight_cards.noarchive` so that sites which block archiving (e.g. x.com) are not repeatedly attempted during build-time auto-lookup or `jekyll freeze-archives`.
+
+### Requirements
+
+1. Add `highlight_cards.noarchive` config: array of regex strings.
+2. If a candidate URL matches any pattern, treat it as not archiveable — skip the "compute an archive" path (same gate as `archiveable_url?` / archive.org / local-path filters).
+3. Do **not** write `archive:none` on match; leave the tag without an archive attribute so a later config change can reattempt.
+4. Do **not** alter tags that already specify an archive URL / `archive:none`.
+5. Applies to both in-build archive lookup and `jekyll freeze-archives`.
+6. Document the option.
+
+### Acceptance Criteria
+
+1. URLs matching a configured pattern are not looked up (no CDX / SavePageNow) in build or freeze-archives.
+2. Non-matching URLs behave as before.
+3. Existing explicit archive attributes remain untouched.
+4. Changing/removing a pattern allows a subsequent freeze/build to attempt previously skipped URLs again.
