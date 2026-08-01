@@ -581,6 +581,19 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
           )
           expect(result).not_to match(%r{web\.archive\.org/web/\d+/[^"]*photo\.jpg})
         end
+
+        # Guard C: self-link (no link=) is lightbox UX, not an outbound archive target.
+        it "does not auto-archive when link is omitted" do
+          result = render_tag("/photo.jpg")
+          expect(result).not_to include("web.archive.org")
+          expect(WebMock).not_to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx})
+        end
+
+        it "still uses an explicit archive URL when link is omitted" do
+          result = render_tag('/photo.jpg archive="https://archive.org/explicit"')
+          expect(result).to include("archive.org/explicit")
+          expect(WebMock).not_to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx})
+        end
       end
     end
 

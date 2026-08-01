@@ -410,5 +410,32 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
         expect(WebMock).to have_requested(:get, %r{web\.archive\.org/save/}).once
       end
     end
+
+    # Guard A/B: skip non-archivable URLs (relative paths, non-http, archive.org hosts)
+    # without CDX or SavePageNow calls.
+    context "when the URL is not archiveable" do
+      before do
+        stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+        stub_request(:get, %r{web\.archive\.org/save/})
+      end
+
+      shared_examples "skips without archive HTTP" do |url|
+        it "returns nil and makes no archive requests for #{url.inspect}" do
+          expect(helper.archive_url_for(url)).to be_nil
+          expect(WebMock).not_to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx})
+          expect(WebMock).not_to have_requested(:get, %r{web\.archive\.org/save/})
+        end
+      end
+
+      it_behaves_like "skips without archive HTTP", "photo.jpg"
+      it_behaves_like "skips without archive HTTP", "./img/x.png"
+      it_behaves_like "skips without archive HTTP", "/assets/x.png"
+      it_behaves_like "skips without archive HTTP", "ftp://example.com/a"
+      it_behaves_like "skips without archive HTTP", ""
+      it_behaves_like "skips without archive HTTP",
+                      "https://web.archive.org/web/20030101000000/http://example.com/"
+      it_behaves_like "skips without archive HTTP", "https://archive.org/details/foo"
+      it_behaves_like "skips without archive HTTP", "http://["
+    end
   end
 end

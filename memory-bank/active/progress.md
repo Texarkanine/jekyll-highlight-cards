@@ -34,3 +34,14 @@ Add ArchiveHelper / PolaroidTag guards so auto-archive skips relative paths, arc
     - No plan amendments required
 * Insights
     - LinkCard already includes ArchiveHelper, so Guards A/B cover both tags without a LinkCard edit
+
+## 2026-08-01 - BUILD - COMPLETE
+
+* Work completed
+    - TDD: red tests for A/B/C, then `archiveable_url?` gate + polaroid `explicit_link` skip
+    - Full suite 455 examples, 0 failures; RuboCop clean; line coverage 100%
+* Decisions made
+    - Host deny-list exact match on downcased URI host
+    - Invalid URI rescued to non-archiveable
+* Insights
+    - Vacuous empty `it` stubs were replaced before red run; shared examples use `it_behaves_like` for RuboCop
