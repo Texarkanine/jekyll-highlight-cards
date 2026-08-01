@@ -14,3 +14,14 @@ Ship an opt-in Jekyll subcommand that freezes Internet Archive URLs into highlig
     - Build-time env-gated auto-lookup remains as fallback
 * Insights
     - Tags already accept explicit `archive=` / `archive:none`; the gap is an authoring tool that writes that path
+
+## 2026-08-01 - CREATIVE - COMPLETE
+
+* Work completed
+    - Architecture: locator + shared markup analysis + surgical insert (`creative-source-scan-rewrite.md`)
+    - CLI/env: invoke enables CDX; SAVE via env/`--save`; write default + `--dry-run` (`creative-cli-env-policy.md`)
+* Decisions made
+    - Skip Liquid-dynamic archive targets (build-time fallback remains)
+    - Freeze does not require `JEKYLL_HIGHLIGHT_CARDS_ARCHIVE=1`
+* Insights
+    - Surgical insert preserves author formatting better than full tag rebuild

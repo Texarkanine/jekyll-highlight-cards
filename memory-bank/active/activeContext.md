@@ -1,14 +1,14 @@
 # Active Context
 
 **Current Task:** Freeze archive URLs via Jekyll subcommand
-**Phase:** COMPLEXITY-ANALYSIS - COMPLETE
+**Phase:** PLAN - IN PROGRESS (creative exploration)
 **Complexity:** Level 3
 
 ## What Was Done
 
-- Intent approved: opt-in Jekyll subcommand that freezes IA archive URLs into source for archive-eligible `linkcard` / `polaroid` tags missing `archive=` / `archive:none`
-- Classified as Level 3: complete feature across command registration, source scan/rewrite, and ArchiveHelper reuse; new authoring surface but not a system redesign
+- Component analysis drafted in `tasks.md`
+- Open questions flagged: (1) source scan/rewrite architecture (2) CLI/env policy
 
 ## Next Step
 
-Load Level 3 workflow and begin PLAN phase
+Resolve open questions via `/niko-creative`, then complete plan
