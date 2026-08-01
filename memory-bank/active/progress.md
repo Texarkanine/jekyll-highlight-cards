@@ -1,8 +1,8 @@
 # Progress
 
-Ship an opt-in Jekyll subcommand that freezes Internet Archive URLs into highlight-card source tags so authors can commit once and skip repeated build-time lookups.
+Ship freeze-archives, then rework: add `highlight_cards.noarchive` regex list so build-time and freeze-archives skip archive attempts for matching URLs.
 
-**Complexity:** Level 3
+**Complexity:** Level 2
 
 ## 2026-08-01 - COMPLEXITY-ANALYSIS - COMPLETE
 
@@ -119,3 +119,12 @@ Ship an opt-in Jekyll subcommand that freezes Internet Archive URLs into highlig
     - Affects both build-time auto-lookup and `jekyll freeze-archives`
 * Insights
     - This is eligibility, not freeze-write policy; shared ArchiveHelper is the choke point
+
+## 2026-08-01 - COMPLEXITY-ANALYSIS - COMPLETE (rework)
+
+* Work completed
+    - Classified noarchive config rework as Level 2
+* Decisions made
+    - L2: enhancement localized to ArchiveHelper eligibility gate + site config plumbing; no new subsystem
+* Insights
+    - `archiveable_url?` today has no site/config — plan must thread site (or patterns) into the existing gate
