@@ -155,8 +155,9 @@ flowchart LR
    - Files: `README.md`, `CHANGELOG.md` (Unreleased)
    - Changes: how to run, recommend `--dry-run` first, commit workflow, CDX-without-`ARCHIVE=1`, `--save` / `_SAVE`, literal-URL-only limitation
 
-7. [ ] **Verify**
+7. [x] **Verify**
    - `bundle exec rspec` (full suite); `bundle exec rubocop` on touched files
+   - Done: 479 examples, 0 failures; RuboCop clean on touched files
 
 ## Technology Validation
 
@@ -195,5 +196,5 @@ No new technology - validation not required. Uses existing Jekyll `Jekyll::Comma
 - [x] Technology validation complete
 - [x] Pre-Mortem complete
 - [x] Preflight
-- [ ] Build
+- [x] Build
 - [ ] QA

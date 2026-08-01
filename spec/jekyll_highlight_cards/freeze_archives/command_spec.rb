@@ -62,7 +62,7 @@ RSpec.describe JekyllHighlightCards::Commands::FreezeArchives do
         expect(File.read(post)).to eq(original)
         expect(summary[:frozen]).to eq(1)
         expect(summary[:written]).to eq(0)
-        expect(ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE"]).to be_nil
+        expect(ENV.fetch("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE", nil)).to be_nil
       end
     end
 
@@ -78,7 +78,7 @@ RSpec.describe JekyllHighlightCards::Commands::FreezeArchives do
 
         summary = described_class.process(site_options(dir))
 
-        expect(ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE"]).to be_nil
+        expect(ENV.fetch("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE", nil)).to be_nil
         expect(File.read(post)).to include("archive:#{archive_url}")
         expect(summary[:frozen]).to eq(1)
         expect(summary[:written]).to eq(1)
@@ -133,17 +133,17 @@ RSpec.describe JekyllHighlightCards::Commands::FreezeArchives do
         MD
         stub_cdx_miss
         save_stub = stub_request(:get, %r{web\.archive\.org/save/})
-          .to_return(
-            status: 200,
-            headers: { "Content-Location" => "/web/20200101120000/https://example.com" }
-          )
+                    .to_return(
+                      status: 200,
+                      headers: { "Content-Location" => "/web/20200101120000/https://example.com" }
+                    )
 
         summary = described_class.process(site_options(dir).merge("save" => true))
 
         expect(save_stub).to have_been_requested
         expect(File.read(post)).to include("archive:#{archive_url}")
         expect(summary[:frozen]).to eq(1)
-        expect(ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE"]).to be_nil
+        expect(ENV.fetch("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE", nil)).to be_nil
       end
     end
 
@@ -175,7 +175,7 @@ RSpec.describe JekyllHighlightCards::Commands::FreezeArchives do
     it "registers the freeze-archives command on the program" do
       program = Mercenary::Program.new(:jekyll)
       described_class.init_with_program(program)
-      expect(program.commands).to have_key(:'freeze-archives')
+      expect(program.commands).to have_key(:"freeze-archives")
     end
   end
 end

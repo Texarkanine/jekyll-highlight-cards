@@ -16,7 +16,7 @@ module JekyllHighlightCards
         # @param prog [Mercenary::Program] the Jekyll CLI program
         # @return [void]
         def init_with_program(prog)
-          prog.command(:'freeze-archives') do |c|
+          prog.command(:"freeze-archives") do |c|
             c.syntax "freeze-archives [options]"
             c.description "Freeze Internet Archive URLs into highlight-card source tags"
 

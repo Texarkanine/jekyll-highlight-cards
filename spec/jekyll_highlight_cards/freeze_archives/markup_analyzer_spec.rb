@@ -44,7 +44,8 @@ RSpec.describe JekyllHighlightCards::FreezeArchives::MarkupAnalyzer do
     it "A8: skips relative or archive.org targets" do
       expect(analyzer.analyze("linkcard", "/relative/path Title")).to be_nil
       expect(analyzer.analyze("linkcard", "https://archive.org/details/foo")).to be_nil
-      expect(analyzer.analyze("polaroid", '/img.jpg link="https://web.archive.org/web/2020/https://example.com"')).to be_nil
+      expect(analyzer.analyze("polaroid",
+                              '/img.jpg link="https://web.archive.org/web/2020/https://example.com"')).to be_nil
     end
   end
 end

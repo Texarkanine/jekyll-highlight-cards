@@ -64,3 +64,13 @@ Ship an opt-in Jekyll subcommand that freezes Internet Archive URLs into highlig
     - Proceeding with Option B architecture and Option B CLI/env policy as planned
 * Insights
     - Step 1 is refactor-under-green via existing tag specs before any freeze units
+
+## 2026-08-01 - BUILD - COMPLETE
+
+* Work completed
+    - Shared markup extract; MarkupAnalyzer; TagLocator; ArchiveInserter; FreezeArchives command; README/CHANGELOG; full verify
+    - 479 examples, 0 failures; RuboCop clean on touched files
+* Decisions made
+    - Runner restores `_SAVE` env after `--save`; dry-run increments frozen without writing
+* Insights
+    - Applying inserts reverse-sorted by range.begin keeps multi-edit files correct without re-locating

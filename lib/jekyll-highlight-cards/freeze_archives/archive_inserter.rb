@@ -41,7 +41,7 @@ module JekyllHighlightCards
       def insert_single_line(head, closer, token)
         # Preserve trailing whitespace before %}
         trailing = head[/\s*\z/] || ""
-        body = head[0...head.length - trailing.length]
+        body = head[0...(head.length - trailing.length)]
         "#{body} #{token}#{trailing}#{closer}"
       end
 
