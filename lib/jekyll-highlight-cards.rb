@@ -21,6 +21,7 @@ require_relative "jekyll-highlight-cards/polaroid_tag"
 require_relative "jekyll-highlight-cards/image_sizing_hooks"
 require_relative "jekyll-highlight-cards/freeze_archives/markup_analyzer"
 require_relative "jekyll-highlight-cards/freeze_archives/tag_locator"
+require_relative "jekyll-highlight-cards/freeze_archives/archive_inserter"
 
 # jekyll-highlight-cards: Styled card components for Jekyll
 #

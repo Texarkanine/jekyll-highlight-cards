@@ -137,10 +137,11 @@ flowchart LR
    - Changes: return spans `{tag:, markup:, range:}` for linkcard/polaroid
    - Done: L1–L2 green; multiline spans supported
 
-4. [ ] **ArchiveInserter**
+4. [x] **ArchiveInserter**
    - Files: inserter + `spec/jekyll_highlight_cards/freeze_archives/archive_inserter_spec.rb`
    - TDD ordering: stub I1–I5 (+ quote / tab-indent edges) → failing tests → red → implement inserter → green
    - Changes: formatting-aware surgical insert — single-line splice vs multiline new line with last-content-line indent (see `creative-source-scan-rewrite.md`)
+   - Done: I1–I5 + quote/tab edges green
 
 5. [ ] **FreezeArchives command**
    - Files: `lib/jekyll-highlight-cards/commands/freeze_archives.rb`, `spec/jekyll_highlight_cards/freeze_archives/command_spec.rb` (temp site fixture), require from `lib/jekyll-highlight-cards.rb`
