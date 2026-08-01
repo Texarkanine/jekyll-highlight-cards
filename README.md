@@ -151,20 +151,18 @@ export JEKYLL_HIGHLIGHT_CARDS_ARCHIVE=1
 
 Build-time lookup still requires `JEKYLL_HIGHLIGHT_CARDS_ARCHIVE=1` (or `_SAVE=1`). That path remains the forgetful fallback for tags you never freeze.
 
-Skip archive attempts for URLs that match site-configured regexes (build-time lookup and `freeze-archives`). Matching only skips the lookup — it does **not** write `archive:none`, so changing the list later can reattempt. Tags that already have an archive attribute are left alone. Patterns are matched against the full URL string:
+You can selectively skip archive attempts for URLs that match site-configured regexes. Patterns are matched against the full URL string; use anchors when needed.
 
 ```yaml
 highlight_cards:
   noarchive:
-    - x\.com
-    - \Ahttps://bad\.example/
+    - ^https?://x\.com/.*
+    - \Ahttps://something\.example\.com/.*
 ```
 
-Invalid regexes raise at lookup time.
+### Freeze Archives Into Source
 
-### Freeze archives into source
-
-To look up Internet Archive snapshots once and write them into your source tags (so builds skip re-lookup), run the opt-in Jekyll subcommand:
+To look up Internet Archive snapshots *once* (instead of on each build) and write them into your source tags, run the `freeze-archives` Jekyll subcommand:
 
 ```bash
 # Rehearse first — reports planned edits, writes nothing
@@ -182,7 +180,6 @@ Review the diff, then commit. The command does **not** commit for you, and it do
 - SavePageNow stays gated: set `JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE=1` or pass `--save`.
 - Only **literal** http(s) URLs are frozen. Liquid targets like `{{ page.url }}` are skipped; build-time auto-lookup still covers those when enabled.
 - Tags that already have `archive:` / `archive=` / `archive:none` are left alone.
-- Failed lookups do not invent archive attributes.
 
 ### CSS Styles
 
