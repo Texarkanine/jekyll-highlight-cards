@@ -125,10 +125,11 @@ flowchart LR
    - Creative ref: `creative-source-scan-rewrite.md`
    - Done: `LinkcardMarkup` / `PolaroidMarkup`; tag specs 206/206 green
 
-2. [ ] **MarkupAnalyzer**
+2. [x] **MarkupAnalyzer**
    - Files: analyzer under `lib/jekyll-highlight-cards/freeze_archives/`, `spec/jekyll_highlight_cards/freeze_archives/markup_analyzer_spec.rb`
    - TDD ordering: stub empty examples for A1–A8 → implement failing assertions → run (red) → implement analyzer → run (green)
    - Changes: classify candidate vs skip using shared parsers + `archiveable_url?`
+   - Done: A1–A8 green; returns `{ target_url: }` or `nil`
 
 3. [ ] **TagLocator**
    - Files: locator + `spec/jekyll_highlight_cards/freeze_archives/tag_locator_spec.rb`
