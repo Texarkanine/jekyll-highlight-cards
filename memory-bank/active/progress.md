@@ -45,3 +45,13 @@ Add ArchiveHelper / PolaroidTag guards so auto-archive skips relative paths, arc
     - Invalid URI rescued to non-archiveable
 * Insights
     - Vacuous empty `it` stubs were replaced before red run; shared examples use `it_behaves_like` for RuboCop
+
+## 2026-08-01 - QA - COMPLETE
+
+* Work completed
+    - Semantic review vs plan: A/B/C complete; moved `archiveable_url?` to `private`
+    - Wrote `.qa-validation-status` PASS
+* Decisions made
+    - No README change required (docs never claimed relative/Wayback URLs are archived)
+* Insights
+    - Public surface of ArchiveHelper stays env/cache/lookup entrypoints; eligibility is an implementation detail
