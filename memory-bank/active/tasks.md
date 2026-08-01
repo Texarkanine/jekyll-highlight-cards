@@ -204,3 +204,8 @@ No new technology - validation not required. Uses existing Jekyll `Jekyll::Comma
 - PASS
 - Finding (fixed): `source_files` skipped `Jekyll::Page` paths because they are source-relative — resolve via `site.in_source_dir`; regression test added
 - No other KISS/DRY/YAGNI/completeness blockers; docs match command behavior
+
+### Post-reflect polish (saved)
+
+- Live info progress + log format `frozen: <rel>: <raw> @ <archive>`; force info despite site quiet
+- command_spec log asserts de-coupled from presentation (SLOBAC)

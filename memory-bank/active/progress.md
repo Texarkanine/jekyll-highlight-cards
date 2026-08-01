@@ -95,3 +95,13 @@ Ship an opt-in Jekyll subcommand that freezes Internet Archive URLs into highlig
     - Standalone L3 task → next operator step is `/niko-archive`
 * Insights
     - Integration fixtures should cover page + collection doc when both are in scope
+
+## 2026-08-01 - POST-REFLECT POLISH - SAVED
+
+* Work completed
+    - Hand-run progress logging at info; ignore site quiet for freeze-archives
+    - Relative-path log format; SLOBAC-friendly semantic log assertions
+* Decisions made
+    - Presentation of log separators is not a unit-test contract
+* Insights
+    - Already-frozen tags skip silently (no CDX); kill/re-run is safe for written files

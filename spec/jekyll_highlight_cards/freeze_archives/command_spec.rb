@@ -189,6 +189,56 @@ RSpec.describe JekyllHighlightCards::Commands::FreezeArchives do
         expect(summary[:written]).to eq(1)
       end
     end
+
+    it "emits info progress that names the relative path, source URL, and archive URL" do
+      Dir.mktmpdir do |dir|
+        write_site(dir, <<~MD)
+          ---
+          title: Hello
+          ---
+          {% linkcard https://example.com Title %}
+        MD
+        stub_cdx_hit
+        messages = []
+        allow(Jekyll.logger).to receive(:info).and_wrap_original do |orig, *args|
+          messages << args
+          orig.call(*args)
+        end
+
+        described_class.process(site_options(dir).merge("quiet" => false))
+
+        freeze_msgs = messages.filter_map { |topic, msg| msg if topic == "freeze-archives:" }
+        # Semantic payloads only — separators / verbs / punctuation may change
+        result = freeze_msgs.find { |msg| msg.include?(archive_url) }
+        expect(result).to include("_posts/2020-01-01-hello.md", target_url, archive_url)
+        expect(freeze_msgs.count { |msg| msg.include?(target_url) }).to be >= 1
+      end
+    end
+
+    it "still emits freeze-archives info progress when the site config sets quiet: true" do
+      Dir.mktmpdir do |dir|
+        File.write(File.join(dir, "_config.yml"), "title: Freeze Test\nquiet: true\n")
+        FileUtils.mkdir_p(File.join(dir, "_posts"))
+        File.write(File.join(dir, "_posts", "2020-01-01-hello.md"), <<~MD)
+          ---
+          title: Hello
+          ---
+          {% linkcard https://example.com Title %}
+        MD
+        stub_cdx_hit
+        messages = []
+        allow(Jekyll.logger).to receive(:info).and_wrap_original do |orig, *args|
+          messages << args
+          orig.call(*args)
+        end
+
+        # No quiet override — site _config.yml quiet:true would otherwise silence info
+        described_class.process(site_options(dir).except("quiet"))
+
+        freeze_msgs = messages.filter_map { |topic, msg| msg if topic == "freeze-archives:" }
+        expect(freeze_msgs).to include(a_string_including(target_url))
+      end
+    end
   end
 
   describe ".init_with_program" do

@@ -41,6 +41,8 @@ module JekyllHighlightCards
           ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE"] = "1" if options["save"]
 
           site = Jekyll::Site.new(configuration_from_options(options))
+          # Hand-run tool: keep progress visible even if the site sets quiet: true
+          Jekyll.logger.log_level = :info unless options["quiet"]
           site.read
 
           summary = Runner.new(
@@ -76,6 +78,7 @@ module JekyllHighlightCards
         def initialize(dry_run:, logger:)
           @dry_run = dry_run
           @logger = logger
+          @site_source = nil
           @locator = JekyllHighlightCards::FreezeArchives::TagLocator.new
           @analyzer = JekyllHighlightCards::FreezeArchives::MarkupAnalyzer.new
           @inserter = JekyllHighlightCards::FreezeArchives::ArchiveInserter.new
@@ -84,6 +87,7 @@ module JekyllHighlightCards
         # @param site [Jekyll::Site]
         # @return [Hash] summary counts
         def run(site)
+          @site_source = site.source
           summary = { frozen: 0, skipped: 0, miss: 0, written: 0 }
 
           source_files(site).each do |path|
@@ -127,25 +131,23 @@ module JekyllHighlightCards
               next
             end
 
-            archive_url = archive_url_for(candidate[:target_url])
+            target = candidate[:target_url]
+            @logger.info "freeze-archives:", "Looking up archive for #{target}"
+            archive_url = archive_url_for(target)
             unless archive_url
               summary[:miss] += 1
+              @logger.info "freeze-archives:", "no archive for #{target}"
               next
             end
 
             summary[:frozen] += 1
+            verb = @dry_run ? "would freeze" : "frozen"
+            @logger.info "freeze-archives:",
+                         "#{verb}: #{relative_source_path(path)} ← #{archive_url}"
             edits << { span: span, archive_url: archive_url }
           end
 
-          return if edits.empty?
-
-          if @dry_run
-            edits.each do |edit|
-              @logger.info "freeze-archives:",
-                           "would freeze #{path} ← #{edit[:archive_url]}"
-            end
-            return
-          end
+          return if edits.empty? || @dry_run
 
           # Apply from end of file so earlier ranges stay valid
           updated = content
@@ -157,6 +159,14 @@ module JekyllHighlightCards
 
           File.write(path, updated)
           summary[:written] += 1
+        end
+
+        def relative_source_path(path)
+          source = @site_source.to_s
+          return path if source.empty?
+
+          prefix = source.end_with?("/") ? source : "#{source}/"
+          path.start_with?(prefix) ? path.delete_prefix(prefix) : path
         end
       end
     end
