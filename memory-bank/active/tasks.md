@@ -119,38 +119,39 @@ flowchart LR
 
 ## Implementation Plan
 
-1. **Extract shared markup parsing (behavior-preserving refactor)**
+1. [x] **Extract shared markup parsing (behavior-preserving refactor)**
    - Files: `lib/jekyll-highlight-cards/linkcard_tag.rb`, `polaroid_tag.rb`, new shared module(s) (e.g. `linkcard_markup.rb` / `polaroid_markup.rb`), existing `linkcard_tag_spec.rb` / `polaroid_tag_spec.rb`
    - TDD ordering: no new behavior — run existing tag specs (must be green) → extract parsers under green → re-run those specs (must stay green). Do not add freeze features in this step.
    - Creative ref: `creative-source-scan-rewrite.md`
+   - Done: `LinkcardMarkup` / `PolaroidMarkup`; tag specs 206/206 green
 
-2. **MarkupAnalyzer**
+2. [ ] **MarkupAnalyzer**
    - Files: analyzer under `lib/jekyll-highlight-cards/freeze_archives/`, `spec/jekyll_highlight_cards/freeze_archives/markup_analyzer_spec.rb`
    - TDD ordering: stub empty examples for A1–A8 → implement failing assertions → run (red) → implement analyzer → run (green)
    - Changes: classify candidate vs skip using shared parsers + `archiveable_url?`
 
-3. **TagLocator**
+3. [ ] **TagLocator**
    - Files: locator + `spec/jekyll_highlight_cards/freeze_archives/tag_locator_spec.rb`
    - TDD ordering: stub L1–L2 → failing tests → red → implement locator → green
    - Changes: return spans `{tag:, markup:, range:}` for linkcard/polaroid
 
-4. **ArchiveInserter**
+4. [ ] **ArchiveInserter**
    - Files: inserter + `spec/jekyll_highlight_cards/freeze_archives/archive_inserter_spec.rb`
    - TDD ordering: stub I1–I5 (+ quote / tab-indent edges) → failing tests → red → implement inserter → green
    - Changes: formatting-aware surgical insert — single-line splice vs multiline new line with last-content-line indent (see `creative-source-scan-rewrite.md`)
 
-5. **FreezeArchives command**
+5. [ ] **FreezeArchives command**
    - Files: `lib/jekyll-highlight-cards/commands/freeze_archives.rb`, `spec/jekyll_highlight_cards/freeze_archives/command_spec.rb` (temp site fixture), require from `lib/jekyll-highlight-cards.rb`
    - TDD ordering: stub C1–C6 → failing tests → red → implement command + wiring → green
    - Changes: `Jekyll::Command#init_with_program`; `--dry-run`, `--save`; site configure + read; locator→analyzer→`archive_url_for`→inserter; summary output
    - Creative ref: `creative-cli-env-policy.md`
    - Docs: [Jekyll custom commands](https://jekyllrb.com/docs/plugins/commands/)
 
-6. **Documentation** (prose — no executable-behavior tests)
+6. [ ] **Documentation** (prose — no executable-behavior tests)
    - Files: `README.md`, `CHANGELOG.md` (Unreleased)
    - Changes: how to run, recommend `--dry-run` first, commit workflow, CDX-without-`ARCHIVE=1`, `--save` / `_SAVE`, literal-URL-only limitation
 
-7. **Verify**
+7. [ ] **Verify**
    - `bundle exec rspec` (full suite); `bundle exec rubocop` on touched files
 
 ## Technology Validation

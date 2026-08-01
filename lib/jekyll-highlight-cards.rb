@@ -12,6 +12,8 @@ require_relative "jekyll-highlight-cards/dimension_parser"
 require_relative "jekyll-highlight-cards/expression_evaluator"
 require_relative "jekyll-highlight-cards/archive_helper"
 require_relative "jekyll-highlight-cards/template_renderer"
+require_relative "jekyll-highlight-cards/linkcard_markup"
+require_relative "jekyll-highlight-cards/polaroid_markup"
 
 # Require tags and hooks
 require_relative "jekyll-highlight-cards/linkcard_tag"
