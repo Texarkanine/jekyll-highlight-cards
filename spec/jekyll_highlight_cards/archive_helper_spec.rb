@@ -415,6 +415,7 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
     # without CDX or SavePageNow calls.
     context "when the URL is not archiveable" do
       before do
+        ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE"] = "1"
         stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
         stub_request(:get, %r{web\.archive\.org/save/})
       end

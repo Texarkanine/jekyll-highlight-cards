@@ -583,16 +583,25 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
         end
 
         # Guard C: self-link (no link=) is lightbox UX, not an outbound archive target.
+        # Use an absolute image URL so Guard A cannot mask a missing explicit_link check.
         it "does not auto-archive when link is omitted" do
-          result = render_tag("/photo.jpg")
+          ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE"] = "1"
+          stub_request(:get, %r{web\.archive\.org/save/})
+
+          result = render_tag("https://example.com/photo.jpg")
           expect(result).not_to include("web.archive.org")
           expect(WebMock).not_to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx})
+          expect(WebMock).not_to have_requested(:get, %r{web\.archive\.org/save/})
         end
 
         it "still uses an explicit archive URL when link is omitted" do
-          result = render_tag('/photo.jpg archive="https://archive.org/explicit"')
+          ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE"] = "1"
+          stub_request(:get, %r{web\.archive\.org/save/})
+
+          result = render_tag('https://example.com/photo.jpg archive="https://archive.org/explicit"')
           expect(result).to include("archive.org/explicit")
           expect(WebMock).not_to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx})
+          expect(WebMock).not_to have_requested(:get, %r{web\.archive\.org/save/})
         end
       end
     end
