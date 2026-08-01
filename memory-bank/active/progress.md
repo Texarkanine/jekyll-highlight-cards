@@ -128,3 +128,12 @@ Ship freeze-archives, then rework: add `highlight_cards.noarchive` regex list so
     - L2: enhancement localized to ArchiveHelper eligibility gate + site config plumbing; no new subsystem
 * Insights
     - `archiveable_url?` today has no site/config — plan must thread site (or patterns) into the existing gate
+
+## 2026-08-01 - PLAN - COMPLETE (rework)
+
+* Work completed
+    - L2 plan: ArchiveHelper site-aware noarchive gate + tag/freeze wiring + README
+* Decisions made
+    - Optional `site:` on `archiveable_url?` / `archive_url_for`; match full URL string; RegexpError propagates
+* Insights
+    - Analyzer and `archive_url_for` both must see site so CDX never runs for matches

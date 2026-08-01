@@ -1,15 +1,14 @@
 # Active Context
 
 **Current Task:** Configurable noarchive URL skip list
-**Phase:** COMPLEXITY-ANALYSIS - COMPLETE
+**Phase:** PLAN - COMPLETE
 **Complexity:** Level 2
 
 ## What Was Done
 
-- Rework initiated on freeze-archives-jekyll-subcommand after manual QA scope creep
-- Classified as Level 2: self-contained enhancement to `ArchiveHelper#archiveable_url?` plus config plumbing and docs
-- Semantics fixed: skip attempt only (no `archive:none` write); explicit archives untouched; applies to build + freeze
+- L2 plan for `highlight_cards.noarchive` regex skip list
+- Design: extend `archiveable_url?` / `archive_url_for` with optional `site:`; match full URL; skip-only (no `archive:none`); wire tags + freeze; document in README
 
 ## Next Step
 
-Load Level 2 workflow → Plan phase
+Preflight validation
