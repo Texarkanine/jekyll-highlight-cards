@@ -176,3 +176,12 @@ Ship freeze-archives, then rework: add `highlight_cards.noarchive` regex list so
     - Standalone L2 rework → next operator step is `/niko-archive`
 * Insights
     - Eligibility must precede archive_cache so noarchive cannot be bypassed by a prior hit
+
+## 2026-08-01 - REFLECT - UPDATED (rework)
+
+* Work completed
+    - Updated reflection-noarchive-config.md with unanchored-regex contract from operator Q&A
+* Decisions made
+    - Unanchored by default is intentional; anchoring belongs in author patterns
+* Insights
+    - Bare host fragments (e.g. `x\.com`) can substring-match other hosts (`notx.com`)

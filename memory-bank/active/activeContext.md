@@ -6,9 +6,10 @@
 
 ## What Was Done
 
-- Reflection written for noarchive-config rework
+- Reflection written for noarchive-config rework, then updated with post-reflect anchoring Q&A
 - Persistent MB unchanged (ArchiveHelper centrality already covered)
 - Feature complete: `highlight_cards.noarchive` skip via `archiveable_url?` for build + freeze
+- Contract: patterns are unanchored by default; authors add `\A`/`\z` when needed
 
 ## Next Step
 

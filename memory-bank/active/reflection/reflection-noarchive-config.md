@@ -27,11 +27,12 @@ TDD cycles were straightforward. Only mechanical friction was RuboCop ExampleLen
 ### Technical
 
 - Eligibility checks must run *before* the per-URL archive cache so a later noarchive match cannot be bypassed by a prior hit for the same URL string.
+- `noarchive` patterns are intentionally **unanchored** (`Regexp.new` + `match?` on the full URL). Authors opt into anchors (`\A` / `\z`) when they need them. Tradeoff: bare `x\.com` also matches substring hosts like `notx.com` — tighten the pattern if that matters.
 
 ### Process
 
-- Nothing notable
+- Post-reflect operator Q&A clarified anchoring semantics; folded into this reflection so archive docs carry the contract.
 
 ### Million-Dollar Question
 
-If noarchive had been assumed from day one, site would already be a required (or ambient) argument on ArchiveHelper rather than an optional kwarg threaded through tags and freeze. What we shipped is the minimal compatible form of that: one gate, optional site, same call-site shape as the archive.org/local filters.
+If noarchive had been assumed from day one, site would already be a required (or ambient) argument on ArchiveHelper rather than an optional kwarg threaded through tags and freeze. What we shipped is the minimal compatible form of that: one gate, optional site, same call-site shape as the archive.org/local filters. Unanchored-by-default matching is the right authoring default for that gate; anchoring stays in the pattern, not in the helper.
