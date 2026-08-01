@@ -131,10 +131,11 @@ flowchart LR
    - Changes: classify candidate vs skip using shared parsers + `archiveable_url?`
    - Done: A1–A8 green; returns `{ target_url: }` or `nil`
 
-3. [ ] **TagLocator**
+3. [x] **TagLocator**
    - Files: locator + `spec/jekyll_highlight_cards/freeze_archives/tag_locator_spec.rb`
    - TDD ordering: stub L1–L2 → failing tests → red → implement locator → green
    - Changes: return spans `{tag:, markup:, range:}` for linkcard/polaroid
+   - Done: L1–L2 green; multiline spans supported
 
 4. [ ] **ArchiveInserter**
    - Files: inserter + `spec/jekyll_highlight_cards/freeze_archives/archive_inserter_spec.rb`
