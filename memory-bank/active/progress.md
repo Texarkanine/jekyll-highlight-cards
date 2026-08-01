@@ -55,3 +55,13 @@ Add ArchiveHelper / PolaroidTag guards so auto-archive skips relative paths, arc
     - No README change required (docs never claimed relative/Wayback URLs are archived)
 * Insights
     - Public surface of ArchiveHelper stays env/cache/lookup entrypoints; eligibility is an implementation detail
+
+## 2026-08-01 - REFLECT - COMPLETE
+
+* Work completed
+    - Wrote `reflection/reflection-archive-non-archivable-url-guards-53.md`
+    - Reconciled persistent files: no updates needed
+* Decisions made
+    - None beyond shipping skip-only guards as planned
+* Insights
+    - Guard C must live at PolaroidTag because `link_url` already defaults to `image_url` before ArchiveHelper sees it
