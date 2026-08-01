@@ -3,12 +3,14 @@
 require "spec_helper"
 
 RSpec.describe JekyllHighlightCards::PolaroidTag do
-  let(:site) { instance_double(Jekyll::Site, source: "/test/site") }
+  let(:site_config) { {} }
+  let(:site) { instance_double(Jekyll::Site, source: "/test/site", config: site_config) }
   let(:registers) { { site: site } }
   let(:context) { Liquid::Context.new({}, {}, registers) }
 
   before do
     JekyllHighlightCards::ArchiveHelper.archive_cache = {}
+    JekyllHighlightCards::ArchiveHelper.noarchive_regexp_cache = {}
     allow(ENV).to receive(:[]).and_call_original
     stub_request(:get, %r{web\.archive\.org/cdx/search/cdx}).to_return(status: 404)
   end

@@ -96,7 +96,7 @@ module JekyllHighlightCards
       # Check for explicit archive URL
       return evaluate_expression(source, context) if source && !source.empty?
 
-      archive_enabled? && archive_url_for(url)
+      archive_enabled? && archive_url_for(url, site: context.registers[:site])
     end
 
     # Build template variables hash for rendering

@@ -4,12 +4,14 @@ require "spec_helper"
 require "tmpdir"
 
 RSpec.describe JekyllHighlightCards::LinkcardTag do
-  let(:site) { instance_double(Jekyll::Site, source: "/test/site") }
+  let(:site_config) { {} }
+  let(:site) { instance_double(Jekyll::Site, source: "/test/site", config: site_config) }
   let(:registers) { { site: site } }
   let(:context) { Liquid::Context.new({}, {}, registers) }
 
   before do
     JekyllHighlightCards::ArchiveHelper.archive_cache = {}
+    JekyllHighlightCards::ArchiveHelper.noarchive_regexp_cache = {}
     allow(ENV).to receive(:[]).and_call_original
     stub_request(:get, %r{web\.archive\.org/cdx/search/cdx}).to_return(status: 404)
   end
@@ -77,6 +79,17 @@ RSpec.describe JekyllHighlightCards::LinkcardTag do
 
       result = render_tag("https://example.com")
       expect(result).to include("web.archive.org/web/20231201120000")
+    end
+
+    it "skips automatic archive lookup when the URL matches highlight_cards.noarchive" do
+      allow(ENV).to receive(:[]).with("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE").and_return("1")
+      site_config["highlight_cards"] = { "noarchive" => ["x\\.com"] }
+      stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+      stub_request(:get, %r{web\.archive\.org/save/})
+
+      result = render_tag("https://x.com/someone/status/1")
+      expect(result).not_to include("web.archive.org")
+      expect(WebMock).not_to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx})
     end
 
     it "evaluates a Liquid URL variable through the render pipeline" do

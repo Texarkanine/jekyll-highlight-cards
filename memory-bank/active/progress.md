@@ -147,3 +147,13 @@ Ship freeze-archives, then rework: add `highlight_cards.noarchive` regex list so
     - Keep optional `site:` threading approach
 * Insights
     - Four lib call sites must all receive site for the feature to work end-to-end
+
+## 2026-08-01 - BUILD - COMPLETE (rework)
+
+* Work completed
+    - Implemented highlight_cards.noarchive via archiveable_url?(site:)
+    - Wired tags + freeze analyzer/command; README; 491 specs green
+* Decisions made
+    - Memoize compiled regexps in ArchiveHelper.noarchive_regexp_cache keyed by site+raw list
+* Insights
+    - Skip-only semantics keep freeze from writing archive:none so config changes can reattempt

@@ -11,8 +11,8 @@ RSpec.describe JekyllHighlightCards::Commands::FreezeArchives do
   let(:archive_url) { "https://web.archive.org/web/20200101120000/https://example.com" }
   let(:target_url) { "https://example.com" }
 
-  def write_site(dir, post_body)
-    File.write(File.join(dir, "_config.yml"), "title: Freeze Test\n")
+  def write_site(dir, post_body, config_yaml: "title: Freeze Test\n")
+    File.write(File.join(dir, "_config.yml"), config_yaml)
     FileUtils.mkdir_p(File.join(dir, "_posts"))
     path = File.join(dir, "_posts", "2020-01-01-hello.md")
     File.write(path, post_body)
@@ -43,6 +43,7 @@ RSpec.describe JekyllHighlightCards::Commands::FreezeArchives do
 
   before do
     JekyllHighlightCards::ArchiveHelper.archive_cache = {}
+    JekyllHighlightCards::ArchiveHelper.noarchive_regexp_cache = {}
   end
 
   describe ".process" do
@@ -114,6 +115,21 @@ RSpec.describe JekyllHighlightCards::Commands::FreezeArchives do
         MD
         original = File.read(post)
 
+        summary = described_class.process(site_options(dir))
+
+        expect(File.read(post)).to eq(original)
+        expect(summary[:frozen]).to eq(0)
+        expect(summary[:skipped]).to be >= 1
+        expect(WebMock).not_to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx})
+      end
+    end
+
+    it "C4b: noarchive matches are skipped without CDX and without writing archive:none" do
+      Dir.mktmpdir do |dir|
+        config = "title: T\nhighlight_cards:\n  noarchive:\n    - x\\.com\n"
+        post = write_site(dir, "{% linkcard https://x.com/foo Title %}\n", config_yaml: config)
+        original = File.read(post)
+        stub_cdx_hit
         summary = described_class.process(site_options(dir))
 
         expect(File.read(post)).to eq(original)

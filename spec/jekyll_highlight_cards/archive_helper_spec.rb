@@ -15,6 +15,7 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
 
   before do
     described_class.archive_cache = {}
+    described_class.noarchive_regexp_cache = {}
   end
 
   describe "#archive_enabled?" do
@@ -437,6 +438,66 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
                       "https://web.archive.org/web/20030101000000/http://example.com/"
       it_behaves_like "skips without archive HTTP", "https://archive.org/details/foo"
       it_behaves_like "skips without archive HTTP", "http://["
+    end
+
+    # highlight_cards.noarchive: site-config regexes skip archive attempts
+    context "when site configures highlight_cards.noarchive" do
+      def site_with(config)
+        instance_double(Jekyll::Site, config: config)
+      end
+
+      before do
+        stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
+          .to_return(
+            status: 200,
+            body: [%w[timestamp original], ["20231201120000", test_url]].to_json
+          )
+        stub_request(:get, %r{web\.archive\.org/save/})
+      end
+
+      it "skips URLs matching a noarchive pattern" do
+        site = site_with("highlight_cards" => { "noarchive" => ["x\\.com"] })
+        blocked = "https://x.com/someone/status/1"
+
+        expect(helper.archive_url_for(blocked, site: site)).to be_nil
+        expect(WebMock).not_to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx})
+        expect(WebMock).not_to have_requested(:get, %r{web\.archive\.org/save/})
+      end
+
+      it "looks up URLs that do not match any noarchive pattern" do
+        site = site_with("highlight_cards" => { "noarchive" => ["x\\.com"] })
+
+        expect(helper.archive_url_for(test_url, site: site)).to eq(archive_url)
+        expect(WebMock).to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx})
+      end
+
+      it "does not skip when noarchive is empty" do
+        site = site_with("highlight_cards" => { "noarchive" => [] })
+
+        expect(helper.archive_url_for(test_url, site: site)).to eq(archive_url)
+      end
+
+      it "does not skip when highlight_cards is absent" do
+        site = site_with({})
+
+        expect(helper.archive_url_for(test_url, site: site)).to eq(archive_url)
+      end
+
+      it "skips when any of multiple patterns matches" do
+        site = site_with(
+          "highlight_cards" => { "noarchive" => ["example\\.org", "x\\.com"] }
+        )
+        blocked = "https://x.com/foo"
+
+        expect(helper.archive_url_for(blocked, site: site)).to be_nil
+        expect(WebMock).not_to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx})
+      end
+
+      it "raises on an invalid noarchive regex" do
+        site = site_with("highlight_cards" => { "noarchive" => ["["] })
+
+        expect { helper.archive_url_for(test_url, site: site) }.to raise_error(RegexpError)
+      end
     end
   end
 end

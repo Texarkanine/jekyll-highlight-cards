@@ -47,5 +47,15 @@ RSpec.describe JekyllHighlightCards::FreezeArchives::MarkupAnalyzer do
       expect(analyzer.analyze("polaroid",
                               '/img.jpg link="https://web.archive.org/web/2020/https://example.com"')).to be_nil
     end
+
+    it "A9: skips URLs matching site highlight_cards.noarchive" do
+      site = instance_double(
+        Jekyll::Site,
+        config: { "highlight_cards" => { "noarchive" => ["x\\.com"] } }
+      )
+      analyzer = described_class.new(site: site)
+
+      expect(analyzer.analyze("linkcard", "https://x.com/foo Title")).to be_nil
+    end
   end
 end

@@ -77,7 +77,7 @@ No new technology - validation not required (stdlib `Regexp` + existing Jekyll `
 - [x] Technology validation complete
 - [x] Pre-Mortem complete
 - [x] Preflight
-- [ ] Build
+- [x] Build
 - [ ] QA
 
 ## Preflight Findings

@@ -78,16 +78,18 @@ module JekyllHighlightCards
         def initialize(dry_run:, logger:)
           @dry_run = dry_run
           @logger = logger
+          @site = nil
           @site_source = nil
           @locator = JekyllHighlightCards::FreezeArchives::TagLocator.new
-          @analyzer = JekyllHighlightCards::FreezeArchives::MarkupAnalyzer.new
           @inserter = JekyllHighlightCards::FreezeArchives::ArchiveInserter.new
         end
 
         # @param site [Jekyll::Site]
         # @return [Hash] summary counts
         def run(site)
+          @site = site
           @site_source = site.source
+          @analyzer = JekyllHighlightCards::FreezeArchives::MarkupAnalyzer.new(site: site)
           summary = { frozen: 0, skipped: 0, miss: 0, written: 0 }
 
           source_files(site).each do |path|
@@ -133,7 +135,7 @@ module JekyllHighlightCards
 
             target = candidate[:target_url]
             @logger.info "freeze-archives:", "Looking up archive for #{target}"
-            archive_url = archive_url_for(target)
+            archive_url = archive_url_for(target, site: @site)
             unless archive_url
               summary[:miss] += 1
               @logger.info "freeze-archives:", "no archive for #{target}"

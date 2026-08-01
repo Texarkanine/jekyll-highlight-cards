@@ -11,6 +11,11 @@ module JekyllHighlightCards
       include ArchiveHelper
       include ExpressionEvaluator
 
+      # @param site [Jekyll::Site, nil] site for +highlight_cards.noarchive+
+      def initialize(site: nil)
+        @site = site
+      end
+
       # Analyze tag markup for freeze eligibility
       #
       # @param tag [String] +"linkcard"+ or +"polaroid"+
@@ -46,7 +51,7 @@ module JekyllHighlightCards
       def candidate_for(target)
         return nil if target.to_s.empty?
         return nil if variable_lookup?(target)
-        return nil unless archiveable_url?(target)
+        return nil unless archiveable_url?(target, site: @site)
 
         { target_url: target }
       end
