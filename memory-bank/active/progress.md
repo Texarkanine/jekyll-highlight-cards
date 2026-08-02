@@ -68,3 +68,12 @@ Restore SimpleCov line coverage to 100% for the three freeze-archives lines left
     - Terminal for standalone L2; archive is operator-initiated
 * Insights
     - `--save` ENV ensure needs both delete and restore examples or coverage silently regresses
+
+## 2026-08-02 - ARCHIVE - IN-PROGRESS
+
+* Work completed
+    - Operator invoked `/niko-archive` (then push)
+* Decisions made
+    - Category: `enhancements/` (test coverage restoration for existing freeze-archives)
+* Insights
+    - None yet
