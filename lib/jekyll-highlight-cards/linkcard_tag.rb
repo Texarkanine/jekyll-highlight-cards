@@ -62,62 +62,7 @@ module JekyllHighlightCards
     # @param markup [String] the tag markup
     # @return [Hash] parsed components
     def split_markup(markup)
-      tokens = []
-      current = ""
-      in_quotes = false
-      quote_char = nil
-      in_liquid = 0
-      escaped = false
-
-      "#{markup} ".each_char do |char|
-        if escaped
-          current += char
-          escaped = false
-          next
-        end
-
-        if char == "\\" && in_quotes
-          escaped = true
-          next
-        end
-
-        if char == "{" && !in_quotes
-          in_liquid += 1
-          current += char
-        elsif char == "}" && in_liquid.positive?
-          in_liquid -= 1
-          current += char
-        elsif char == '"' && !in_quotes
-          in_quotes = true
-          quote_char = char
-          current += char
-        elsif char == quote_char
-          in_quotes = false
-          current += char
-          quote_char = nil
-        elsif char.match?(/\s/) && !in_quotes && in_liquid.zero?
-          tokens << current
-          current = ""
-        else
-          current += char
-        end
-      end
-      tokens.reject!(&:empty?)
-
-      result = {}
-      result[:url] = tokens.shift
-
-      title_tokens = []
-      tokens.each do |token|
-        if token.start_with?("archive:")
-          result[:archive] = token.delete_prefix("archive:")
-        else
-          title_tokens << token
-        end
-      end
-      result[:title] = title_tokens.join(" ") unless title_tokens.empty?
-
-      result
+      LinkcardMarkup.split(markup)
     end
 
     # Resolve URL from token (may be Liquid expression or literal)
@@ -151,7 +96,7 @@ module JekyllHighlightCards
       # Check for explicit archive URL
       return evaluate_expression(source, context) if source && !source.empty?
 
-      archive_enabled? && archive_url_for(url)
+      archive_enabled? && archive_url_for(url, site: context.registers[:site])
     end
 
     # Build template variables hash for rendering

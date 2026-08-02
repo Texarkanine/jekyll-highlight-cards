@@ -17,15 +17,16 @@ module JekyllHighlightCards
     @archive_cache = {}
 
     class << self
-      attr_accessor :archive_cache
+      attr_accessor :archive_cache, :noarchive_regexp_cache
     end
 
     # Get archive URL for a given URL, with caching and optional submission
     #
     # @param url [String] the original URL to archive
+    # @param site [Jekyll::Site, nil] optional site for +highlight_cards.noarchive+ patterns
     # @return [String, nil] the archive URL, or nil if not found
-    def archive_url_for(url)
-      return nil unless archiveable_url?(url)
+    def archive_url_for(url, site: nil)
+      return nil unless archiveable_url?(url, site: site)
 
       ArchiveHelper.archive_cache[url] ||= begin
         archive_url = lookup_archive(url)
@@ -63,18 +64,46 @@ module JekyllHighlightCards
     # Whether +url+ is eligible for CDX lookup / SavePageNow submission.
     #
     # Requires an absolute http(s) URI with a host. Rejects Internet Archive
-    # hosts so Wayback / archive.org URLs are not re-submitted.
+    # hosts so Wayback / archive.org URLs are not re-submitted. Also rejects
+    # URLs matching any +highlight_cards.noarchive+ regex on +site+ config.
     #
     # @param url [String] candidate URL
+    # @param site [Jekyll::Site, nil] optional site for +highlight_cards.noarchive+
     # @return [Boolean] true if the URL may be archived
-    def archiveable_url?(url)
+    def archiveable_url?(url, site: nil)
       uri = URI.parse(url.to_s)
       return false unless uri.is_a?(URI::HTTP) && uri.host
       return false if %w[archive.org web.archive.org].include?(uri.host.downcase)
+      return false if noarchive_match?(url, site)
 
       true
     rescue URI::InvalidURIError
       false
+    end
+
+    # Whether +url+ matches any +highlight_cards.noarchive+ pattern on +site+.
+    #
+    # @param url [String] candidate URL (full string matched)
+    # @param site [Jekyll::Site, nil]
+    # @return [Boolean]
+    # @raise [RegexpError] when a configured pattern is invalid
+    def noarchive_match?(url, site)
+      noarchive_patterns_for(site).any? { |pattern| pattern.match?(url.to_s) }
+    end
+
+    # Compile +highlight_cards.noarchive+ patterns from site config (memoized per site).
+    #
+    # @param site [Jekyll::Site, nil]
+    # @return [Array<Regexp>]
+    def noarchive_patterns_for(site)
+      return [] unless site
+
+      raw = site.config.dig("highlight_cards", "noarchive")
+      return [] if raw.nil? || Array(raw).empty?
+
+      cache = (ArchiveHelper.noarchive_regexp_cache ||= {})
+      cache_key = [site.object_id, raw]
+      cache[cache_key] ||= Array(raw).map { |pattern| Regexp.new(pattern.to_s) }
     end
 
     # Look up the latest archived snapshot for a URL via Internet Archive CDX API

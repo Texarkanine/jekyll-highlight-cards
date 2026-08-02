@@ -3,12 +3,14 @@
 require "spec_helper"
 
 RSpec.describe JekyllHighlightCards::PolaroidTag do
-  let(:site) { instance_double(Jekyll::Site, source: "/test/site") }
+  let(:site_config) { {} }
+  let(:site) { instance_double(Jekyll::Site, source: "/test/site", config: site_config) }
   let(:registers) { { site: site } }
   let(:context) { Liquid::Context.new({}, {}, registers) }
 
   before do
     JekyllHighlightCards::ArchiveHelper.archive_cache = {}
+    JekyllHighlightCards::ArchiveHelper.noarchive_regexp_cache = {}
     allow(ENV).to receive(:[]).and_call_original
     stub_request(:get, %r{web\.archive\.org/cdx/search/cdx}).to_return(status: 404)
   end
@@ -926,6 +928,14 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
     it "strips https from link display text" do
       result = render_tag('/photo.jpg link="https://example.com/path"')
       expect(result).to match(%r{polaroid-link[^>]*>\s*<a[^>]*>example\.com/path</a>})
+    end
+  end
+
+  describe JekyllHighlightCards::PolaroidMarkup do
+    it "does not let quoted closing braces end a Liquid expression early" do
+      parsed = described_class.parse('/img.jpg title={{ "}}" }} link="https://example.com"')
+      expect(parsed[:title]).to eq('{{ "}}" }}')
+      expect(parsed[:link]).to eq('"https://example.com"')
     end
   end
 end

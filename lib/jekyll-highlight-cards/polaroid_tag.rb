@@ -58,7 +58,12 @@ module JekyllHighlightCards
                        else
                          params.fetch(:image_link)
                        end
-      archive_url = resolve_archive(params[:archive], link_url, explicit_link: explicit_link)
+      archive_url = resolve_archive(
+        params[:archive],
+        link_url,
+        site: context.registers[:site],
+        explicit_link: explicit_link
+      )
 
       variables = build_template_variables(
         params.fetch(:image_url),
@@ -83,58 +88,13 @@ module JekyllHighlightCards
     # @param context [Liquid::Context] the Liquid context
     # @return [Hash] parsed parameters
     def parse_markup(markup, context)
-      tokens = []
-      current = ""
-      in_quotes = false
-      quote_char = nil
-      in_liquid = 0
-      escaped = false
+      parsed = PolaroidMarkup.parse(markup)
 
-      # Trailing space flushes the final token through the whitespace branch
-      "#{markup} ".each_char do |char|
-        if escaped
-          current += char
-          escaped = false
-          next
-        end
+      result = { image_url: evaluate_expression(parsed[:image_url], context) }
+      parsed.each do |key, value|
+        next if key == :image_url
 
-        if char == "\\" && in_quotes
-          escaped = true
-          next
-        end
-
-        if char == "{" && !in_quotes
-          in_liquid += 1
-          current += char
-        elsif char == "}" && in_liquid.positive?
-          in_liquid -= 1
-          current += char
-        elsif ['"', "'"].include?(char) && !in_quotes
-          in_quotes = true
-          quote_char = char
-          current += char
-        elsif char == quote_char
-          in_quotes = false
-          current += char
-          quote_char = nil
-        elsif char.match?(/\s/) && !in_quotes && in_liquid.zero?
-          tokens << current
-          current = ""
-        else
-          current += char
-        end
-      end
-
-      image_url_token = tokens.shift
-      image_url = evaluate_expression(image_url_token, context)
-
-      result = { image_url: image_url }
-      tokens.each do |token|
-        next unless token =~ /\A(\w+)=(.+)\z/
-
-        key = Regexp.last_match(1).to_sym
-        value_token = Regexp.last_match(2)
-        result[key] = evaluate_expression(value_token, context)
+        result[key] = evaluate_expression(value, context)
       end
 
       result
@@ -145,14 +105,15 @@ module JekyllHighlightCards
     #
     # @param source [String, nil] the archive source
     # @param url [String] the target URL to archive
+    # @param site [Jekyll::Site, nil] site for +highlight_cards.noarchive+
     # @param explicit_link [Boolean] whether +link=+ was provided (self-link is not an archive target)
     # @return [String, nil] resolved archive URL
-    def resolve_archive(source, url, explicit_link: true)
+    def resolve_archive(source, url, site: nil, explicit_link: true)
       return nil if source && source.downcase == "none"
       return source unless source.to_s.empty?
       return nil unless explicit_link
 
-      archive_enabled? && archive_url_for(url)
+      archive_enabled? && archive_url_for(url, site: site)
     end
 
     # Build template variables hash for rendering

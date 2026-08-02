@@ -8,6 +8,7 @@ Jekyll site authors who want styled link and image cards with optional Internet 
 
 - Highlight outbound links with `{% linkcard %}` (optional title, archive URL / `archive:none`)
 - Present images as polaroid-style cards with `{% polaroid %}` (size, title, alt, link, archive options)
+- Freeze Internet Archive URLs into card source tags once via `jekyll freeze-archives`, then commit
 - Specify Markdown image dimensions via `![alt](image.jpg =300x200)`
 - Override default HTML templates and SCSS for site-specific styling
 

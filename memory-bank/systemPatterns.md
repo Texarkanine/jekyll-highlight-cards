@@ -2,7 +2,7 @@
 
 ## How This System Works
 
-This is a Jekyll plugin gem: runtime code lives under `lib/jekyll-highlight-cards/`, ships Liquid tags plus a Markdown image-sizing hook, and registers SCSS via a relative path from the gem entrypoint. Templates live in `_includes/` and styles in `_sass/` so consuming sites can override them with Jekyll’s usual cascade. Internet Archive behavior is centralized in `ArchiveHelper` (HTTP + caching) and consumed by both tags. Tests are RSpec under `spec/`; SimpleCov is started from `spec/spec_helper.rb` before the gem loads so coverage includes plugin code and excludes `spec/` / `vendor/`.
+This is a Jekyll plugin gem: runtime code lives under `lib/jekyll-highlight-cards/`, ships Liquid tags, a Markdown image-sizing hook, and an opt-in `jekyll freeze-archives` command (`Jekyll::Command`), and registers SCSS via a relative path from the gem entrypoint. Templates live in `_includes/` and styles in `_sass/` so consuming sites can override them with Jekyll’s usual cascade. Tag markup parsing is shared (`LinkcardMarkup` / `PolaroidMarkup`) so render and freeze-archives stay in lockstep. Internet Archive behavior is centralized in `ArchiveHelper` (HTTP + caching) and consumed by tags and the freeze command. Tests are RSpec under `spec/`; SimpleCov is started from `spec/spec_helper.rb` before the gem loads so coverage includes plugin code and excludes `spec/` / `vendor/`.
 
 ## Gemspec Owns Dev Dependencies
 

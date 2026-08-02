@@ -11,6 +11,7 @@ A Jekyll plugin providing styled card components for links and images with Inter
 - **`{% polaroid %}`** - Polaroid-style image cards with titles, links, and archive support
 - **Markdown Image Sizing** - Extended syntax for image dimensions: `![alt](image.jpg =300x200)`
 - **Internet Archive Integration** - Automatic lookup and archival for both tags
+- **`jekyll freeze-archives`** - Opt-in command to freeze archive URLs into source
 - **Customizable** - Override HTML templates and CSS styles
 
 ## Installation
@@ -147,6 +148,41 @@ Or in your shell config:
 # In .bashrc, .zshrc, etc.
 export JEKYLL_HIGHLIGHT_CARDS_ARCHIVE=1
 ```
+
+| Flag | Description |
+|------|-------------|
+| `JEKYLL_HIGHLIGHT_CARDS_ARCHIVE` | Enable build-time lookup to see if there is an IA snapshot available |
+| `JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE` | Also submit the URL to SavePageNow (runs even when CDX already found a snapshot) |
+
+You can selectively skip archive attempts for URLs that match site-configured regexes. Patterns are matched against the full URL string; use anchors when needed.
+
+```yaml
+highlight_cards:
+  noarchive:
+    - ^https?://x\.com/.*
+    - \Ahttps://something\.example\.com/.*
+```
+
+### Freeze Archives Into Source
+
+To look up Internet Archive snapshots *once* (instead of on each build) and write them into your source tags, run the `freeze-archives` Jekyll subcommand:
+
+```bash
+# Rehearse first — reports planned edits, writes nothing
+bundle exec jekyll freeze-archives --dry-run
+
+# Write archive: / archive= into eligible tags
+bundle exec jekyll freeze-archives
+```
+
+Review the diff, then commit. The command does **not** commit for you, and it does **not** run as part of `jekyll build`.
+
+**How it differs from build-time lookup**
+
+- Invoking `freeze-archives` performs CDX lookup — you do **not** need `JEKYLL_HIGHLIGHT_CARDS_ARCHIVE=1`.
+- SavePageNow stays gated: set `JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE=1` or pass `--save`.
+- Only **literal** http(s) URLs are frozen. Liquid targets like `{{ page.url }}` are skipped; build-time auto-lookup still covers those when enabled.
+- Tags that already have `archive:` / `archive=` / `archive:none` are left alone.
 
 ### CSS Styles
 

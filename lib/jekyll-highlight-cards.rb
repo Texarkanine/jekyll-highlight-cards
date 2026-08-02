@@ -12,11 +12,17 @@ require_relative "jekyll-highlight-cards/dimension_parser"
 require_relative "jekyll-highlight-cards/expression_evaluator"
 require_relative "jekyll-highlight-cards/archive_helper"
 require_relative "jekyll-highlight-cards/template_renderer"
+require_relative "jekyll-highlight-cards/linkcard_markup"
+require_relative "jekyll-highlight-cards/polaroid_markup"
 
 # Require tags and hooks
 require_relative "jekyll-highlight-cards/linkcard_tag"
 require_relative "jekyll-highlight-cards/polaroid_tag"
 require_relative "jekyll-highlight-cards/image_sizing_hooks"
+require_relative "jekyll-highlight-cards/freeze_archives/markup_analyzer"
+require_relative "jekyll-highlight-cards/freeze_archives/tag_locator"
+require_relative "jekyll-highlight-cards/freeze_archives/archive_inserter"
+require_relative "jekyll-highlight-cards/commands/freeze_archives"
 
 # jekyll-highlight-cards: Styled card components for Jekyll
 #
