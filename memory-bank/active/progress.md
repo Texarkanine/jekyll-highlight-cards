@@ -48,3 +48,13 @@ Restore SimpleCov line coverage to 100% for the three freeze-archives lines left
     - No production changes; shortened ENV example body to satisfy RSpec/ExampleLength
 * Insights
     - `execute` path covers action wiring without stubbing `process`
+
+## 2026-08-02 - QA - COMPLETE
+
+* Work completed
+    - Semantic review of three new examples against plan + SLOBAC guardrails
+    - Wrote `.qa-validation-status` = PASS
+* Decisions made
+    - No code fixes required
+* Insights
+    - Coverage-gap examples that assert distinct behaviors (restore vs delete, execute vs process) stay maintainable
