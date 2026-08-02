@@ -38,3 +38,13 @@ Restore SimpleCov line coverage to 100% for the three freeze-archives lines left
     - Proceed to build (L2 autonomous path)
 * Insights
     - Coverage-only work still needs behavioral oracles; line hits alone are not the plan's success bar
+
+## 2026-08-02 - BUILD - COMPLETE
+
+* Work completed
+    - Specs for B2 (ENV restore sentinel), B3 (unsupported tag), B1 (Mercenary execute side-effect freeze)
+    - 504 examples, 0 failures; line coverage 100%; RuboCop clean
+* Decisions made
+    - No production changes; shortened ENV example body to satisfy RSpec/ExampleLength
+* Insights
+    - `execute` path covers action wiring without stubbing `process`

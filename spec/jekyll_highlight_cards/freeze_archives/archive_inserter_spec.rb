@@ -108,5 +108,14 @@ RSpec.describe JekyllHighlightCards::FreezeArchives::ArchiveInserter do
       result = inserter.insert(content, span_for(content, "linkcard"), archive_url)
       expect(result).to eq("{% linkcard https://example.com Title archive:#{archive_url} -%}\n")
     end
+
+    it "raises ArgumentError for an unsupported tag name" do
+      content = "{% notacard https://example.com %}"
+      span = { tag: "notacard", range: 0...content.length }
+
+      expect do
+        inserter.insert(content, span, archive_url)
+      end.to raise_error(ArgumentError, /unsupported tag/i)
+    end
   end
 end

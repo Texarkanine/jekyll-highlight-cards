@@ -1,12 +1,15 @@
 # Active Context
 
 ## Current Task: restore-100-line-coverage
-**Phase:** PLAN - COMPLETE
+**Phase:** BUILD - COMPLETE
 
 ## What Was Done
-- Level 2 plan: three TDD cycles (ENV restore, unsupported-tag via `#insert`, Mercenary `execute` → process)
-- Extend existing `command_spec.rb` + `archive_inserter_spec.rb` only; no new deps; SLOBAC guardrails recorded
-- Measured gap remains: `freeze_archives.rb:30`, `:71`, `archive_inserter.rb:67`
+- Added 3 behavioral specs: ENV restore after `--save`, unsupported-tag via `#insert`, Mercenary `execute` → freeze
+- Files modified:
+  - `/home/mobaxterm/git/jekyll-highlight-cards/spec/jekyll_highlight_cards/freeze_archives/command_spec.rb`
+  - `/home/mobaxterm/git/jekyll-highlight-cards/spec/jekyll_highlight_cards/freeze_archives/archive_inserter_spec.rb`
+- Full suite: 504 examples, 0 failures; SimpleCov 579/579 (100%); RuboCop clean on touched specs
+- No production code changes
 
 ## Next Step
-- Preflight validation (auto)
+- QA review (auto)

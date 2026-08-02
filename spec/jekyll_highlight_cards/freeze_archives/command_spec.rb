@@ -163,6 +163,26 @@ RSpec.describe JekyllHighlightCards::Commands::FreezeArchives do
       end
     end
 
+    it "restores a pre-existing ARCHIVE_SAVE env value after --save" do
+      ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE"] = "preexisting"
+      begin
+        Dir.mktmpdir do |dir|
+          write_site(dir, "{% linkcard https://example.com Title %}\n")
+          stub_cdx_miss
+          stub_request(:get, %r{web\.archive\.org/save/}).to_return(
+            status: 200,
+            headers: { "Content-Location" => "/web/20200101120000/https://example.com" }
+          )
+
+          described_class.process(site_options(dir).merge("save" => true))
+
+          expect(ENV.fetch("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE")).to eq("preexisting")
+        end
+      ensure
+        ENV.delete("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE")
+      end
+    end
+
     it "C6: jekyll build alone does not rewrite sources" do
       Dir.mktmpdir do |dir|
         post = write_site(dir, <<~MD)
@@ -276,6 +296,24 @@ RSpec.describe JekyllHighlightCards::Commands::FreezeArchives do
       program = Mercenary::Program.new(:jekyll)
       described_class.init_with_program(program)
       expect(program.commands).to have_key(:"freeze-archives")
+    end
+
+    it "runs freeze-archives when the registered Mercenary action executes" do
+      Dir.mktmpdir do |dir|
+        post = write_site(dir, <<~MD)
+          ---
+          title: Hello
+          ---
+          {% linkcard https://example.com Title %}
+        MD
+        stub_cdx_hit
+        program = Mercenary::Program.new(:jekyll)
+        described_class.init_with_program(program)
+
+        program.commands[:"freeze-archives"].execute([], site_options(dir))
+
+        expect(File.read(post)).to include("archive:#{archive_url}")
+      end
     end
   end
 end
