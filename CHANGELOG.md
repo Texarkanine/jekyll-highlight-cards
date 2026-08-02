@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.2.0](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v2.1.0...v2.2.0) (2026-08-02)
+
+
+### Features
+
+* freeze-archives command and highlight_cards.noarchive skips ([#56](https://github.com/Texarkanine/jekyll-highlight-cards/issues/56)) ([a50d109](https://github.com/Texarkanine/jekyll-highlight-cards/commit/a50d109807a0709c47aeebab021b5b49bbd35d8f))
+
+
+### Bug Fixes
+
+* **archive:** skip non-archivable URLs [[#53](https://github.com/Texarkanine/jekyll-highlight-cards/issues/53)] ([#54](https://github.com/Texarkanine/jekyll-highlight-cards/issues/54)) ([928e6d8](https://github.com/Texarkanine/jekyll-highlight-cards/commit/928e6d8268318dbca85ec5d8143b1a1b67f6275a))
+
 ## [2.1.0](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v2.0.0...v2.1.0) (2026-07-19)
 
 
