@@ -58,3 +58,13 @@ Restore SimpleCov line coverage to 100% for the three freeze-archives lines left
     - No code fixes required
 * Insights
     - Coverage-gap examples that assert distinct behaviors (restore vs delete, execute vs process) stay maintainable
+
+## 2026-08-02 - REFLECT - COMPLETE
+
+* Work completed
+    - Wrote `reflection/reflection-restore-100-line-coverage.md`
+    - Reconciled persistent MB files — no updates (test-only)
+* Decisions made
+    - Terminal for standalone L2; archive is operator-initiated
+* Insights
+    - `--save` ENV ensure needs both delete and restore examples or coverage silently regresses
