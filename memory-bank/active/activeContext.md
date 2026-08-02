@@ -1,12 +1,12 @@
 # Active Context
 
 ## Current Task: restore-100-line-coverage
-**Phase:** COMPLEXITY-ANALYSIS - COMPLETE
+**Phase:** PLAN - COMPLETE
 
 ## What Was Done
-- Fresh `/niko` entry; intent clarified and approved
-- Measured coverage: 99.48% (576/579); misses at `freeze_archives.rb:30`, `:71`, `archive_inserter.rb:67`
-- Classified Level 2 (self-contained test enhancement in freeze-archives, SLOBAC constraint)
+- Level 2 plan: three TDD cycles (ENV restore, unsupported-tag via `#insert`, Mercenary `execute` → process)
+- Extend existing `command_spec.rb` + `archive_inserter_spec.rb` only; no new deps; SLOBAC guardrails recorded
+- Measured gap remains: `freeze_archives.rb:30`, `:71`, `archive_inserter.rb:67`
 
 ## Next Step
-- Load Level 2 workflow and execute plan phase
+- Preflight validation (auto)

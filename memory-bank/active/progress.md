@@ -15,3 +15,15 @@ Restore SimpleCov line coverage to 100% for the three freeze-archives lines left
     - Level 2: self-contained coverage restoration in freeze-archives; SLOBAC as hard constraint on test design
 * Insights
     - Gap is entirely in freeze-archives CLI/ensure/inserter edges, not tag render paths
+
+## 2026-08-02 - PLAN - COMPLETE
+
+* Work completed
+    - Wrote Level 2 TDD plan for B1 (Mercenary execute→process), B2 (ENV restore sentinel), B3 (unsupported tag via `#insert`)
+    - Mapped tests to existing `command_spec.rb` and `archive_inserter_spec.rb`
+    - Recorded SLOBAC guardrails and pre-mortem (no spy-only / skip / private-only coverage)
+* Decisions made
+    - Test-only; no production changes unless Mercenary path proves unreachable
+    - B2 sentinel must differ from `"1"`; B3 through public `#insert`
+* Insights
+    - C5 already covers ENV delete (nil) branch; only the restore-previous branch is missing
