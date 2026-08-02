@@ -43,7 +43,7 @@ Restore SimpleCov line coverage from 99.48% (576/579) to 100% by adding SLOBAC-c
 
 3. **B1 — Mercenary action → process (RED → GREEN)**
    - Files: `spec/jekyll_highlight_cards/freeze_archives/command_spec.rb`
-   - Changes: extend `.init_with_program` context — after register, `program.commands[:"freeze-archives"].execute([], site_options(dir))` (or equivalent) against a temp site with CDX stub; assert freeze outcome (e.g. archive token in post / summary via side effects already proven for `process`). Do not stub `process` solely to prove the call.
+   - Changes: extend `.init_with_program` context — after register, `program.commands[:"freeze-archives"].execute([], site_options(dir))` (or equivalent) against a temp site with CDX stub; assert freeze outcome via **file side effects** (archive token in post). `execute` discards `process`'s return value (`c.action` does not return the summary), so do not use the summary hash as oracle. Do not stub `process` solely to prove the call.
 
 4. **Verify coverage gate**
    - Files: none (verification)
@@ -83,6 +83,13 @@ No new technology - validation not required
 - [x] Implementation plan complete
 - [x] Technology validation complete
 - [x] Pre-Mortem complete
-- [ ] Preflight
+- [x] Preflight
 - [ ] Build
 - [ ] QA
+
+## Preflight Findings
+
+- PASS: TDD ordering is per-step (test additions before any production change); no change-detector docs tests scheduled
+- PASS: Extends existing freeze-archives specs; conventions match `systemPatterns.md`
+- PASS: Completeness — B1/B2/B3 map to the three uncovered lines and brief ACs
+- ADVISORY (incorporated): Mercenary `execute` discards `process` return value — B1 oracle must be file side effects

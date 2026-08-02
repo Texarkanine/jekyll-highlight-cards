@@ -27,3 +27,14 @@ Restore SimpleCov line coverage to 100% for the three freeze-archives lines left
     - B2 sentinel must differ from `"1"`; B3 through public `#insert`
 * Insights
     - C5 already covers ENV delete (nil) branch; only the restore-previous branch is missing
+
+## 2026-08-02 - PREFLIGHT - COMPLETE
+
+* Work completed
+    - Validated TDD encoding, conventions, completeness against freeze-archives specs and uncovered lines
+    - Amended B1: `execute` discards summary — file side-effect oracle required
+    - Wrote `.preflight-status` = PASS
+* Decisions made
+    - Proceed to build (L2 autonomous path)
+* Insights
+    - Coverage-only work still needs behavioral oracles; line hits alone are not the plan's success bar
