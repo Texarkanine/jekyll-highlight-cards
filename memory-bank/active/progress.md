@@ -185,3 +185,12 @@ Ship freeze-archives, then rework: add `highlight_cards.noarchive` regex list so
     - Unanchored by default is intentional; anchoring belongs in author patterns
 * Insights
     - Bare host fragments (e.g. `x\.com`) can substring-match other hosts (`notx.com`)
+
+## 2026-08-01 - ARCHIVE - IN-PROGRESS
+
+* Work completed
+    - Leaving REFLECT COMPLETE (rework); entering archive for freeze-archives + noarchive-config
+* Decisions made
+    - Archive both the L3 freeze-archives feature and the L2 noarchive rework when clearing the shared ephemeral bank
+* Insights
+    - Parent L3 was never archived (operator chose rework); clearing ephemerals requires inlining both reflections + creative docs
