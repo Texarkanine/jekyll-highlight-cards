@@ -164,6 +164,7 @@ RSpec.describe JekyllHighlightCards::Commands::FreezeArchives do
     end
 
     it "restores a pre-existing ARCHIVE_SAVE env value after --save" do
+      previous_save = ENV.fetch("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE", nil)
       ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE"] = "preexisting"
       begin
         Dir.mktmpdir do |dir|
@@ -179,7 +180,11 @@ RSpec.describe JekyllHighlightCards::Commands::FreezeArchives do
           expect(ENV.fetch("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE")).to eq("preexisting")
         end
       ensure
-        ENV.delete("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE")
+        if previous_save.nil?
+          ENV.delete("JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE")
+        else
+          ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE"] = previous_save
+        end
       end
     end
 
