@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v2.2.0...v3.0.0) (2026-08-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE no longer submits to SavePageNow when CDX already found a snapshot. Builds with SAVE=1 no longer re-archive every unfrozen URL on every run.
+
+### Bug Fixes
+
+* only SavePageNow on CDX miss [[#59](https://github.com/Texarkanine/jekyll-highlight-cards/issues/59)] ([#60](https://github.com/Texarkanine/jekyll-highlight-cards/issues/60)) ([013ab78](https://github.com/Texarkanine/jekyll-highlight-cards/commit/013ab78bfa1f01ecc063c2dbaf8f5c3cd9c318a2))
+
 ## [2.2.0](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v2.1.0...v2.2.0) (2026-08-02)
 
 
