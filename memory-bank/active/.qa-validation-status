@@ -1,0 +1,5 @@
+PASS
+
+Reviewed: 2026-08-11
+Scope: archive-save-only-on-cdx-miss (#59)
+Findings: Implementation meets the CDX-hit, CDX-miss, and SavePageNow-failure requirements; documentation and breaking-change metadata are aligned.

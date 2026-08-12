@@ -288,7 +288,7 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
       expect(helper.archive_url_for(test_url)).to be_nil
     end
 
-    it "falls back to the CDX lookup result when submission fails" do
+    it "does not submit when CDX already found a snapshot" do
       stub_request(:get, %r{web\.archive\.org/cdx/search/cdx})
         .to_return(
           status: 200,
@@ -296,9 +296,9 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
         )
 
       stub_request(:get, %r{web\.archive\.org/save/})
-        .to_return(status: 500, body: "Internal Server Error")
 
       expect(helper.archive_url_for(test_url)).to eq(archive_url)
+      expect(WebMock).not_to have_requested(:get, %r{web\.archive\.org/save/})
     end
   end
 
@@ -361,7 +361,7 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
       expect(helper.archive_url_for(test_url)).to be_nil
     end
 
-    context "when SavePageNow is enabled but submission fails" do
+    context "when SavePageNow is enabled and CDX finds a snapshot" do
       before do
         ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE"] = "1"
 
@@ -372,15 +372,15 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
           )
 
         stub_request(:get, %r{web\.archive\.org/save/})
-          .to_return(status: 500, body: "Internal Server Error")
       end
 
-      it "falls back to the CDX lookup result" do
+      it "returns the CDX snapshot without calling SavePageNow" do
         expect(helper.archive_url_for(test_url)).to eq(archive_url)
+        expect(WebMock).not_to have_requested(:get, %r{web\.archive\.org/save/})
       end
     end
 
-    context "when SavePageNow is enabled" do
+    context "when SavePageNow is enabled and CDX finds no snapshot" do
       before do
         ENV["JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE"] = "1"
 
@@ -409,6 +409,13 @@ RSpec.describe JekyllHighlightCards::ArchiveHelper do
 
         expect(WebMock).to have_requested(:get, %r{web\.archive\.org/cdx/search/cdx}).once
         expect(WebMock).to have_requested(:get, %r{web\.archive\.org/save/}).once
+      end
+
+      it "returns nil when SavePageNow fails after a CDX miss" do
+        stub_request(:get, %r{web\.archive\.org/save/})
+          .to_return(status: 500, body: "Internal Server Error")
+
+        expect(helper.archive_url_for(test_url)).to be_nil
       end
     end
 

@@ -31,7 +31,7 @@ module JekyllHighlightCards
       ArchiveHelper.archive_cache[url] ||= begin
         archive_url = lookup_archive(url)
 
-        archive_url = submit_archive(url) || archive_url if archive_save_enabled?
+        archive_url = submit_archive(url) if archive_url.nil? && archive_save_enabled?
 
         archive_url
       end
