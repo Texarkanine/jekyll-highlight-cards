@@ -17,3 +17,7 @@ With `JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE=1`, `ArchiveHelper#archive_url_for` al
 - `lib/jekyll-highlight-cards/archive_helper.rb`
 - `spec/jekyll_highlight_cards/archive_helper_spec.rb`
 - `README.md`
+
+### QA Results
+- ✅ PASS — `archive_url_for` returns the CDX snapshot without SavePageNow on a hit, submits only after a miss (including lookup failures, which return `nil`), and returns `nil` when that submission fails.
+- ✅ PASS — Focused specs cover the hit, miss, and miss-plus-failure behavior; the README and breaking commit metadata state the revised contract.

@@ -23,3 +23,13 @@ Fix `ARCHIVE_SAVE` so SavePageNow is only invoked on CDX miss (ensure archive ex
     - Shape: `submit_archive(url) if archive_url.nil? && archive_save_enabled?` (no `|| archive_url` fallback needed on the miss path)
 * Insights
     - Old “falls back to CDX when SAVE fails” specs assumed hit+always-submit; replaced with hit-skips-save assertions
+
+## 2026-08-11 - QA - COMPLETE (PASS)
+
+* Work completed
+    - Semantically reviewed the committed implementation, behavior specs, documentation, and release metadata against issue #59.
+    - Re-ran the full suite: 505 examples, 0 failures, 100% line coverage.
+* Decisions made
+    - Accepted the CDX-hit guard as the minimal implementation of the new SAVE contract.
+* Insights
+    - `lookup_archive` normalizes lookup failures to `nil`, so the guard intentionally submits on lookup failure when SAVE is enabled, matching the project brief.
