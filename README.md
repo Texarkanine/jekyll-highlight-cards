@@ -152,7 +152,7 @@ export JEKYLL_HIGHLIGHT_CARDS_ARCHIVE=1
 | Flag | Description |
 |------|-------------|
 | `JEKYLL_HIGHLIGHT_CARDS_ARCHIVE` | Enable build-time lookup to see if there is an IA snapshot available |
-| `JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE` | Also submit the URL to SavePageNow (runs even when CDX already found a snapshot) |
+| `JEKYLL_HIGHLIGHT_CARDS_ARCHIVE_SAVE` | On CDX miss, also submit the URL to SavePageNow (skipped when a snapshot already exists) |
 
 You can selectively skip archive attempts for URLs that match site-configured regexes. Patterns are matched against the full URL string; use anchors when needed.
 
