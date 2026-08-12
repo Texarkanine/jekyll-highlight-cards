@@ -1,14 +1,16 @@
 # Active Context
 
 **Current Task:** archive-save-only-on-cdx-miss (#59)
-**Phase:** COMPLEXITY-ANALYSIS - COMPLETE
+**Phase:** BUILD - COMPLETE
 **Complexity:** Level 1
 
 ## What Was Done
 
-- Intent clarified and approved: SAVE means ensure an archive exists, not re-submit every build.
-- Classified Level 1: bug fix in a single component (`ArchiveHelper`), plus docs/tests.
+- TDD: specs for SAVE-only-on-CDX-miss (hit skips SavePageNow; miss submits; miss+fail → nil).
+- Fixed `archive_url_for` to `submit_archive` only when lookup returns nil.
+- Updated README env-var wording.
+- Full suite: 505 examples, 0 failures, 100% line coverage.
 
 ## Next Step
 
-Load Level 1 workflow → Build phase.
+QA phase (subagent `/niko-qa`).
