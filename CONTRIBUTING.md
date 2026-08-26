@@ -1,4 +1,18 @@
-# Contributing to jekyll-highlight-cards
+# Contributing
+
+Want to contribute? We'd love to see it! Thoughtful issues and PRs that make the project better are enthusiastically welcomed here!
+
+## Issues
+
+Open an issue for a bug, an idea, or a question.
+
+## Pull requests
+
+1. Fork the repository. If you already have write access, a branch on the origin is fine.
+2. Open a pull request against `main` and fill in the pull request template.
+3. Title the PR as a [conventional commit](https://www.conventionalcommits.org/): `feat`, `fix`, or `chore`. This repository uses release-please: `feat` and `fix` cut a release; `chore` does not.
+
+Keep the change focused: one concern per pull request when practical.
 
 ## Development Setup
 
@@ -10,7 +24,7 @@
 ### Clone and Setup
 
 ```bash
-git clone https://github.com/texarkanine/jekyll-highlight-cards.git
+git clone https://github.com/Texarkanine/jekyll-highlight-cards.git
 cd jekyll-highlight-cards
 bundle install
 ```
@@ -150,24 +164,10 @@ This project follows Test-Driven Development:
 
 ### Adding Features
 
-1. Create feature branch: `git checkout -b feature/my-feature`
-2. Write tests in `spec/`
-3. Implement feature in `lib/`
-4. Run tests: `bundle exec rspec`
-5. Check style: `bundle exec rubocop`
-6. Commit with descriptive message
-7. Push and create pull request
-
-### Commit Messages
-
-Use conventional commit format:
-
-- `feat: Add new feature`
-- `fix: Fix bug in XYZ`
-- `docs: Update README`
-- `test: Add tests for ABC`
-- `refactor: Improve XYZ`
-- `style: Fix Rubocop issues`
+1. Write tests in `spec/`
+2. Implement the feature in `lib/`
+3. Run tests: `bundle exec rspec`
+4. Check style: `bundle exec rubocop`
 
 ## Testing Guidelines
 
@@ -188,7 +188,7 @@ RSpec.describe MyModule do
         # test code
       end
     end
-    
+
     context "with invalid input" do
       it "raises appropriate error" do
         # test code
@@ -253,7 +253,6 @@ If auto-correct doesn't work, manually fix reported issues.
 2. Verify all required files exist
 3. Check Ruby version compatibility
 
-## Questions?
+## License
 
-Open an issue on GitHub for questions, bug reports, or feature requests.
-
+By opening a pull request, you license your contribution under this repository's license, and you grant Texarkanine a perpetual, worldwide, non-exclusive right to relicense that contribution as part of this project under any [OSI-approved](https://opensource.org/licenses) license. You keep your copyright.
