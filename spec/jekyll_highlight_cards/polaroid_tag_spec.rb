@@ -860,7 +860,7 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
       expect(result).to include('target="_blank"')
     end
 
-    # rubocop:disable RSpec/ExampleLength, RSpec/MultipleExpectations -- observing all template locals for Mutant
+    # rubocop:disable-next RSpec/ExampleLength, RSpec/MultipleExpectations -- observing all template locals for Mutant
     it "passes raw template variables through to the template" do
       custom_dir = File.join("/tmp", "polaroid-vars-#{Process.pid}")
       template = <<~HTML
@@ -906,7 +906,6 @@ RSpec.describe JekyllHighlightCards::PolaroidTag do
         expect(result).to include('data-esc-archive="https://archive.org/x?q=&lt;d&gt;"')
       end
     end
-    # rubocop:enable RSpec/ExampleLength, RSpec/MultipleExpectations
 
     it "uses distinct escaped URLs when image, link, and image_link differ" do
       result = render_tag(

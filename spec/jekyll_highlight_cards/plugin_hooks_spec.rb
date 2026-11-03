@@ -4,7 +4,7 @@ require "spec_helper"
 
 # Observes the site :after_init hook registered in lib/jekyll-highlight-cards.rb
 # that appends the gem's _sass path to site.config["sass"]["load_paths"].
-RSpec.describe "JekyllHighlightCards Sass load path hook" do
+RSpec.describe JekyllHighlightCards do
   describe "site after_init registration" do
     it "appends the gem SASS_PATH to an empty sass load_paths list" do
       site = instance_double(Jekyll::Site, config: {})
