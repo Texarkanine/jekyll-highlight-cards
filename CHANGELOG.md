@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v3.0.0...v3.0.1) (2026-11-23)
+
+
+### Bug Fixes
+
+* **ci:** let the lockfile job commit inside the Ruby image ([#77](https://github.com/Texarkanine/jekyll-highlight-cards/issues/77)) ([3fbfc11](https://github.com/Texarkanine/jekyll-highlight-cards/commit/3fbfc11c0fd4dd220737eb631a6df7d3bd526d3c))
+
 ## [3.0.0](https://github.com/Texarkanine/jekyll-highlight-cards/compare/v2.2.0...v3.0.0) (2026-08-12)
 
 
